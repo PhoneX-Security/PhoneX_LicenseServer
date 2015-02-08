@@ -20,6 +20,8 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
+//Route::get('login', 'Auth\AuthController@getLogin');
+
 Route::get('test', function(){
 //	return 'test';
 	return \Phonex\User::all();

@@ -3,6 +3,7 @@
 use Phonex\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\Registrar;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
 class AuthController extends Controller {
@@ -48,6 +49,8 @@ class AuthController extends Controller {
 		]);
 
 		$credentials = $request->only('email', 'password');
+		// only with allowed access
+		$credentials['has_access'] = 1;
 
 		if ($this->auth->attempt($credentials, $request->has('remember')))
 		{
