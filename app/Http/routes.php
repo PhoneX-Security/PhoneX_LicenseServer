@@ -11,9 +11,12 @@
 |
 */
 
-Route::get('/', 'WelcomeController@index');
+use Phonex\User;
+
+//Route::get('/', 'WelcomeController@index');
 
 Route::get('home', 'HomeController@index');
+Route::get('/', 'HomeController@index');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
@@ -23,16 +26,18 @@ Route::controllers([
 Route::get('login', 'Auth\AuthController@getLogin');
 Route::get('logout', 'Auth\AuthController@getLogout');
 
-Route::get('test', function(){
+Route::resource('users', 'UserController');
+
+//Route::get('test', function(){
 //	return 'test';
-	return \Phonex\User::all();
-	//return View::make('test');
-
-
-//    dd('test');
-//    $hasher = new \Illuminate\Hashing\BcryptHasher();
-//
+//	return \Phonex\User::all();
+//return View::make('test');
+//	$hasher = new \Illuminate\Hashing\BcryptHasher();
+//    dd($hasher);
 //    $user = User::where('username', 'gorila')->first();
 //    $user->password = $hasher->make('buso');
+//	$user->has_access = true;
+//	$user->email = 'gorila@phone-x.net';
 //    $x = $user->save();
-});
+//	dd($x);
+//});
