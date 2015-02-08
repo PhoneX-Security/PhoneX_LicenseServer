@@ -8,6 +8,12 @@ use Phonex\User;
 
 class UserController extends Controller {
 
+
+	public function __construct()
+	{
+		$this->middleware('auth');
+	}
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -15,7 +21,8 @@ class UserController extends Controller {
 	 */
 	public function index()
 	{
-		$users = User::all();
+		$users = User::paginate(15);
+//		dd($users);
 		return view('user.index', ['users' => $users]);
 
 		//

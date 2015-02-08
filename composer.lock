@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "24b87f4cc74e0456230b7c4ea1b410ba",
+    "hash": "78a45007a641703ea606d83f1cbc3329",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -340,6 +340,52 @@
             "time": "2014-12-20 21:24:13"
         },
         {
+            "name": "illuminate/html",
+            "version": "v5.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/html.git",
+                "reference": "3d1009bb8e0f25720c914af5c1f4015dd373c9ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/html/zipball/3d1009bb8e0f25720c914af5c1f4015dd373c9ef",
+                "reference": "3d1009bb8e0f25720c914af5c1f4015dd373c9ef",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "~5.0",
+                "illuminate/session": "~5.0",
+                "illuminate/support": "~5.0",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\Html\\": ""
+                },
+                "files": [
+                    "helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylorotwell@gmail.com"
+                }
+            ],
+            "time": "2015-01-01 16:31:18"
+        },
+        {
             "name": "ircmaxell/password-compat",
             "version": "v1.0.4",
             "source": {
@@ -527,16 +573,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.0.0",
+            "version": "v5.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "44c61252b5762ff53ad181ed416e3006c50a6a9b"
+                "reference": "30391aa20874c30725f653bea1ea5b895a5217cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/44c61252b5762ff53ad181ed416e3006c50a6a9b",
-                "reference": "44c61252b5762ff53ad181ed416e3006c50a6a9b",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/30391aa20874c30725f653bea1ea5b895a5217cf",
+                "reference": "30391aa20874c30725f653bea1ea5b895a5217cf",
                 "shasum": ""
             },
             "require": {
@@ -648,7 +694,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2015-02-04 13:59:07"
+            "time": "2015-02-06 23:14:12"
         },
         {
             "name": "league/flysystem",

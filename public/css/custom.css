@@ -1,0 +1,5 @@
+/*https://stackoverflow.com/questions/20760047/bootstrap-caret-with-upside-down*/
+.caret.caret-reversed {
+    border-top-width: 0;
+    border-bottom: 4px solid #000000;
+}
