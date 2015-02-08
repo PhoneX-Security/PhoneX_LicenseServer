@@ -16,10 +16,20 @@ class CreateUsersTable extends Migration {
 		{
 			$table->increments('id');
 			$table->string('username');
-			$table->string('email')->unique();
+			$table->string('email')->unique()->nullable();
 			$table->string('password', 60);
 			$table->boolean('has_access')->default(false);
 			$table->rememberToken();
+			// kind of legacy attributes
+			$table->string('confirmEmail');
+			$table->string('confirmNonce', 100);
+			$table->boolean('confirmed');
+			$table->boolean('isTrial')->default(false);
+			$table->integer('trialNumber');
+			// foreign keys
+			$table->unsignedInteger('subscriber_id'); // referencing opensips db, table subscriber
+			$table->unsignedInteger('parent_id'); // self referencing
+
 			$table->timestamps();
 		});
 	}

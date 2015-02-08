@@ -20,7 +20,8 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
-//Route::get('login', 'Auth\AuthController@getLogin');
+Route::get('login', 'Auth\AuthController@getLogin');
+Route::get('logout', 'Auth\AuthController@getLogout');
 
 Route::get('test', function(){
 //	return 'test';
