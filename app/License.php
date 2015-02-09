@@ -1,7 +1,7 @@
 <?php namespace Phonex;
 
 use Illuminate\Database\Eloquent\Model;
-use Phonex\Utils\SortableTrait;
+//use Phonex\Utils\SortableTrait;
 
 
 class License extends Model{
@@ -17,6 +17,6 @@ class License extends Model{
 	}
 
 	public function licenseType() {
-		return $this->belongsTo('PhonexLicenseType', 'license_type_id');
+		return $this->belongsTo('Phonex\LicenseType', 'license_type_id');
 	}
 }

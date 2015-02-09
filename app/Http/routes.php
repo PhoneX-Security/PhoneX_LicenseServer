@@ -10,9 +10,6 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-
-use Phonex\User;
-
 //Route::get('/', 'WelcomeController@index');
 
 Route::get('home', 'HomeController@index');
@@ -26,7 +23,12 @@ Route::controllers([
 Route::get('login', 'Auth\AuthController@getLogin');
 Route::get('logout', 'Auth\AuthController@getLogout');
 
-Route::resource('users', 'UserController');
+// Authenticated pages
+Route::group(['middleware' => 'auth'], function() {
+	Route::resource('users', 'UserController', ['only' => ['index']]);
+	Route::resource('licenses', 'LicenseController', ['only' => ['index']]);
+});
+
 
 //Route::get('test', function(){
 //	return 'test';

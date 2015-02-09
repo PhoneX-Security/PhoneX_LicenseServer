@@ -1,25 +1,35 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Phonex\Http\Requests;
-use Phonex\User;
+use Phonex\License;
+use Phonex\Utils\InputGet;
 
-class UserController extends Controller {
+class LicenseController extends Controller {
 
 
-	public function __construct()
-	{
-		$this->middleware('auth');
-	}
 
 	/**
 	 * Display a listing of the resource.
 	 *
 	 * @return Response
 	 */
-	public function index()
-	{
-		$users = User::sortable()->paginate(15);
-		return view('user.index', ['users' => $users]);
+	public function index(){
+		$sortable = ['username', 'is_trial', 'license_type', 'active', 'starts_at', 'expires_at'];
+		$s = InputGet::get('s','licenses.id');
+		$o = InputGet::get('o', 'asc') == 'desc' ? 'desc' : 'asc';
+		if (!in_array($s, $sortable)){
+			$s = 'licenses.id';
+		}
+
+		$query = License::join('license_types', 'licenses.license_type_id', '=', 'license_types.id')
+			->join('users', 'licenses.user_id', '=', 'users.id')
+			->orderBy($s, $o)
+			->select(['users.username', 'license_types.name as license_type', 'license_types.is_trial', 'licenses.*',
+				\DB::raw('IF(expires_at IS NULL OR expires_at >= NOW(), 1, 0) as active')]); // Warning: MySQL specific syntax
+
+		$licenses = $query->paginate(15);
+//		dd($licenses[0]);
+		return view('license.index', ['licenses' => $licenses]);
 	}
 
 	/**

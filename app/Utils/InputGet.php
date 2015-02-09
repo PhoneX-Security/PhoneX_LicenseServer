@@ -12,6 +12,7 @@
  * Using late static binding here: http://php.net/manual/en/language.oop5.late-static-bindings.php
  * example: static::$type instead of self::$type - to be evaluated on runtime
  */
+
 class InputGet{
     protected static $type = INPUT_GET;
 
