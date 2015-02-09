@@ -146,9 +146,7 @@ return [
 		'Phonex\Providers\RouteServiceProvider',
 		'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
 		'Barryvdh\Debugbar\ServiceProvider',
-		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Html\HtmlServiceProvider',
-
 	],
 
 	/*
@@ -196,10 +194,12 @@ return [
 		'URL'       => 'Illuminate\Support\Facades\URL',
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
-		'Debugbar' => 'Barryvdh\Debugbar\Facade', // for logginga
-//		'Sortable' => '\Phonex\Utils\SortableTrait', // for logging
+
 		'HTML'      => 'Illuminate\Html\HtmlFacade',
-		'Form'      => 'Illuminate\Html\Facades\FormFacade',
+		'Form'      => 'Illuminate\Html\FormFacade',
+		'Debugbar' => 'Barryvdh\Debugbar\Facade', // for logging
+
+		'InputGet' => 'Phonex\Utils\InputGet'
 	],
 
 ];

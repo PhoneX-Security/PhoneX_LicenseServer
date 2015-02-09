@@ -26,6 +26,7 @@
 		<div class="col-sm-4">
 			<h3 style="margin-top: 0">Licenses</h3>
 		</div>
+
 		{{--<div class="col-sm-4 pull-right text-right center">--}}
 			{{--<a class="btn btn-sm btn-info view-btn-create" href="#">--}}
 				{{--<i class="fa fa-plus-circle"></i> New User--}}
@@ -40,29 +41,29 @@
 			<div class="panel-heading">
 				<div class="row">
 					<div class="col-xs-8 pull-left">
+						<form method="get" class="form-inline">
+							@if(\Request::has('o')) <input type="hidden" name="o" value="{{ InputGet::get('o') }}" /> @endif
+							@if(\Request::has('s')) <input type="hidden" name="s" value="{{ InputGet::get('s') }}" /> @endif
+							<div class="form-group">
+								<label class="col-md-1 control-label text-le">Filters:</label>
+							</div>
+							<div class="form-group">
+								<label class="checkbox-inline" for="checkboxes-0">
+									{!! Form::checkbox('active_only', '1', \Request::has('active_only'), ['id'=>'checkboxes-0']); !!}
+									Active only
+								</label>
 
-						<form style="margin: 0" class="form-horizontal">
-								<!-- Multiple Checkboxes (inline) -->
-								<div style="margin: 0" class="form-group">
-									<label style="padding-top: 0" class="col-md-1 control-label text-le" for="checkboxes">
-										Filters:
-									</label>
-									<div class="col-md-4">
-										<label style="padding-top: 0" class="checkbox-inline" for="checkboxes-0">
-											<input type="checkbox" name="checkboxes" id="checkboxes-0" value="1">
-											Active only
-										</label>
-										<label style="padding-top: 0" class="checkbox-inline" for="checkboxes-1">
-											<input type="checkbox" name="checkboxes" id="checkboxes-1" value="2">
-											Trial only
-										</label>
-									</div>
-								</div>
+								<label class="checkbox-inline" for="checkboxes-1">
+									{!! Form::checkbox('trial_only', '1', \Request::has('trial_only'), ['id'=>'checkboxes-1']); !!}
+									Trial only
+								</label>
+
+							</div>
+							<button type="submit" style="margin-left: 10px" class="btn btn-default">Submit</button>
 						</form>
-
 					</div>
 					<div class="text-right pull-right col-xs-2">
-						Total: {{ $licenses->total() }}
+						<span style="line-height: 38px">Total: {{ $licenses->total() }}</span>
 					</div>
 				</div>
 			</div>

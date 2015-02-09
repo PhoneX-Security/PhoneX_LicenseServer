@@ -14,6 +14,12 @@ class LicenseController extends Controller {
 	 * @return Response
 	 */
 	public function index(){
+		if (\Request::has('filters')){
+//			dd($_GET);
+//			dd(\Request::get('filters'));
+		}
+
+
 		$sortable = ['username', 'is_trial', 'license_type', 'active', 'starts_at', 'expires_at'];
 		$s = InputGet::get('s','licenses.id');
 		$o = InputGet::get('o', 'asc') == 'desc' ? 'desc' : 'asc';
@@ -26,6 +32,14 @@ class LicenseController extends Controller {
 			->orderBy($s, $o)
 			->select(['users.username', 'license_types.name as license_type', 'license_types.is_trial', 'licenses.*',
 				\DB::raw('IF(expires_at IS NULL OR expires_at >= NOW(), 1, 0) as active')]); // Warning: MySQL specific syntax
+
+		if (InputGet::has('active_only')){
+			$query = $query->whereRaw('( expires_at IS NULL OR expires_at >= NOW() )');
+
+		}
+		if (InputGet::has('trial_only')){
+			$query = $query->where('is_trial', 1);
+		}
 
 		$licenses = $query->paginate(15);
 //		dd($licenses[0]);
