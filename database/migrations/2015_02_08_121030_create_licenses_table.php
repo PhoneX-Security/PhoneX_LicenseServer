@@ -18,6 +18,7 @@ class CreateLicensesTable extends Migration {
 			$table->unsignedInteger('user_id');
 			$table->unsignedInteger('license_type_id');
 			$table->timestamps();
+			$table->boolean('is_activated')->default(false);
 			$table->timestamp('starts_at')->nullable();
 			$table->timestamp('expires_at')->nullable();
 			$table->text('comment');

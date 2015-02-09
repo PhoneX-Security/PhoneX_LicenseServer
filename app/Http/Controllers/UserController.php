@@ -5,6 +5,7 @@ use Phonex\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Phonex\User;
+use Phonex\Utils\InputGet;
 
 class UserController extends Controller {
 
@@ -21,11 +22,8 @@ class UserController extends Controller {
 	 */
 	public function index()
 	{
-		$users = User::paginate(15);
-//		dd($users);
+		$users = User::sortable()->paginate(15);
 		return view('user.index', ['users' => $users]);
-
-		//
 	}
 
 	/**

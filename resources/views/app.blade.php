@@ -30,13 +30,16 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#">PhoneX</a>
+				<a class="navbar-brand" style="margin-top: -5px" href="#">
+					<img alt="Brand" src="/img/icon2.png">
+				</a>
 			</div>
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<li><a href="/">Home</a></li>
 					<li><a href="/users">Users</a></li>
+					<li><a href="/licenses">Licenses</a></li>
 				</ul>
 
 				<ul class="nav navbar-nav navbar-right">

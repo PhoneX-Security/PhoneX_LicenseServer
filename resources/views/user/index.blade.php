@@ -67,7 +67,7 @@
 			<div class="panel-heading">
 				<div class="row">
 					<div class="col-xs-2">[Filters to add]</div>
-					<div class="text-right pull-right col-xs-2">Total: 25</div>
+					<div class="text-right pull-right col-xs-2">Total: {{ $users->total() }}</div>
 				</div>
 			</div>
 			<table class="table table-condensed">
@@ -96,8 +96,8 @@
 
 						<td class="text-center">
 							<div class="btn-group  btn-group-xs">
-								<a type="button" class="btn btn-info   view-btn-edit" href="http://demo.lavalite.org/admin/user/group/1/edit" title="Update group"><i class="fa fa-pencil-square-o"></i></a>
-								<a type="button" class="btn btn-danger action_confirm   view-btn-delete" data-method="delete" href="http://demo.lavalite.org/admin/user/group/1" title="Delete group"><i class="fa fa-times-circle-o"></i></a>
+								<a type="button" class="btn btn-info   view-btn-edit" href="#" title="Edit"><i class="fa fa-pencil-square-o"></i></a>
+								<a type="button" class="btn btn-danger action_confirm   view-btn-delete" data-method="delete" href="#" title="Delete user"><i class="fa fa-times-circle-o"></i></a>
 							</div>
 						</td>
 					</tr>
@@ -107,7 +107,7 @@
 
 		</div>
 		<div class="text-center">
-			{!! $users->render(); !!}
+			{!! $users->appends(Request::except('page'))->render(); !!}
 		</div>
 </section>
 
