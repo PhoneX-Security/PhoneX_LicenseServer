@@ -25,7 +25,8 @@ Route::get('logout', 'Auth\AuthController@getLogout');
 
 // Authenticated pages
 Route::group(['middleware' => 'auth'], function() {
-	Route::resource('users', 'UserController', ['only' => ['index']]);
+	Route::resource('users', 'UserController');
+//	Route::resource('users', 'UserController', ['only' => ['index']]);
 	Route::resource('licenses', 'LicenseController', ['only' => ['index']]);
 });
 

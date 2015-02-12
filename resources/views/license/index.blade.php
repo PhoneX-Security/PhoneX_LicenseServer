@@ -6,7 +6,7 @@
 	<div class="row">
 	<h1>
 		Licenses
-		<small> Index</small>
+		<small>Manage licenses</small>
 	</h1>
 	</div>
 
@@ -59,11 +59,11 @@
 								</label>
 
 							</div>
-							<button type="submit" style="margin-left: 10px" class="btn btn-default">Submit</button>
+							<button type="submit" style="margin-left: 10px; padding: 2px 10px" class="btn btn-default">Submit</button>
 						</form>
 					</div>
 					<div class="text-right pull-right col-xs-2">
-						<span style="line-height: 38px">Total: {{ $licenses->total() }}</span>
+						<span >Total: {{ $licenses->total() }}</span>
 					</div>
 				</div>
 			</div>
@@ -84,8 +84,8 @@
 						<td>{{ $lic->license_type }}</td>
 						<td>@if($lic->is_trial) Yes @else No @endif</td>
 						<td>@if($lic->active) Yes @else No @endif</td>
-						<td>{{ $lic->starts_at }}</td>
-						<td>{{ $lic->expires_at }}</td>
+						<td>{{ $lic->formatted_starts_at}}</td>
+						<td>{{ $lic->formatted_expires_at }}</td>
 						<td>TODO</td>
 					</tr>
 				@endforeach

@@ -1,5 +1,6 @@
 <?php namespace Phonex\Http\Controllers;
 
+use Carbon\Carbon;
 use Phonex\Http\Requests;
 use Phonex\License;
 use Phonex\Utils\InputGet;
@@ -18,7 +19,6 @@ class LicenseController extends Controller {
 //			dd($_GET);
 //			dd(\Request::get('filters'));
 		}
-
 
 		$sortable = ['username', 'is_trial', 'license_type', 'active', 'starts_at', 'expires_at'];
 		$s = InputGet::get('s','licenses.id');
@@ -42,7 +42,15 @@ class LicenseController extends Controller {
 		}
 
 		$licenses = $query->paginate(15);
-//		dd($licenses[0]);
+
+		foreach ($licenses as $v){
+			if ($v->starts_at){
+				$v->formatted_starts_at = Carbon::parse($v->starts_at)->format('Y-m-d');
+			}
+			if ($v->expires_at) {
+				$v->formatted_expires_at = Carbon::parse($v->expires_at)->format('Y-m-d');
+			}
+		}
 		return view('license.index', ['licenses' => $licenses]);
 	}
 

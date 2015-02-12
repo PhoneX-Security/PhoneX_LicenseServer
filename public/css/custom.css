@@ -7,3 +7,22 @@
 .padding-0 {
     padding: 0;
 }
+
+.phonex-table-sortable th a,.phonex-table-sortable th a:hover {
+    color: #333;
+}
+
+.phonex-table-div {
+    display: table;
+    width: 100%;
+}
+.phonex-table-div .left-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+.phonex-table-div .right-cell {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: right;
+}
+

@@ -19,7 +19,7 @@ class UserController extends Controller {
 	public function index()
 	{
 		$users = User::sortable()->paginate(15);
-		return view('user.index', ['users' => $users]);
+		return view('user.index', compact('users'));
 	}
 
 	/**
@@ -29,7 +29,8 @@ class UserController extends Controller {
 	 */
 	public function create()
 	{
-		//
+		return view('user.create');
+
 	}
 
 	/**
