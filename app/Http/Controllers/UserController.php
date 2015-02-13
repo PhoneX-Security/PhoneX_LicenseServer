@@ -1,6 +1,7 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Phonex\Http\Requests;
+use Phonex\LicenseType;
 use Phonex\User;
 
 class UserController extends Controller {
@@ -8,7 +9,7 @@ class UserController extends Controller {
 
 	public function __construct()
 	{
-		$this->middleware('auth');
+//		$this->middleware('auth');
 	}
 
 	/**
@@ -29,7 +30,12 @@ class UserController extends Controller {
 	 */
 	public function create()
 	{
-		return view('user.create');
+
+		$licenseTypes = LicenseType::all();
+//		dd($licenseTypes);
+
+
+		return view('user.create', compact('licenseTypes'));
 
 	}
 
@@ -40,7 +46,9 @@ class UserController extends Controller {
 	 */
 	public function store()
 	{
-		//
+		$user = new User();
+		$user->fill(\Input::all());
+		dd($user);
 	}
 
 	/**

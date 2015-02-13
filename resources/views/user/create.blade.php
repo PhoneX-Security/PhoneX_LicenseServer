@@ -34,34 +34,21 @@
 						<i class="fa fa-angle-left"></i> Back
 					</a>
 
-					{{--<button class="btn btn-small"><i class="icon-pencil"></i> Edit</button>--}}
 				</div>
 			</div>
 
-			{{--<!-- Nav tabs -->--}}
-			{{--<ul class="nav nav-tabs" role="tablist">--}}
-				{{--<li class="active"><a href="#home" role="tab" data-toggle="tab">Home</a></li>--}}
-				{{--<li><a href="#profile" role="tab" data-toggle="tab">Profile</a></li>--}}
-				{{--<li><a href="#messages" role="tab" data-toggle="tab">Messages</a></li>--}}
-				{{--<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>--}}
-			{{--</ul>--}}
-
-			{{--<!-- Tab panes -->--}}
-			{{--<div class="tab-content">--}}
-				{{--<div class="tab-pane active" id="home">A</div>--}}
-				{{--<div class="tab-pane" id="profile">B</div>--}}
-				{{--<div class="tab-pane" id="messages">C</div>--}}
-				{{--<div class="tab-pane" id="settings">D</div>--}}
-			{{--</div>--}}
-
 			<div class="panel panel-default">
 				<div class="panel-body">
-					<div class="box-body">
+
+					<form  role="form" method="POST" action="/users">
+						<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+						<h4>Details</h4>
 
 						<div class="row">
 							<div class="col-md-6 ">
 								<div class="form-group"><label for="username" class="control-label">Username</label>
-									<input class="form-control" placeholder="Enter username" id="username" type="text" name="username">
+									<input class="form-control" value="{{ old('username') }}" placeholder="Enter username" id="username" type="text" name="username">
 									<span class="help-block">Username serves as an login into PhoneX application.</span>
 								</div>
 							</div>
@@ -70,24 +57,54 @@
 						<div class="row">
 							<div class="col-md-6 ">
 								<div class="form-group"><label for="email" class="control-label">E-mail Address</label>
-									<input class="form-control" placeholder="Enter E-mail Address in format username@phone-x.net" id="email" type="email" name="email">
+									<input class="form-control" value="{{ old('email') }}" placeholder="Enter E-mail Address in format username@phone-x.net" id="email" type="email" name="email">
 
 								</div>
 							</div>
 						</div>
 
-						{{--<div class="row">--}}
-						{{--<div class="col-md-6 ">--}}
-								{{--<div class="form-group"><label for="first_name" class="control-label">First Name</label><input class="form-control" placeholder="Enter First Name" id="first_name" type="text" name="first_name"></div>--}}
-							{{--</div>--}}
-							{{--<div class="col-md-6 ">--}}
-								{{--<div class="form-group"><label for="last_name" class="control-label">Last Name</label><input class="form-control" placeholder="Enter Last Name" id="last_name" type="text" name="last_name"></div>--}}
-							{{--</div>--}}
-						{{--</div>--}}
+						<h4>License</h4>
 
 						<div class="checkbox">
 							<label>
-								<input id="users_create_has_access" type="checkbox"> Give admin access
+								<input id="users_create_issue_license" name="issue_license" @if(old('issue_license')) checked @endif type="checkbox"> Issue license
+							</label>
+						</div>
+
+						<div class="form-group">
+							<div class="row">
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="starts_at" class="control-label">Start date</label>
+										<div class="input-group date">
+											<input type="text" name="starts_at" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<label for="password" class="control-label">Type</label>
+									<select class="form-control">
+										@foreach($licenseTypes as $type)
+											<option>{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
+										@endforeach
+									</select>
+								</div>
+
+								<div class="col-md-6 ">
+									<div class="form-group"><label for="opensips_password" class="control-label">PhoneX app default password</label>
+										<input class="form-control" value="{{ old('opensips_password') }}" id="opensips_password" type="text" name="opensips_password">
+										<span class="help-block">Password will be changed on first login.</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<h4>Access</h4>
+
+						<div class="checkbox">
+							<label>
+								<input id="users_create_has_access" name="has_access" @if(old('has_access')) checked @endif type="checkbox"> Give admin access
 							</label>
 						</div>
 
@@ -95,7 +112,7 @@
 							<div class="col-md-6 ">
 								<div class="form-group">
 									<label for="password" class="control-label">Password</label>
-									<input class="form-control" placeholder="Enter Password" id="users_create_password" type="password" name="password" disabled>
+									<input class="form-control" placeholder="Enter Password" id="users_create_password" type="password" name="password">
 								</div>
 							</div>
 							<div class="col-md-6 ">
@@ -106,12 +123,16 @@
 							</div>
 						</div>
 
-					</div>
+						{{--<hr />--}}
+
+
+
 					<div class="row">
 						<div class="col-md-12">
 							<div><input class="btn-large btn-primary btn" type="submit" value="Submit"> <input class="btn-large btn-default btn" type="reset" value="Reset"></div>
 						</div>
 					</div>
+					</form>
 				</div>
 			</div>
 		</div>
