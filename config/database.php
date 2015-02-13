@@ -64,6 +64,18 @@ return [
 			'strict'    => false,
 		],
 
+		'mysql_opensips' => [
+			'driver'    => 'mysql',
+			'host'      => env('OPENSIPS_DB_HOST'),
+			'database'  => env('OPENSIPS_DB_DATABASE'),
+			'username'  => env('OPENSIPS_DB_USERNAME'),
+			'password'  => 'DzSpf8s8KC7RDb3b',
+			'charset'   => 'utf8',
+			'collation' => 'utf8_unicode_ci',
+			'prefix'    => '',
+			'strict'    => false,
+		],
+
 		'pgsql' => [
 			'driver'   => 'pgsql',
 			'host'     => env('DB_HOST', 'localhost'),
