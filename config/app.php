@@ -199,7 +199,8 @@ return [
 		'Form'      => 'Illuminate\Html\FormFacade',
 		'Debugbar' => 'Barryvdh\Debugbar\Facade', // for logging
 
-		'InputGet' => 'Phonex\Utils\InputGet'
+		'InputGet' => 'Phonex\Utils\InputGet',
+		'InputPost' => 'Phonex\Utils\InputPost'
 	],
 
 ];

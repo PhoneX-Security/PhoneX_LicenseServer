@@ -15,7 +15,8 @@ $readyFn = function(){
 
 
     $('.input-group.date').datepicker({
-
+        format: "dd-mm-yyyy",
+        language: "en-GB"
     });
 
 
@@ -34,6 +35,47 @@ $readyFn = function(){
     //});
 };
 
+$initDatePicker = function(e){
+    alert('x');
+}
+
+$initDatePickerLangs = function(){
+    //https://eternicode.github.io/bootstrap-datepicker/
+    $.fn.datepicker.dates['en-GB'] = {
+            days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            daysMin: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+            months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            today: "Today",
+            clear: "Clear",
+            weekStart: 1,
+            format: "dd/mm/yyyy"
+        };
+    $.fn.datepicker.dates['cs'] = {
+        days: ["Neděle", "Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"],
+        daysShort: ["Ned", "Pon", "Úte", "Stř", "Čtv", "Pát", "Sob", "Ned"],
+        daysMin: ["Ne", "Po", "Út", "St", "Čt", "Pá", "So", "Ne"],
+        months: ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"],
+        monthsShort: ["Led", "Úno", "Bře", "Dub", "Kvě", "Čer", "Čnc", "Srp", "Zář", "Říj", "Lis", "Pro"],
+        today: "Dnes",
+        clear: "Vymazat",
+        weekStart: 1,
+        format: "d.m.yyyy"
+    };
+    $.fn.datepicker.dates["sk"] = {
+        days: ["Nedeľa", "Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota", "Nedeľa"],
+        daysShort: ["Ned", "Pon", "Uto", "Str", "Štv", "Pia", "Sob", "Ned"],
+        daysMin: ["Ne", "Po", "Ut", "St", "Št", "Pia", "So", "Ne"],
+        months: ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"],
+        monthsShort: ["Jan", "Feb", "Mar", "Apr", "Máj", "Jún", "Júl", "Aug", "Sep", "Okt", "Nov", "Dec"],
+        today: "Dnes"
+    };
+
+
+}
+
 $(document).ready(function(){
+    $initDatePickerLangs();
     $readyFn();
 });

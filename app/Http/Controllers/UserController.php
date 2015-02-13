@@ -1,8 +1,12 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Phonex\Http\Requests;
+use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\LicenseType;
 use Phonex\User;
+use Phonex\Utils\InputGet;
+use Phonex\Utils\InputPost;
+use Redirect;
 
 class UserController extends Controller {
 
@@ -44,11 +48,27 @@ class UserController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(CreateUserRequest $request)
 	{
+		// all data should be valid at the moment (see @CreateUserRequest#rules)
 		$user = new User();
-		$user->fill(\Input::all());
-		dd($user);
+		$user->username = InputPost::get('username');
+		$user->email = InputPost::get('email');
+		if (InputPost::has('has_access')){
+			$user->password = bcrypt(InputPost::get('password'));
+			$user->has_access = 1;
+		} else {
+			$user->has_access = 0;
+		}
+		$user->save();
+
+		// store license
+		if (InputPost::has('issue_license')){
+
+		}
+
+		return Redirect::route('users.index')
+			->with('success', 'The new user ' . $user->username . ' has been created.');
 	}
 
 	/**

@@ -7,6 +7,12 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Phonex\Utils\SortableTrait;
 
+/**
+ * @property bool|mixed email
+ * @property bool|mixed username
+ * @property string password
+ * @property int has_access
+ */
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract {
 	use Authenticatable, CanResetPassword, SortableTrait;
 

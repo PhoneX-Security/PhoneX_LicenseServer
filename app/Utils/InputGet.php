@@ -35,6 +35,3 @@ class InputGet{
     }
 }
 
-class InputPost extends InputGet {
-    protected static $type = INPUT_POST;
-}
