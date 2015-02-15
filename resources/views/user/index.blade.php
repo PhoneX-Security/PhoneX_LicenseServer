@@ -20,12 +20,7 @@
 
 	<section class="content">
 
-	@if(Session::has('success'))
-		<div class="alert alert-success alert-dismissable" role="alert">
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			<strong>Success!</strong> {{ Session::get('success') }}
-		</div>
-	@endif
+    @include('errors.notifications')
 
 	<div class="row">
 		<div class="col-sm-12">
@@ -56,7 +51,7 @@
 				</div>
 				<table class="table table-condensed phonex-table-sortable">
 					<tr>
-						<th>{!! link_to_sort('id', 'ID') !!}</th>
+						<th class="text-center">{!! link_to_sort('id', 'ID') !!}</th>
 						<th>{!! link_to_sort('username', 'Username') !!}</th>
 						<th>{!! link_to_sort('email', 'E-mail') !!}</th>
 						<th>{!! link_to_sort('has_access', 'Has access') !!}</th>
@@ -66,7 +61,7 @@
 					@foreach($users as $user)
 						<tr>
 
-							<td>{{ $user->id }}</td>
+							<td class="text-center">{{ $user->id }}</td>
 							<td>
 
                                 <a href="{{ \URL::route('users.show', [ $user->id ]) }}">{{ $user->username }}</a>

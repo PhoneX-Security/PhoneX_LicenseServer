@@ -33,7 +33,7 @@
 					<a class="btn btn-sm btn-primary view-btn-create" href="/users">
 						<i class="fa fa-angle-left"></i> Back
 					</a>
-                    <a class="btn btn-sm btn-primary" href="/users">
+                    <a class="btn btn-sm btn-primary" href="{{ \URL::route('users.edit', [$user->id]) }}">
                         <i class="fa fa-edit"></i> Edit
                     </a>
                     <a class="btn btn-sm btn-primary" href="/users">
@@ -46,9 +46,9 @@
 			<div class="panel panel-default">
 				<div class="panel-body">
 
-						{{--<h4>Details</h4>--}}
+                    @include('errors.notifications')
 
-
+					{{--<h4>Details</h4>--}}
 
                     <div class="" role="tabpanel" >
                         <div class="row" style="margin-bottom: 15px">
@@ -125,8 +125,13 @@
                                             <td>@if($license->active) Yes @else No @endif</td>
                                             <td>{{ date_simple($license->starts_at) }}</td>
                                             <td>{{ date_simple($license->expires_at) }}</td>
-                                            <td>TODO</td>
-                                            <td>TODO</td>
+                                            <td>{{ $license->comment }}</td>
+                                            <td>
+                                                {{--class="text-center"--}}
+                                                <div class="btn-group  btn-group-xs">
+                                                    <a type="button" class="btn btn-info   view-btn-edit" href="#" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>
+                                                </div>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </table>

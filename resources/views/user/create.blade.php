@@ -39,7 +39,7 @@
 
 			<div class="panel panel-default">
 				<div class="panel-body">
-					@include('errors.form_error')
+					@include('errors.notifications')
 
 					<form  role="form" method="POST" action="/users">
 						<input type="hidden" name="_token" value="{{ csrf_token() }}">
