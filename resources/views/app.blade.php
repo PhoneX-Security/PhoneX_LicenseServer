@@ -41,8 +41,8 @@
 					<span class="icon-bar"></span>
 				</button>
 				<a class="navbar-brand" style="margin-top: -5px;" href="/">
-					<img alt="Brand" src="/img/icon2.png">
-                    License Server
+					<img alt="Brand" src="/img/icon2.png" style="display:inline">
+                    License Server {{ Config::get('app.version_name') }}
 				</a>
 			</div>
 

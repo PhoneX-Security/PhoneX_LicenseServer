@@ -30,13 +30,6 @@
                         <i class="fa fa-angle-left"></i> Back to licenses
                     </a>
 
-					{{--<a class="btn btn-sm btn-primary view-btn-create" href="{{ \URL::route('users.show', [$user->id]) }}">--}}
-						{{--<i class="fa fa-close"></i> Cancel editing--}}
-					{{--</a>--}}
-                    {{--<a class="btn btn-sm btn-primary" href="/users">--}}
-                        {{--<i class="fa fa-edit"></i> Issue license--}}
-                    {{--</a>--}}
-
 				</div>
 			</div>
 
