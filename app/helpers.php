@@ -1,4 +1,5 @@
 <?php
+use Carbon\Carbon;
 
 /**
  * @param $type
@@ -40,3 +41,14 @@ function link_to_sort($col, $title = null){
     $parameters = array_merge(Input::except(['page']), array('s' => $col, 'o' => (\Request::get('o') === 'asc' ? 'desc' : 'asc')));
     return link_to_route(Route::currentRouteName(), $title, $parameters) . $indicator;
 }
+
+if (!function_exists('date_simple')){
+    function date_simple($datetime){
+        if (!$datetime){
+            return '';
+        } else {
+            return Carbon::parse($datetime)->format('d.m.Y');
+        }
+    }
+}
+

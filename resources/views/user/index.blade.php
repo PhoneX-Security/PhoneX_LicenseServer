@@ -31,7 +31,7 @@
 		<div class="col-sm-12">
 			<div style="margin-bottom: 10px">
 				<form class="form-inline">
-					<a class="btn btn-sm btn-info view-btn-create" href="/users/create">
+					<a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
 						<i class="fa fa-plus-circle"></i> New User
 					</a>
 
@@ -67,7 +67,10 @@
 						<tr>
 
 							<td>{{ $user->id }}</td>
-							<td><a href="#">{{ $user->username }}</a></td>
+							<td>
+
+                                <a href="{{ \URL::route('users.show', [ $user->id ]) }}">{{ $user->username }}</a>
+                            </td>
 							<td>{{ $user->email or '' }}</td>
 							<td>@if($user->has_access) Yes @else No @endif</td>
 

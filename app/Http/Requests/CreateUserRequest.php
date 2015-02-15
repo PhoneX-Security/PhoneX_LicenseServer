@@ -23,7 +23,7 @@ class CreateUserRequest extends Request {
 	{
 		return [
 			'username' => 'required|max:255|unique:users',
-			'email' => 'required|email|max:255|unique:users',
+//			'email' => 'required|email|max:255|unique:users',
 			// giving access
 			'password' => 'confirmed|min:8|max:255|required_with:has_access',
 			// giving license

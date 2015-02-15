@@ -1,5 +1,6 @@
 <?php namespace Phonex\Http\Controllers;
 
+use Carbon\Carbon;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\LicenseType;
@@ -7,40 +8,28 @@ use Phonex\User;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
 use Redirect;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller {
 
 
 	public function __construct()
 	{
+		// Automatically added in routes.php
 //		$this->middleware('auth');
 	}
 
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
+
 	public function index()
 	{
 		$users = User::sortable()->paginate(15);
 		return view('user.index', compact('users'));
 	}
 
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
 	public function create()
 	{
-
 		$licenseTypes = LicenseType::all();
-//		dd($licenseTypes);
-
-
 		return view('user.create', compact('licenseTypes'));
-
 	}
 
 	/**
@@ -53,7 +42,7 @@ class UserController extends Controller {
 		// all data should be valid at the moment (see @CreateUserRequest#rules)
 		$user = new User();
 		$user->username = InputPost::get('username');
-		$user->email = InputPost::get('email');
+		$user->email = $user->username . "@phone-x.net"; //InputPost::get('email');
 		if (InputPost::has('has_access')){
 			$user->password = bcrypt(InputPost::get('password'));
 			$user->has_access = 1;
@@ -79,7 +68,22 @@ class UserController extends Controller {
 	 */
 	public function show($id)
 	{
-		//
+//		$user = User::find($id);
+        // Dot is used for nested loading
+		$user = User::with('licenses.licenseType')->find($id);
+		if ($user == null){
+			throw new NotFoundHttpException;
+		}
+
+        foreach($user->licenses as $license){
+            if (!$license->expires_at || Carbon::now()->gt(Carbon::parse($license->expires_at))) {
+                $license->active = false;
+            } else {
+                $license->active = true;
+            }
+        }
+
+		return view('user.show', compact('user'));
 	}
 
 	/**

@@ -30,7 +30,7 @@
 				</div>
 				<div class="right-cell">
 
-					<a class="btn btn-sm btn-info view-btn-create" href="/users">
+					<a class="btn btn-sm btn-primary view-btn-create" href="/users">
 						<i class="fa fa-angle-left"></i> Back
 					</a>
 
@@ -39,16 +39,7 @@
 
 			<div class="panel panel-default">
 				<div class="panel-body">
-					@if (count($errors) > 0)
-						<div class="alert alert-danger">
-							<strong>No!</strong> There were some problems with your input.<br><br>
-							<ul>
-								@foreach ($errors->all() as $error)
-									<li>{{ $error }}</li>
-								@endforeach
-							</ul>
-						</div>
-					@endif
+					@include('errors.form_error')
 
 					<form  role="form" method="POST" action="/users">
 						<input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -64,16 +55,14 @@
 							</div>
 						</div>
 
-						<div class="row">
-							<div class="col-md-6 ">
-								<div class="form-group"><label for="email" class="control-label">E-mail Address*</label>
-									<input class="form-control" required value="{{ old('email') }}" placeholder="Enter E-mail Address in format username@phone-x.net" id="email" type="email" name="email">
+						{{--<div class="row">--}}
+							{{--<div class="col-md-6 ">--}}
+								{{--<div class="form-group"><label for="email" class="control-label">E-mail Address*</label>--}}
+									{{--<input class="form-control" required value="{{ old('email') }}" placeholder="Enter E-mail Address in format username@phone-x.net" id="email" type="email" name="email">--}}
 
-								</div>
-							</div>
-						</div>
-
-
+								{{--</div>--}}
+							{{--</div>--}}
+						{{--</div>--}}
 
 						<h4>Access</h4>
 						<div class="panel panel-default">
