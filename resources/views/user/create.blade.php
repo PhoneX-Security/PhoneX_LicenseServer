@@ -11,10 +11,7 @@
 					Users
 					{{--<small>New user</small>--}}
 				</h1>
-				<ol class="breadcrumb">
-					<li><a href="#"><i class="fa fa-home"></i> Home </a></li>
-					<li class="active">Users</li>
-				</ol>
+                @include('navigation.breadcrumb')
 			</div>
 		</div>
 	</section>
@@ -130,11 +127,22 @@
 									</div>
 								</div>
 
+                                <div class="row">
+                                    <div class="col-md-6 ">
+                                        <div class="form-group">
+                                            <label for="password" class="control-label">Issuer (username)</label>
+                                            <input class="form-control" value="{{ old('issuer_username', Auth::user()->username) }}"
+                                                   placeholder="Enter username" id="issuer_username" type="text" name="issuer_username">
+                                            <span class="help-block">By default current user.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
 								<div class="row">
 									<div class="col-md-6 ">
 										<div class="form-group">
 											<label for="password" class="control-label">License notes</label>
-											<textarea class="form-control" rows="3"></textarea>
+											<textarea name="comment" class="form-control" rows="3"></textarea>
 										</div>
 									</div>
 								</div>

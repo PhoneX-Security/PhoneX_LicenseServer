@@ -12,6 +12,10 @@
     color: #333;
 }
 
+.phonex-table-sortable tr th:first-child,.phonex-table-sortable tr td:first-child {
+    padding-left: 15px;
+}
+
 .phonex-table-div {
     display: table;
     width: 100%;

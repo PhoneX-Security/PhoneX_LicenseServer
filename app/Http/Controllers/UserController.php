@@ -54,6 +54,7 @@ class UserController extends Controller {
 
 		// store license
 		if (InputPost::has('issue_license')){
+            // TODO
 
 		}
 

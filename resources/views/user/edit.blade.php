@@ -11,10 +11,7 @@
 					Users
 					{{--<small>New user</small>--}}
 				</h1>
-				<ol class="breadcrumb">
-					<li><a href="#"><i class="fa fa-home"></i> Home </a></li>
-					<li class="active">Users</li>
-				</ol>
+                @include('navigation.breadcrumb')
 			</div>
 		</div>
 	</section>

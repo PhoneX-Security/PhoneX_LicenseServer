@@ -1,118 +1,113 @@
 @extends('app')
 
 @section('content')
+
 <div class="container">
-<section class="content-header">
-	<div class="row">
-	<h1>
-		Licenses
-		<small>Manage licenses</small>
-	</h1>
-	</div>
+    <section class="content-header">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>
+                    Licenses
+                    <small>Manage</small>
+                </h1>
+                @include('navigation.breadcrumb')
+            </div>
+        </div>
+    </section>
 
-	<div class="row">
+    <section class="content">
 
-		<ol class="breadcrumb">
-			<li><a href="#"><i class="fa fa-dashboard"></i> Home </a></li>
-			<li class="active">Licenses</li>
-		</ol>
+        @include('errors.notifications')
 
-	</div>
-</section>
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="margin-bottom: 10px">
+                    <form class="form-inline">
+                        {{--<a class="btn btn-sm btn-primary view-btn-create" href="/users/create">--}}
+                            {{--<i class="fa fa-plus-circle"></i> New User--}}
+                        {{--</a>--}}
 
-<section class="content">    <!-- Success-Messages -->
+                        <form class="form-horizontal" style="width: 10%" action="#" method="get">
 
-	<div class="row">
-		<div class="col-sm-4">
-			<h3 style="margin-top: 0">Licenses</h3>
-		</div>
+                            <div class="input-group">
+                                <input type="search" class="form-control input-sm" name="q" value="" placeholder="Search">
+                                <span class="input-group-btn">
+                                    <button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
+                                </span>
+                            </div>
+                        </form>
+                    </form>
+                </div>
 
-		{{--<div class="col-sm-4 pull-right text-right center">--}}
-			{{--<a class="btn btn-sm btn-info view-btn-create" href="#">--}}
-				{{--<i class="fa fa-plus-circle"></i> New User--}}
-			{{--</a>--}}
-		{{--</div>--}}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
 
-	</div><!-- /.box-header -->
+                            <div class="col-xs-8 pull-left">
+                                <form method="get" class="form-inline">
+                                    @if(\Request::has('o')) <input type="hidden" name="o" value="{{ InputGet::get('o') }}" /> @endif
+                                    @if(\Request::has('s')) <input type="hidden" name="s" value="{{ InputGet::get('s') }}" /> @endif
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label text-le">Filters:</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="checkbox-inline" for="checkboxes-0">
+                                            {!! Form::checkbox('active_only', '1', \Request::has('active_only'), ['id'=>'checkboxes-0']); !!}
+                                            Active only
+                                        </label>
 
+                                        <label class="checkbox-inline" for="checkboxes-1">
+                                            {!! Form::checkbox('trial_only', '1', \Request::has('trial_only'), ['id'=>'checkboxes-1']); !!}
+                                            Trial only
+                                        </label>
 
+                                    </div>
+                                    <button type="submit" style="margin-left: 10px; padding: 2px 10px" class="btn btn-default">Submit</button>
+                                </form>
+                            </div>
 
-	<div class="row panel panel-default">
-			<div class="panel-heading">
-				<div class="row">
-					<div class="col-xs-8 pull-left">
-						<form method="get" class="form-inline">
-							@if(\Request::has('o')) <input type="hidden" name="o" value="{{ InputGet::get('o') }}" /> @endif
-							@if(\Request::has('s')) <input type="hidden" name="s" value="{{ InputGet::get('s') }}" /> @endif
-							<div class="form-group">
-								<label class="col-md-1 control-label text-le">Filters:</label>
-							</div>
-							<div class="form-group">
-								<label class="checkbox-inline" for="checkboxes-0">
-									{!! Form::checkbox('active_only', '1', \Request::has('active_only'), ['id'=>'checkboxes-0']); !!}
-									Active only
-								</label>
+                            <div class="text-right pull-right col-xs-2">Total: {{ $licenses->total() }}</div>
+                        </div>
+                    </div>
+                    {{--licenses table--}}
+                    <table class="table table-condensed phonex-table-sortable">
+                        <tr>
+                            <th >{!! link_to_sort('username', 'Username') !!}</th>
+                            <th>{!! link_to_sort('license_type', 'License type') !!}</th>
+                            <th>{!! link_to_sort('is_trial', 'Trial') !!}</th>
+                            <th>Active</th>
+                            <th>{!! link_to_sort('starts_at', 'Start date') !!}</th>
+                            <th>{!! link_to_sort('expires_at', 'Expiration date') !!}</th>
+                            <th>Options</th>
+                        </tr>
+                        @foreach($licenses as $lic)
+                            <tr>
+                                <td><a href="{{ \URL::route('users.show', [$lic->user_id]) }}">{{ $lic->username }}</a></td>
+                                <td>{{ ucfirst($lic->license_type) }}</td>
+                                <td>@if($lic->is_trial) Yes @else No @endif</td>
+                                <td>@if($lic->active) Yes @else No @endif</td>
+                                <td>{{ $lic->formatted_starts_at}}</td>
+                                <td>{{ $lic->formatted_expires_at }}</td>
+                                <td>
+                                    <div class="btn-group  btn-group-xs">
+                                        <a type="button" class="btn btn-info view-btn-edit" href="{{ \URL::route('licenses.edit', $lic->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </table>
 
-								<label class="checkbox-inline" for="checkboxes-1">
-									{!! Form::checkbox('trial_only', '1', \Request::has('trial_only'), ['id'=>'checkboxes-1']); !!}
-									Trial only
-								</label>
+                </div>
 
-							</div>
-							<button type="submit" style="margin-left: 10px; padding: 2px 10px" class="btn btn-default">Submit</button>
-						</form>
-					</div>
-					<div class="text-right pull-right col-xs-2">
-						<span >Total: {{ $licenses->total() }}</span>
-					</div>
-				</div>
-			</div>
-			<table class="table table-condensed">
-
-				<tr>
-					<th >{!! link_to_sort('username', 'Username') !!}</th>
-					<th>{!! link_to_sort('license_type', 'License type') !!}</th>
-					<th>{!! link_to_sort('is_trial', 'Trial') !!}</th>
-					<th>Active</th>
-					<th>{!! link_to_sort('starts_at', 'Start date') !!}</th>
-					<th>{!! link_to_sort('expires_at', 'Expiration date') !!}</th>
-					<th>Options</th>
-				</tr>
-				@foreach($licenses as $lic)
-					<tr>
-						<td><a href="#">{{ $lic->username }}</a></td>
-						<td>{{ $lic->license_type }}</td>
-						<td>@if($lic->is_trial) Yes @else No @endif</td>
-						<td>@if($lic->active) Yes @else No @endif</td>
-						<td>{{ $lic->formatted_starts_at}}</td>
-						<td>{{ $lic->formatted_expires_at }}</td>
-						<td>TODO</td>
-					</tr>
-				@endforeach
-				{{--@foreach($users as $user)--}}
-					{{--<tr>--}}
-						{{--<td><a href="#">{{ $user->username }}</a></td>--}}
-						{{--<td>{{ $user->email or '' }}</td>--}}
-						{{--<td>@if($user->has_access) Yes @else No @endif</td>--}}
-
-						{{--<td class="text-center">--}}
-							{{--<div class="btn-group  btn-group-xs">--}}
-								{{--<a type="button" class="btn btn-info   view-btn-edit" href="#" title="Edit"><i class="fa fa-pencil-square-o"></i></a>--}}
-								{{--<a type="button" class="btn btn-danger action_confirm   view-btn-delete" data-method="delete" href="#" title="Delete user"><i class="fa fa-times-circle-o"></i></a>--}}
-							{{--</div>--}}
-						{{--</td>--}}
-					{{--</tr>--}}
-				{{--@endforeach--}}
-			</table>
+                <div class="text-center">
+                    {!! $licenses->appends(Request::except('page'))->render(); !!}
+                </div>
+            </div>
+        </div>
 
 
-		</div>
-		<div class="text-center">
-			{!! $licenses->appends(Request::except('page'))->render(); !!}
-		</div>
-</section>
+    </section>
 
 </div>
-
 
 @endsection

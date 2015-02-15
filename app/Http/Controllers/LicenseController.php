@@ -2,8 +2,12 @@
 
 use Carbon\Carbon;
 use Phonex\Http\Requests;
+use Phonex\Http\Requests\UpdateLicenseRequest;
 use Phonex\License;
 use Phonex\Utils\InputGet;
+use Phonex\Utils\InputPost;
+use Redirect;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class LicenseController extends Controller {
 
@@ -85,26 +89,34 @@ class LicenseController extends Controller {
 		//
 	}
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
 	public function edit($id)
 	{
-		//
+		$license = License::find($id);
+        if ($license == null){
+            throw new NotFoundHttpException;
+        }
+
+        return view('license.edit', compact('license'));
 	}
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  int $id
+     * @param UpdateLicenseRequest $request
+     * @return Response
+     */
+	public function update($id, UpdateLicenseRequest $request)
 	{
-		//
+        $license = License::find($id);
+        if ($license == null){
+            throw new NotFoundHttpException;
+        }
+        $license->comment = InputPost::get('comment');
+        $license->save();
+
+        return \Redirect::route('licenses.edit', [$id])
+            ->with('success', 'License has been updated.');
 	}
 
 	/**

@@ -40,8 +40,9 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" style="margin-top: -5px" href="/">
+				<a class="navbar-brand" style="margin-top: -5px;" href="/">
 					<img alt="Brand" src="/img/icon2.png">
+                    License Server
 				</a>
 			</div>
 

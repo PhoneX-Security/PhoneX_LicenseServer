@@ -10,10 +10,7 @@
 					Users
 					<small>Manage users</small>
 				</h1>
-				<ol class="breadcrumb">
-					<li><a href="#"><i class="fa fa-home"></i> Home </a></li>
-					<li class="active">Users</li>
-				</ol>
+                @include('navigation.breadcrumb')
 			</div>
 		</div>
 	</section>
@@ -51,7 +48,7 @@
 				</div>
 				<table class="table table-condensed phonex-table-sortable">
 					<tr>
-						<th class="text-center">{!! link_to_sort('id', 'ID') !!}</th>
+						<th>{!! link_to_sort('id', 'ID') !!}</th>
 						<th>{!! link_to_sort('username', 'Username') !!}</th>
 						<th>{!! link_to_sort('email', 'E-mail') !!}</th>
 						<th>{!! link_to_sort('has_access', 'Has access') !!}</th>
@@ -61,9 +58,8 @@
 					@foreach($users as $user)
 						<tr>
 
-							<td class="text-center">{{ $user->id }}</td>
+							<td>{{ $user->id }}</td>
 							<td>
-
                                 <a href="{{ \URL::route('users.show', [ $user->id ]) }}">{{ $user->username }}</a>
                             </td>
 							<td>{{ $user->email or '' }}</td>
@@ -77,8 +73,8 @@
 
 							<td class="text-center">
 								<div class="btn-group  btn-group-xs">
-									<a type="button" class="btn btn-info   view-btn-edit" href="#" title="Edit"><i class="fa fa-pencil-square-o"></i></a>
-									<a type="button" class="btn btn-danger action_confirm   view-btn-delete" data-method="delete" href="#" title="Delete user"><i class="fa fa-times-circle-o"></i></a>
+									<a type="button" class="btn btn-info view-btn-edit" href="{{ \URL::route('users.edit', $user->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>
+									{{--<a type="button" class="btn btn-danger action_confirm   view-btn-delete" data-method="delete" href="#" title="Delete user"><i class="fa fa-times-circle-o"></i></a>--}}
 								</div>
 							</td>
 						</tr>

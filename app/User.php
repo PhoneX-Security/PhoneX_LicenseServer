@@ -26,4 +26,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	public function licenses(){
 		return $this->hasMany('Phonex\License', 'user_id');
 	}
+
+    public function issuedLicenses(){
+        return $this->hasMany('Phonex\License', 'issuer_id');
+    }
 }
