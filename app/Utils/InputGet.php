@@ -5,6 +5,7 @@
  * Date: 27.1.15
  * Time: 19:40
  */
+use Carbon\Carbon;
 
 
 /**
@@ -32,6 +33,16 @@ class InputGet{
 
     public static function getEmail($name, $default = false){
         return getParameter(static::$type, $name, FILTER_VALIDATE_EMAIL, $default);
+    }
+
+    /**
+     * @param $name
+     * @param bool $default
+     * @return static Carbon
+     */
+    public static function getCarbonTime($name, $default = false){
+        $rawDate = static::get($name, $default);
+        return Carbon::parse($rawDate);
     }
 }
 

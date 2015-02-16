@@ -4,6 +4,7 @@ use Phonex\Exceptions\InvalidStateException;
 
 /**
  * @property  username
+ * @property mixed id
  */
 class SipUser extends Model{
     protected $connection = 'mysql_opensips';
@@ -44,9 +45,7 @@ class SipUser extends Model{
         $sipUser->forcePasswordChange = 1;
         $sipUser->issued_on = $startsAt;
         $sipUser->expires_on = $expiresAt;
-        $sipUser->save();
-
-        dd($sipUser);
+        return $sipUser;
     }
 
 

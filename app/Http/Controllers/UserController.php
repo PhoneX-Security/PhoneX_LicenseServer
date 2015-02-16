@@ -4,7 +4,9 @@ use Carbon\Carbon;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
+use Phonex\License;
 use Phonex\LicenseType;
+use Phonex\SipUser;
 use Phonex\User;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
@@ -52,11 +54,35 @@ class UserController extends Controller {
 		}
 		$user->save();
 
-		// store license
-		if (InputPost::has('issue_license')){
-            // TODO
+        // store license
+        if (InputPost::has('issue_license')){
+            $licenseType = LicenseType::find(InputPost::getInteger('license_type_id'));
+            $issuer = User::where('username', InputPost::get('issuer_username'))->first();
 
-		}
+            $startsAt = InputPost::getCarbonTime('starts_at')->toDateTimeString();
+            $expiresAt = InputPost::getCarbonTime('starts_at')->addDays($licenseType->days);
+
+            $license = new License();
+            $license->user_id = $user->id;
+            $license->license_type_id = $licenseType->id;
+            $license->issuer_id = $issuer->id;
+            $license->comment = InputPost::get('comment');
+            $license->starts_at = $startsAt;
+            $license->expires_at = $expiresAt;
+            $license->save();
+
+            $sipUser = SipUser::createSubscriber($user->username, InputPost::get('sip_default_password'), $startsAt, $expiresAt);
+            $sipUser->save();
+
+//            dd($sipUser->id);
+
+            $user->subscriber_id = $sipUser->id;
+            $user->save();
+//            update(['subscriber_id' => $sipUser->id]);
+
+            return Redirect::route('users.index')
+                ->with('success', 'The new user ' . $user->username . ' with license has been created.');
+        }
 
 		return Redirect::route('users.index')
 			->with('success', 'The new user ' . $user->username . ' has been created.');

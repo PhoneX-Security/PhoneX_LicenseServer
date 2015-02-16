@@ -5,6 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 //use Phonex\Utils\SortableTrait;
 
 
+/**
+ * @property mixed user_id
+ * @property mixed license_type_id
+ * @property  issuer_id
+ * @property bool|mixed comment
+ * @property  issuer_id
+ */
 class License extends Model{
 //	use SortableTrait;
 
