@@ -120,7 +120,7 @@
 
 										<div class="col-md-6 ">
 											<div class="form-group"><label for="opensips_password" class="control-label">PhoneX default password</label>
-												<input class="form-control" value="{{ old('phonex_default_password') }}" id="phonex_default_password" type="text" name="phonex_default_password">
+												<input class="form-control" value="{{ old('phonex_default_password','phonexxx') }}" id="phonex_default_password" type="text" name="phonex_default_password">
 												<span class="help-block">Password will be changed on first login.</span>
 											</div>
 										</div>

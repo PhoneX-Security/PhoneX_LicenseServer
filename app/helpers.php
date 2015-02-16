@@ -52,3 +52,27 @@ if (!function_exists('date_simple')){
     }
 }
 
+/**
+ * OpenSips specific functions for password generation
+ */
+if (!function_exists('getHA1_1')) {
+    function getHA1_1($sip, $password)
+    {
+        // split sip by @
+        $arr = explode("@", $sip, 2);
+        if ($arr == null || count($arr) != 2) {
+            var_dump($arr);
+            throw new Exception("Invalid SIP format");
+        }
+        return getHA1_2($arr[0], $arr[1], $password);
+    }
+}
+
+if (!function_exists('getHA1_2')) {
+    function getHA1_2($username, $domain, $password)
+    {
+        $x = $username . ":" . $domain . ":" . $password;
+        return md5($x);
+    }
+}
+

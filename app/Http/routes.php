@@ -12,6 +12,10 @@
 */
 //Route::get('/', 'WelcomeController@index');
 
+use Carbon\Carbon;
+use Phonex\SipUser;
+use Phonex\User;
+
 Route::get('home', 'HomeController@index');
 Route::get('/', 'HomeController@index');
 
@@ -31,7 +35,15 @@ Route::group(['middleware' => 'auth'], function() {
 });
 
 Route::get('x', function(){
-    return 'x';
+
+    $p = SipUser::createSubscriber('buso', 'buso', Carbon::now()->toDateTimeString(), Carbon::now()->toDateTimeString());
+
+//    $x = User::find(831);
+//    $x->has_access = 1;
+//    $x->password = bcrypt('Jeftedib4');
+//    $x->save();
+//
+//    dd($x);
 });
 
 

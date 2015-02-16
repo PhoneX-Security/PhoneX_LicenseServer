@@ -33,9 +33,9 @@
                     <a class="btn btn-sm btn-primary" href="{{ \URL::route('users.edit', [$user->id]) }}">
                         <i class="fa fa-edit"></i> Edit
                     </a>
-                    <a class="btn btn-sm btn-primary" href="/users">
-                        <i class="fa fa-edit"></i> Issue license
-                    </a>
+                    {{--<a class="btn btn-sm btn-primary" href="/users">--}}
+                        {{--<i class="fa fa-edit"></i> Issue license--}}
+                    {{--</a>--}}
 
 				</div>
 			</div>
