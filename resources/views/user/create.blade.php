@@ -63,7 +63,7 @@
 
 						<h4>Access</h4>
 						<div class="panel panel-default">
-							<div class="panel-body">
+							<div class="panel-body give_access_panel">
 
 								<div class="checkbox">
 									<label>
@@ -75,13 +75,13 @@
 									<div class="col-md-6 ">
 										<div class="form-group">
 											<label for="password" class="control-label">Password</label>
-											<input class="form-control" placeholder="Enter Password" id="users_create_password" type="password" name="password">
+											<input class="form-control" placeholder="Enter Password" id="users_create_password" type="password" name="password" disabled>
 										</div>
 									</div>
 									<div class="col-md-6 ">
 										<div class="form-group">
 											<label for="password_confirmation" class="control-label">Confirm Password</label>
-											<input class="form-control" placeholder="Re-enter Password" id="users_create_password_confirmation" type="password" name="password_confirmation">
+											<input class="form-control" placeholder="Re-enter Password" id="users_create_password_confirmation" type="password" name="password_confirmation" disabled>
 										</div>
 									</div>
 								</div>
@@ -90,8 +90,7 @@
 
 						<h4>License</h4>
 						<div class="panel panel-default">
-							<div class="panel-body">
-
+							<div class="panel-body issue_license_panel">
 								<div class="checkbox">
 									<label>
 										<input id="users_create_issue_license" name="issue_license" @if(old('issue_license')) checked @endif type="checkbox"> Issue license
@@ -104,14 +103,14 @@
 											<div class="form-group">
 												<label for="starts_at" class="control-label">Start date</label>
 												<div class="input-group date">
-													<input value="{{ old('starts_at') }}" type="text" name="starts_at" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+													<input value="{{ old('starts_at') }}" type="text" name="starts_at" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
 												</div>
 											</div>
 										</div>
 
 										<div class="col-md-3">
 											<label for="password" class="control-label">Type</label>
-											<select name="license_type_id" class="form-control">
+											<select name="license_type_id" class="form-control" disabled>
 												@foreach($licenseTypes as $type)
 													<option value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
 												@endforeach
@@ -120,7 +119,7 @@
 
 										<div class="col-md-6 ">
 											<div class="form-group"><label for="sip_default_password" class="control-label">SIP default password</label>
-												<input class="form-control" value="{{ old('sip_default_password','phonexxx') }}" id="sip_default_password" type="text" name="sip_default_password">
+												<input class="form-control" value="{{ old('sip_default_password','phonexxx') }}" id="sip_default_password" type="text" name="sip_default_password" disabled>
 												<span class="help-block">Password will be changed on first login.</span>
 											</div>
 										</div>
@@ -132,7 +131,7 @@
                                         <div class="form-group">
                                             <label for="password" class="control-label">Issuer (username)</label>
                                             <input class="form-control" value="{{ old('issuer_username', Auth::user()->username) }}"
-                                                   placeholder="Enter username" id="issuer_username" type="text" name="issuer_username">
+                                                   placeholder="Enter username" id="issuer_username" type="text" name="issuer_username" disabled>
                                             <span class="help-block">By default current user.</span>
                                         </div>
                                     </div>
@@ -142,7 +141,7 @@
 									<div class="col-md-6 ">
 										<div class="form-group">
 											<label for="password" class="control-label">License notes</label>
-											<textarea name="comment" class="form-control" rows="3"></textarea>
+											<textarea name="comment" class="form-control" rows="3" disabled></textarea>
 										</div>
 									</div>
 								</div>

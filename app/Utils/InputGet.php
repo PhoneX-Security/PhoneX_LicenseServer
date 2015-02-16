@@ -27,6 +27,11 @@ class InputGet{
         return getParameter(static::$type, $name, FILTER_UNSAFE_RAW, $default);
     }
 
+    // TODO implement
+    public static function getAlphaNum($name, $default = false){
+        return getParameter(static::$type, $name, FILTER_UNSAFE_RAW, $default);
+    }
+
     public static function getInteger($name, $default = false){
         return getParameter(static::$type, $name, FILTER_VALIDATE_INT, $default);
     }

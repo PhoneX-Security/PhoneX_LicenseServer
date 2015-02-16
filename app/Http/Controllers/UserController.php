@@ -25,13 +25,22 @@ class UserController extends Controller {
 
 	public function index()
 	{
-		$users = User::sortable()->paginate(15);
+        $limit = InputGet::getInteger('limit', 15);
+
+		$query = User::sortable();
+        if(InputGet::has('username')){
+            $query = $query->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
+        }
+
+        $users = $query->paginate($limit);
 		return view('user.index', compact('users'));
 	}
 
 	public function create()
 	{
-		$licenseTypes = LicenseType::all();
+		$licenseTypes = LicenseType::all()->sortBy('order');
+//        dd($licenseTypes);
+//        all();
 		return view('user.create', compact('licenseTypes'));
 	}
 

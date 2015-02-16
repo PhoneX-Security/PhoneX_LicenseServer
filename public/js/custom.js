@@ -14,25 +14,27 @@ $readyFn = function(){
     console.log( "JQuery version loaded:" + jQuery.fn.jquery );
 
 
+    /* Create user functionality */
     $('.input-group.date').datepicker({
         format: "dd-mm-yyyy",
         language: "en-GB"
     });
 
 
+    // Has access
+    $("#users_create_has_access").click(function() {
+        $(".give_access_panel input")
+            .not("#users_create_has_access")
+            .attr("disabled", !this.checked);
+    });
 
+    // Issue license
+    $("#users_create_issue_license").click(function() {
+        $(".issue_license_panel input, .issue_license_panel select, .issue_license_panel textarea")
+            .not("#users_create_issue_license")
+            .attr("disabled", !this.checked);
+    });
 
-    //
-    //$('#users_create_has_access').click(function(){
-    //    if($(this).is(':checked')){
-    //        $('#users_create_password').removeAttr('disabled');
-    //        $('#users_create_password_confirmation').removeAttr('disabled');
-    //
-    //    }else{
-    //        $('#users_create_password').attr('disabled', 'disabled');
-    //        $('#users_create_password_confirmation').attr('disabled', 'disabled');
-    //    }
-    //});
 };
 
 $initDatePicker = function(e){

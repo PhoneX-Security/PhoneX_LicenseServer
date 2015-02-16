@@ -30,33 +30,17 @@ Route::get('logout', 'Auth\AuthController@getLogout');
 // Authenticated pages
 Route::group(['middleware' => 'auth'], function() {
 	Route::resource('users', 'UserController');
-//	Route::resource('users', 'UserController', ['only' => ['index']]);
 	Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 });
 
 Route::get('x', function(){
 
-    $p = SipUser::createSubscriber('buso', 'buso', Carbon::now()->toDateTimeString(), Carbon::now()->toDateTimeString());
+//    $p = SipUser::createSubscriber('buso', 'buso', Carbon::now()->toDateTimeString(), Carbon::now()->toDateTimeString());
 
-//    $x = User::find(831);
-//    $x->has_access = 1;
-//    $x->password = bcrypt('Jeftedib4');
-//    $x->save();
-//
-//    dd($x);
+    $x = User::where('username', 'test84')->first();
+    $x->has_access = 1;
+    $x->password = bcrypt('MercedeS30422');
+    $x->save();
+
+    dd($x);
 });
-
-
-//Route::get('test', function(){
-//	return 'test';
-//	return \Phonex\User::all();
-//return View::make('test');
-//	$hasher = new \Illuminate\Hashing\BcryptHasher();
-//    dd($hasher);
-//    $user = User::where('username', 'gorila')->first();
-//    $user->password = $hasher->make('buso');
-//	$user->has_access = true;
-//	$user->email = 'gorila@phone-x.net';
-//    $x = $user->save();
-//	dd($x);
-//});
