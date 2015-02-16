@@ -30,6 +30,10 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 });
 
+Route::get('x', function(){
+    return 'x';
+});
+
 
 //Route::get('test', function(){
 //	return 'test';

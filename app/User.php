@@ -16,7 +16,12 @@ use Phonex\Utils\SortableTrait;
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract {
 	use Authenticatable, CanResetPassword, SortableTrait;
 
-	protected $table = 'users';
+    // legacy names
+    const CREATED_AT = 'dateCreated';
+    const UPDATED_AT = 'dateUpdated';
+
+
+    protected $table = 'phonex_users';
 
 	protected $fillable = ['username', 'email', 'password', 'has_access'];
 	protected $sortable = ['username', 'email', 'has_access', 'id'];

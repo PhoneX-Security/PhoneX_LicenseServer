@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class License extends Model{
 //	use SortableTrait;
 
-	protected $table = 'licenses';
+	protected $table = 'phonex_licenses';
 
 	protected $fillable = ['comment'];
 //	protected $sortable = ['username', 'email', 'has_access', 'id'];

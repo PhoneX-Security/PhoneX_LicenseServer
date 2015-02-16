@@ -12,7 +12,7 @@ class CreateLicenseTypesTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('license_types', function(Blueprint $table)
+		Schema::create('phonex_license_types', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->timestamps();
@@ -29,7 +29,7 @@ class CreateLicenseTypesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('license_types');
+		Schema::drop('phonex_license_types');
 	}
 
 }
