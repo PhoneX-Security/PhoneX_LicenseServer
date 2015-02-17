@@ -14,12 +14,14 @@ class SipUser extends Model{
     public $timestamps = false;
 
     public function setPasswordFields($password){
-        if (empty($this->sip) || empty($this->domain)){
-            throw new InvalidStateException('Cannot set password fields (HA1_1, HA1_2) because SIP or domain is empty in this object.');
+        if (empty($this->username) || empty($this->domain)){
+            throw new InvalidStateException('Cannot set password fields (HA1_1, HA1_2) because username or domain is empty in this object.');
         }
 
+        $sip = $this->username . "@" . $this->domain;
+
         $ha1 = getHA1_1($sip, $password);
-        $ha1b = getHA1_2($sip, $domain, $password);
+        $ha1b = getHA1_2($sip, $this->domain, $password);
 
         $this->ha1 = $ha1;
         $this->ha1b = $ha1b;

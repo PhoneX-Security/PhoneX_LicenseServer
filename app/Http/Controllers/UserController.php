@@ -1,6 +1,8 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
@@ -39,16 +41,10 @@ class UserController extends Controller {
 	public function create()
 	{
 		$licenseTypes = LicenseType::all()->sortBy('order');
-//        dd($licenseTypes);
-//        all();
 		return view('user.create', compact('licenseTypes'));
 	}
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
+
 	public function store(CreateUserRequest $request)
 	{
 		// all data should be valid at the moment (see @CreateUserRequest#rules)
@@ -83,11 +79,8 @@ class UserController extends Controller {
             $sipUser = SipUser::createSubscriber($user->username, InputPost::get('sip_default_password'), $startsAt, $expiresAt);
             $sipUser->save();
 
-//            dd($sipUser->id);
-
             $user->subscriber_id = $sipUser->id;
             $user->save();
-//            update(['subscriber_id' => $sipUser->id]);
 
             return Redirect::route('users.index')
                 ->with('success', 'The new user ' . $user->username . ' with license has been created.');
@@ -97,9 +90,8 @@ class UserController extends Controller {
 			->with('success', 'The new user ' . $user->username . ' has been created.');
 	}
 
-	public function show($id){
-//		$user = User::find($id);
-        // Dot is used for nested loading
+	public function show($id)
+    {
 		$user = User::with(['licenses.licenseType', 'issuedLicenses.licenseType'])->find($id);
 		if ($user == null){
 			throw new NotFoundHttpException;
@@ -116,7 +108,8 @@ class UserController extends Controller {
 		return view('user.show', compact('user'));
 	}
 
-	public function edit($id){
+	public function edit($id)
+    {
         $user = User::with('licenses.licenseType')->find($id);
         if ($user == null){
             throw new NotFoundHttpException;
@@ -125,7 +118,8 @@ class UserController extends Controller {
         return view('user.edit', compact('user'));
 	}
 
-	public function update($id, UpdateUserRequest $request){
+	public function update($id, UpdateUserRequest $request)
+    {
         $user = User::find($id);
         if ($user == null){
             throw new NotFoundHttpException;
@@ -162,5 +156,38 @@ class UserController extends Controller {
 	{
 		//
 	}
+
+    public function patchChangeSipPassword($id)
+    {
+        $newPass = InputPost::get('sip_default_password');
+
+        $data = ['sip_default_password' => $newPass, 'id' => $id];
+
+        $v = Validator::make($data, [
+            'id' => 'required|exists:phonex_users,id',
+            'sip_default_password' => 'required|min:8',
+        ]);
+
+        if ($v->fails()){
+            return redirect()
+                ->back()
+                ->withInput($data)
+                ->withErrors($v->errors());
+        }
+
+        $user = User::find($id);
+        if(!$user->subscriber_id){
+            // redirect for naughty boys
+            return redirect()->back();
+        }
+
+        $sipUser = SipUser::find($user->subscriber_id);
+        $sipUser->setPasswordFields($newPass);
+        $sipUser->forcePasswordChange = 1;
+        $sipUser->save();
+
+        return Redirect::route('users.show', [$user->id])
+            ->with('success', 'User SIP password has been reset.');
+    }
 
 }

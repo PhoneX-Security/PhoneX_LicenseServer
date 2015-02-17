@@ -30,6 +30,8 @@ Route::get('logout', 'Auth\AuthController@getLogout');
 // Authenticated pages
 Route::group(['middleware' => 'auth'], function() {
 	Route::resource('users', 'UserController');
+    Route::patch('users/{users}/change-sip-pass', ['as' => 'users.change_sip_pass', 'uses' => 'UserController@patchChangeSipPassword']);
+
 	Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 });
 
