@@ -13,6 +13,7 @@
 //Route::get('/', 'WelcomeController@index');
 
 use Carbon\Carbon;
+use Phonex\Events\AuditEvent;
 use Phonex\SipUser;
 use Phonex\User;
 
@@ -36,13 +37,14 @@ Route::group(['middleware' => 'auth'], function() {
 });
 
 Route::get('x', function(){
+//    event(new AuditEvent('salalaj', 'sip_user', 1, 'password' ));
 
 //    $p = SipUser::createSubscriber('buso', 'buso', Carbon::now()->toDateTimeString(), Carbon::now()->toDateTimeString());
 
-    $x = User::where('username', 'test84')->first();
-    $x->has_access = 1;
-    $x->password = bcrypt('MercedeS30422');
-    $x->save();
-
-    dd($x);
+//    $x = User::where('username', 'test84')->first();
+//    $x->has_access = 1;
+//    $x->password = bcrypt('MercedeS30422');
+//    $x->save();
+//
+//    dd($x);
 });

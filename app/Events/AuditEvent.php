@@ -53,4 +53,12 @@ class AuditEvent extends Event {
         $this->newValue = $newValue;
     }
 
+    public static function create($entityName = null,$entityId = null,$fieldName = null,$oldValue = null,$newValue = null){
+        return new AuditEvent('create', $entityName, $entityId, $fieldName, $oldValue, $newValue);
+    }
+
+    public static function update($entityName = null,$entityId = null,$fieldName = null,$oldValue = null,$newValue = null){
+        return new AuditEvent('update', $entityName, $entityId, $fieldName, $oldValue, $newValue);
+    }
+
 }

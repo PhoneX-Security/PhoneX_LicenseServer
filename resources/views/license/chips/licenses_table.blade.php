@@ -1,8 +1,19 @@
+{{--
+Parameters: $licenses, $show_username, $show_issuer
+--}}
+
 @if($licenses && count($licenses) > 0)
     <table class="table table-condensed">
         <tr>
             <th>License type</th>
-            <th>Issuer</th>
+
+            @if(isset($show_username))
+                <th>Username</th>
+            @endif
+
+            @if(isset($show_issuer))
+                <th>Issuer</th>
+            @endif
 
             <th>Trial</th>
             <th>Active</th>
@@ -15,9 +26,17 @@
         @foreach($licenses as $license)
             <tr>
                 <td>{{ ucfirst($license->licenseType->name) }} ({{ $license->licenseType->days }} days)</td>
+
+                @if(isset($show_username))
+                    <td><a href="{{ \URL::route('users.show', $license->user_id)  }}" >{{ $license->user->username }}</a></td>
+                @endif
+
+                @if(isset($show_issuer))
                 <td>@if ($license->issuer)
                         <a href="{{ \URL::route('users.show', $license->issuer_id)  }}" >{{ $license->issuer->username }}</a>
                     @else - @endif</td>
+                @endif
+
                 <td>@if($license->licenseType->is_trial) Yes @else No @endif</td>
                 <td>@if($license->active) Yes @else No @endif</td>
                 <td>{{ date_simple($license->starts_at) }}</td>

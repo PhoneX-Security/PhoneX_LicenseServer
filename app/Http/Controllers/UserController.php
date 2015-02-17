@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
+use Phonex\Events\AuditEvent;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
@@ -59,6 +60,8 @@ class UserController extends Controller {
 		}
 		$user->save();
 
+        event(AuditEvent::create('user', $user->id));
+
         // store license
         if (InputPost::has('issue_license')){
             $licenseType = LicenseType::find(InputPost::getInteger('license_type_id'));
@@ -75,6 +78,8 @@ class UserController extends Controller {
             $license->starts_at = $startsAt;
             $license->expires_at = $expiresAt;
             $license->save();
+
+            event(AuditEvent::create('license', $license->id));
 
             $sipUser = SipUser::createSubscriber($user->username, InputPost::get('sip_default_password'), $startsAt, $expiresAt);
             $sipUser->save();
@@ -185,6 +190,9 @@ class UserController extends Controller {
         $sipUser->setPasswordFields($newPass);
         $sipUser->forcePasswordChange = 1;
         $sipUser->save();
+
+        // audit this
+        event(AuditEvent::update('sip_user', $user->subscriber_id, 'password'));
 
         return Redirect::route('users.show', [$user->id])
             ->with('success', 'User SIP password has been reset.');

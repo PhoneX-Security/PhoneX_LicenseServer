@@ -14,11 +14,11 @@ class AuditEventHandler {
 	}
 
     public function onEventReceived(AuditEvent $event){
-        if (Auth::guest){
+        if (Auth::guest()){
             throw new UserLoggedOutException("Cannot audit received event, user is logged out.");
         }
 
-        $auditTrial = AuditTrail::create($event);
+        $auditTrial = AuditTrail::fillFrom($event);
         $auditTrial->save();
     }
 }

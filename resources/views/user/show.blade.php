@@ -105,10 +105,10 @@
                                 </div>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="licenses-t">
-                                @include('license.chips.licenses_table', ['licenses' => $user->licenses])
+                                @include('license.chips.licenses_table', ['licenses' => $user->licenses, 'show_issuer'=>true])
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="issued-licenses-t">
-                                @include('license.chips.licenses_table', ['licenses' => $user->issuedLicenses])
+                                @include('license.chips.licenses_table', ['licenses' => $user->issuedLicenses, 'show_username'=>true])
                             </div>
                         </div>
                     </div>

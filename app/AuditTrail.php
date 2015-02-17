@@ -12,8 +12,18 @@ use Phonex\Events\AuditEvent;
  * @property null new_value
  */
 class AuditTrail extends Model{
+    protected $table = 'audit_trail';
 
-    public static function create(AuditEvent $event){
+    // called automatically by IoC
+    public static function boot(){
+        parent::boot();
+        // fill in user id automatically by hooked callback
+        self::creating(function($auditTrial){
+            $auditTrial->user_id = \Auth::user()->id;
+        });
+    }
+
+    public static function fillFrom(AuditEvent $event){
         $auditTrail = new AuditTrail();
         $auditTrail->operation = $event->operation;
         $auditTrail->entity_name = $event->entityName;
@@ -23,6 +33,4 @@ class AuditTrail extends Model{
         $auditTrail->new_value = $event->newValue;
         return $auditTrail;
     }
-
-	protected $table = 'audit_trail';
 }
