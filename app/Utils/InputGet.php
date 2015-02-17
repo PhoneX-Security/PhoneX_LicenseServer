@@ -21,6 +21,11 @@ class InputGet{
         return filter_has_var(static::$type, $name);
     }
 
+    public static function hasNonEmpty($name){
+        $var = static::get($name);
+        return filter_has_var(static::$type, $name) && !empty($var);
+    }
+
     // All methods: Returns value of the requested variable on success, FALSE if the validation filter fails, or NULL if the $name variable is not set.
     // TODO throw Exception when filter fails
     public static function get($name, $default = false){

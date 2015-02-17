@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\UpdateLicenseRequest;
 use Phonex\License;
+use Phonex\User;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
 use Redirect;
@@ -44,6 +45,10 @@ class LicenseController extends Controller {
 		if (InputGet::has('trial_only')){
 			$query = $query->where('is_trial', 1);
 		}
+
+        if(InputGet::has('username')){
+            $query = $query->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
+        }
 
 		$licenses = $query->paginate(15);
 
@@ -112,6 +117,14 @@ class LicenseController extends Controller {
         if ($license == null){
             throw new NotFoundHttpException;
         }
+
+        if (InputPost::hasNonEmpty('issuer_username')){
+            $issuer = User::where('username', InputPost::getAlphaNum('issuer_username'))->first();
+            $license->issuer_id = $issuer->id;
+        } else {
+            $license->issuer_id = null;
+        }
+
         $license->comment = InputPost::get('comment');
         $license->save();
 

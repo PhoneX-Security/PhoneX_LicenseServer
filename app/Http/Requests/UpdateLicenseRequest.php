@@ -1,10 +1,27 @@
 <?php namespace Phonex\Http\Requests;
 
-use Phonex\Http\Requests\Request;
 
 class UpdateLicenseRequest extends Request {
 
-	/**
+//    function __construct(Factory $v){
+//        $v->extend('issuer_username_rule',
+//            function($attribute, $value, $parameters){
+//                if (empty($value)){
+//                    return true; // empty is OK
+//                }
+//                return empty($value) ||
+//                User::where('username', $value)
+////                return $value == 'foo';
+//            }
+//        );
+////        \Validator::extend()
+//
+////        $v->extend()
+////        Validator::class
+//    }
+
+
+    /**
 	 * Determine if the user is authorized to make this request.
 	 *
 	 * @return bool
@@ -22,6 +39,8 @@ class UpdateLicenseRequest extends Request {
 	public function rules()
 	{
 		return [
+            // sometimes = only if input is non-empty
+            'issuer_username' => 'sometimes|exists:phonex_users,username'
 
 		];
 	}

@@ -27,13 +27,13 @@
                             {{--<i class="fa fa-plus-circle"></i> New User--}}
                         {{--</a>--}}
 
-                        <form class="form-horizontal" style="width: 10%" action="#" method="get">
+                        <form class="form-horizontal" style="width: 10%" action="{{ \URL::route('licenses.index') }}" method="get">
 
                             <div class="input-group">
-                                <input type="search" class="form-control input-sm" name="q" value="" placeholder="Search">
-                                <span class="input-group-btn">
-                                    <button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
-                                </span>
+                                <input type="search" class="form-control input-sm" name="username" value="{{ Input::get('username') }}" placeholder="Search">
+                        <span class="input-group-btn">
+                            <button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
+                        </span>
                             </div>
                         </form>
                     </form>
@@ -72,22 +72,27 @@
                     {{--licenses table--}}
                     <table class="table table-condensed phonex-table-sortable">
                         <tr>
+                            <th >{!! link_to_sort('id', 'ID') !!}</th>
                             <th >{!! link_to_sort('username', 'Username') !!}</th>
                             <th>{!! link_to_sort('license_type', 'License type') !!}</th>
                             <th>{!! link_to_sort('is_trial', 'Trial') !!}</th>
                             <th>Active</th>
                             <th>{!! link_to_sort('starts_at', 'Start date') !!}</th>
                             <th>{!! link_to_sort('expires_at', 'Expiration date') !!}</th>
+                            <th width="25%">Comment</th>
                             <th>Options</th>
                         </tr>
                         @foreach($licenses as $lic)
                             <tr>
+                                <td>{{ $lic->id}}</td>
                                 <td><a href="{{ \URL::route('users.show', [$lic->user_id]) }}">{{ $lic->username }}</a></td>
                                 <td>{{ ucfirst($lic->license_type) }}</td>
                                 <td>@if($lic->is_trial) Yes @else No @endif</td>
                                 <td>@if($lic->active) Yes @else No @endif</td>
                                 <td>{{ $lic->formatted_starts_at}}</td>
                                 <td>{{ $lic->formatted_expires_at }}</td>
+                                <td>{{ $lic->comment }}</td>
+
                                 <td>
                                     <div class="btn-group  btn-group-xs">
                                         <a type="button" class="btn btn-info view-btn-edit" href="{{ \URL::route('licenses.edit', $lic->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>

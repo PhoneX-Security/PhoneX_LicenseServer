@@ -19,7 +19,11 @@ class AuthController extends Controller {
 	|
 	*/
 
-	use AuthenticatesAndRegistersUsers;
+	use AuthenticatesAndRegistersUsers{
+        // do not allow registration at the moment
+        getRegister as private;
+        postRegister as private;
+    }
 
 	/**
 	 * Create a new authentication controller instance.

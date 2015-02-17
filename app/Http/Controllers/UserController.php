@@ -100,7 +100,7 @@ class UserController extends Controller {
 	public function show($id){
 //		$user = User::find($id);
         // Dot is used for nested loading
-		$user = User::with('licenses.licenseType')->find($id);
+		$user = User::with(['licenses.licenseType', 'issuedLicenses.licenseType'])->find($id);
 		if ($user == null){
 			throw new NotFoundHttpException;
 		}

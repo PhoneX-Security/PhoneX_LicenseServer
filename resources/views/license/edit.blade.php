@@ -84,12 +84,28 @@
 
                         <div class="row">
                             <div class="col-md-6 ">
-                                <dl>
-                                    <dt>Issuer</dt>
-                                    <dd>@if ($license->issuer)
-                                            <a href="{{ \URL::route('users.show', $license->issuer_id)  }}" >{{ $license->issuer->username }}</a>
-                                        @else - @endif</dd>
-                                </dl>
+                                {{--<dl>--}}
+                                    {{--<dt>Issuer</dt>--}}
+                                    {{--<dd>{!! \Form::text !!} @if ($license->issuer)--}}
+                                            {{--<a href="{{ \URL::route('users.show', $license->issuer_id)  }}" >{{ $license->issuer->username }}</a>--}}
+                                        {{--@else - @endif</dd>--}}
+                                    {{--<dd>@if ($license->issuer)--}}
+                                            {{--<a href="{{ \URL::route('users.show', $license->issuer_id)  }}" >{{ $license->issuer->username }}</a>--}}
+                                        {{--@else - @endif</dd>--}}
+                                {{--</dl>--}}
+
+                                <div class="form-group">
+                                    <label for="password" class="control-label">Issuer (username)</label>
+
+
+                                    {!! \Form::text('issuer_username', ($license->issuer ? $license->issuer->username : null) , ['class' => 'form-control']) !!}
+
+                                    {{--<input class="form-control" value="{{ old('issuer_username',  $license->issuer->username) }}"--}}
+                                           {{--placeholder="Enter username" id="issuer_username" type="text" name="issuer_username">--}}
+
+                                    {{--<input class="form-control" value="{{ old('issuer_username',  $license->issuer->username) }}"--}}
+                                           {{--placeholder="Enter username" id="issuer_username" type="text" name="issuer_username">--}}
+                                </div>
                             </div>
                         </div>
 

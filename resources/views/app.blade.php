@@ -58,7 +58,8 @@
 				<ul class="nav navbar-nav navbar-right">
 					@if (Auth::guest())
 						<li><a href="/login">Login</a></li>
-						<li><a href="/auth/register">Register</a></li>
+                        {{--Do not allow registration at the moment--}}
+						{{--<li><a href="/auth/register">Register</a></li>--}}
 					@else
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{  Auth::user()->email }} <span class="caret"></span></a>
