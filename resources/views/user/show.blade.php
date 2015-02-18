@@ -151,6 +151,16 @@
                                             </dl>
                                         </div>
                                     </div>
+
+                                    {{--Feature especially for Dusan--}}
+                                    @if(strlen($user->subscriber->ha1)<32)
+                                        <div class="alert alert-danger" role="alert">
+                                            <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                                            <span class="sr-only">Error:</span>
+                                            User has corrupted password! Workaround: reset password.
+                                        </div>
+                                    @endif
+
                                 @else
                                     User has no SIP license issued yet, therefore no details are available
                                 @endif
