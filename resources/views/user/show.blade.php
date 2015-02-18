@@ -103,6 +103,58 @@
                                         </dl>
                                     </div>
                                 </div>
+
+                                <h4>SIP details</h4>
+                                @if($user->subscriber)
+                                    <div class="row">
+                                        <div class="col-md-4 ">
+                                            <dl>
+                                                <dt>First authentication</dt>
+                                                <dd>{{ $user->subscriber->date_first_authCheck or '-'}}</dd>
+                                            </dl>
+                                        </div>
+
+                                        <div class="col-md-4 ">
+                                            <dl>
+                                                <dt>First cert generation</dt>
+                                                <dd>{{ $user->subscriber->date_first_login or '-'}}</dd>
+                                            </dl>
+                                        </div>
+
+                                        <div class="col-md-4 ">
+                                            <dl>
+                                                <dt>First user added</dt>
+                                                <dd>{{ $user->subscriber->date_first_user_added or '-'}}</dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 ">
+                                            <dl>
+                                                <dt>Last activity</dt>
+                                                <dd>{{ $user->subscriber->date_last_activity or '-'}}</dd>
+                                            </dl>
+                                        </div>
+
+                                        <div class="col-md-4 ">
+                                            <dl>
+                                                <dt>Last authentication</dt>
+                                                <dd>{{ $user->subscriber->date_last_authCheck or '-'}}</dd>
+                                            </dl>
+                                        </div>
+
+                                        <div class="col-md-4 ">
+                                            <dl>
+                                                <dt>Last password changed</dt>
+                                                <dd>{{ $user->subscriber->date_last_pass_change or '-'}}</dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                @else
+                                    User has no SIP license issued yet, therefore no details are available
+                                @endif
+
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="licenses-t">
                                 @include('license.chips.licenses_table', ['licenses' => $user->licenses, 'show_issuer'=>true])

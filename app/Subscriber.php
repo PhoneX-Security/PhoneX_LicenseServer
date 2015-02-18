@@ -6,7 +6,7 @@ use Phonex\Exceptions\InvalidStateException;
  * @property  username
  * @property mixed id
  */
-class SipUser extends Model{
+class Subscriber extends Model{
     protected $connection = 'mysql_opensips';
     protected $table = 'subscriber';
 
@@ -32,7 +32,7 @@ class SipUser extends Model{
         $ha1 = getHA1_1($sip, $password);
         $ha1b = getHA1_2($sip, $domain, $password);
 
-        $sipUser = new SipUser();
+        $sipUser = new Subscriber();
         $sipUser->username = $username;
         $sipUser->domain = $domain;
 //        $sipUser->password =

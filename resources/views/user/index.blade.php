@@ -52,6 +52,7 @@
 						<th>{!! link_to_sort('username', 'Username') !!}</th>
 						<th>{!! link_to_sort('email', 'E-mail') !!}</th>
 						<th>{!! link_to_sort('has_access', 'Has access') !!}</th>
+                        <th>SIP - Last activity</th>
 						<th>Roles</th>
 						<th class="text-center">Options</th>
 					</tr>
@@ -64,6 +65,7 @@
                             </td>
 							<td>{{ $user->email or '' }}</td>
 							<td>@if($user->has_access) Yes @else No @endif</td>
+                            <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
 
 							<td>
 								@if($user->has_access) <i class="fa fa-check-square fa-fw"></i> Admin @endif

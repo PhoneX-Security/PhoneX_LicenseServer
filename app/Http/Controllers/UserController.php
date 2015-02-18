@@ -9,7 +9,7 @@ use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\License;
 use Phonex\LicenseType;
-use Phonex\SipUser;
+use Phonex\Subscriber;
 use Phonex\User;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
@@ -30,7 +30,10 @@ class UserController extends Controller {
 	{
         $limit = InputGet::getInteger('limit', 15);
 
-		$query = User::sortable();
+		$query = User::sortable()->with('subscriber');
+        // avoid qa users
+        $query = $query->where('qa_trial', false);
+
         if(InputGet::has('username')){
             $query = $query->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
         }
@@ -81,7 +84,7 @@ class UserController extends Controller {
 
             event(AuditEvent::create('license', $license->id));
 
-            $sipUser = SipUser::createSubscriber($user->username, InputPost::get('sip_default_password'), $startsAt, $expiresAt);
+            $sipUser = Subscriber::createSubscriber($user->username, InputPost::get('sip_default_password'), $startsAt, $expiresAt);
             $sipUser->save();
 
             $user->subscriber_id = $sipUser->id;
@@ -186,13 +189,13 @@ class UserController extends Controller {
             return redirect()->back();
         }
 
-        $sipUser = SipUser::find($user->subscriber_id);
+        $sipUser = Subscriber::find($user->subscriber_id);
         $sipUser->setPasswordFields($newPass);
         $sipUser->forcePasswordChange = 1;
         $sipUser->save();
 
         // audit this
-        event(AuditEvent::update('sip_user', $user->subscriber_id, 'password'));
+        event(AuditEvent::update('subscriber', $user->subscriber_id, 'password'));
 
         return Redirect::route('users.show', [$user->id])
             ->with('success', 'User SIP password has been reset.');

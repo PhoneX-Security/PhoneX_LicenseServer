@@ -38,6 +38,8 @@ class LicenseController extends Controller {
 			->select(['phonex_users.username', 'phonex_license_types.name as license_type', 'phonex_license_types.is_trial', 'phonex_licenses.*',
 				\DB::raw('IF(expires_at IS NULL OR expires_at >= NOW(), 1, 0) as active')]); // Warning: MySQL specific syntax
 
+        $query = $query->where('phonex_users.qa_trial', false);
+
 		if (InputGet::has('active_only')){
 			$query = $query->whereRaw('( expires_at IS NULL OR expires_at >= NOW() )');
 

@@ -14,7 +14,7 @@
 
 use Carbon\Carbon;
 use Phonex\Events\AuditEvent;
-use Phonex\SipUser;
+use Phonex\Subscriber;
 use Phonex\User;
 
 Route::get('home', 'HomeController@index');
