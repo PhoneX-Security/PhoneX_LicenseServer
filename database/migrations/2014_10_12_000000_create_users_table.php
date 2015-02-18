@@ -24,7 +24,10 @@ class CreateUsersTable extends Migration {
 			$table->string('confirmEmail');
 			$table->string('confirmNonce', 100);
 			$table->boolean('confirmed');
+            // legacy, not in USE (now licenses are trials, not users)
 			$table->boolean('isTrial')->default(false);
+            // QA trial user - flag to mark users that are for QA testing
+            $table->boolean('qa_trial')->default(false);
 			$table->integer('trialNumber');
 			// foreign keys
 			$table->unsignedInteger('subscriber_id'); // referencing opensips db, table subscriber
