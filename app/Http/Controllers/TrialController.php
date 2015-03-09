@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Log;
+use Phonex\ContactList;
 use Phonex\License;
 use Phonex\LicenseType;
 use Phonex\Subscriber;
@@ -169,6 +170,11 @@ class TrialController extends Controller {
         // save user id to trial request
         $trialRequest->phonexUserId = $user->id;
         $trialRequest->save();
+
+        // add support to contact list
+        if (!$isQaTrial){
+            ContactList::addSupportToContactListMutually($user);
+        }
 
         return $this->responseOk($user->username, $subscriber->email_address, $password, $expiresAtUnixTime);
     }

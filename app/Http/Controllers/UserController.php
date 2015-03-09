@@ -2,7 +2,9 @@
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Phonex\ContactList;
 use Phonex\Events\AuditEvent;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\CreateUserRequest;
@@ -90,8 +92,11 @@ class UserController extends Controller {
             $user->subscriber_id = $sipUser->id;
             $user->save();
 
+            // add support to contact list
+            $supportAdded = ContactList::addSupportToContactListMutually($user);
+
             return Redirect::route('users.index')
-                ->with('success', 'The new user ' . $user->username . ' with license has been created.');
+                ->with('success', 'The new user ' . $user->username . ' + license has been created.' . ($supportAdded ? "Support account has been mutually added to contact list" : ""));
         }
 
 		return Redirect::route('users.index')

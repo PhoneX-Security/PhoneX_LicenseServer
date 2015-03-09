@@ -13,6 +13,7 @@ use Phonex\Utils\SortableTrait;
  * @property string password
  * @property int has_access
  * @property int confirmed
+ * @property mixed subscriber_id
  */
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract {
 	use Authenticatable, CanResetPassword, SortableTrait;
@@ -20,7 +21,6 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     // legacy names
     const CREATED_AT = 'dateCreated';
     const UPDATED_AT = 'dateUpdated';
-
 
     protected $table = 'phonex_users';
 
@@ -40,5 +40,9 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     public function subscriber(){
         // weird, parameters 2 + 3 are switched ()
         return $this->hasOne('Phonex\Subscriber', 'id', 'subscriber_id');
+    }
+
+    public static function getSupportUser(){
+        return User::where('username', "support")->first();
     }
 }
