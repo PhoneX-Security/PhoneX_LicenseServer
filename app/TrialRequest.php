@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed phonexUserId
  */
 class TrialRequest extends Model{
-    protected $connection = 'mysql_opensips';
     protected $table = 'phonex_trial_requests';
 
     // legacy names

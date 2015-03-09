@@ -27,17 +27,21 @@ class TrialController extends Controller {
 
     public function getCaptcha(){
         $img = new Securimage();
+
+        $captchaHeight =  intval(Request::input("height", 120));
+        $captchaHeight = min($captchaHeight, 384);
+
         // You can customize the image by making changes below, some examples are included - remove the "//" to uncomment
         //$img->session_name = 'phone-x';
         //$img->ttf_file        = './Quiff.ttf';
         //$img->captcha_type    = Securimage::SI_CAPTCHA_MATHEMATIC; // show a simple math problem instead of text
         //$img->case_sensitive  = true;                              // true to use case sensitve codes - not recommended
-        $img->image_height    = 120;                                // height in pixels of the image
+        $img->image_height    = $captchaHeight;                                // height in pixels of the image
         $img->image_width     = $img->image_height * M_E;          // a good formula for image size based on the height
-        $img->perturbation    = 1.2;                               // 1.0 = high distortion, higher numbers = more distortion
+//        $img->perturbation    = 1.2;                               // 1.0 = high distortion, higher numbers = more distortion
         //$img->image_bg_color  = new Securimage_Color("#0099CC");   // image background color
         //$img->text_color      = new Securimage_Color("#EAEAEA");   // captcha text color
-        $img->num_lines       = 15;                                 // how many lines to draw over the image
+//        $img->num_lines       = 15;                                 // how many lines to draw over the image
         //$img->line_color      = new Securimage_Color("#0000CC");   // color of lines over the image
         //$img->image_type      = SI_IMAGE_JPEG;                     // render as a jpeg image
         //$img->signature_color = new Securimage_Color(rand(0, 64),
@@ -51,7 +55,7 @@ class TrialController extends Controller {
         // $img->show('/path/to/background_image.jpg');
     }
 
-    public function getTrial(){
+    public function postTrial(){
         $version = intval(Request::get('version'));
         $captcha = Request::input('captcha');
         $imei = Request::input('imei');
@@ -108,11 +112,11 @@ class TrialController extends Controller {
     }
 
     private function issueTrial(TrialRequest $trialRequest){
-        $trialNumber = $this->getMaxTrialNumber($this->isPhonexIp()) + 1;
-
+        $isQaTrial = $this->isPhonexIp();
+        $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
         $username = 'trial' . $trialNumber;
 
-        if ($this->isPhonexIp()){
+        if ($isQaTrial){
             $username = 'qa_' . $username;
         }
 
@@ -123,6 +127,7 @@ class TrialController extends Controller {
         $user->has_access = 0;
         $user->trialNumber = $trialNumber;
         $user->confirmed = 1;
+        $user->qa_trial = $isQaTrial ? 1 : 0;
         $saved = $user->save();
 
         // allow user to try again
@@ -135,7 +140,9 @@ class TrialController extends Controller {
         $licenseType = LicenseType::find(1); // MAGIC ID - trial is #1
 
         $startsAt = Carbon::now()->toDateTimeString();
-        $expiresAt = Carbon::now()->addDays($licenseType->days)->toDateTimeString();
+        $c_expiresAt = Carbon::now()->addDays($licenseType->days);
+        $expiresAt = $c_expiresAt->toDateTimeString();
+        $expiresAtUnixTime = $c_expiresAt->format("U");
 
         $license = new License();
         $license->user_id = $user->id;
@@ -163,7 +170,7 @@ class TrialController extends Controller {
         $trialRequest->phonexUserId = $user->id;
         $trialRequest->save();
 
-        return $this->responseOk($user->username, $subscriber->email_address, $password, $expiresAt);
+        return $this->responseOk($user->username, $subscriber->email_address, $password, $expiresAtUnixTime);
     }
 
     private function getMaxTrialNumber($isQaTrial = false){
