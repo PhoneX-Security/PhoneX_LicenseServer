@@ -12,6 +12,7 @@ use Phonex\Utils\SortableTrait;
  * @property bool|mixed username
  * @property string password
  * @property int has_access
+ * @property int confirmed
  */
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract {
 	use Authenticatable, CanResetPassword, SortableTrait;

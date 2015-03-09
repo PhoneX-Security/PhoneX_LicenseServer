@@ -5,6 +5,7 @@ use Phonex\Exceptions\InvalidStateException;
 /**
  * @property  username
  * @property mixed id
+ * @property mixed email_address
  */
 class Subscriber extends Model{
     protected $connection = 'mysql_opensips';

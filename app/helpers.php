@@ -76,3 +76,15 @@ if (!function_exists('getHA1_2')) {
     }
 }
 
+/**
+ *
+ * @param timestamp the optional timestamp parameter is an integer Unix timestamp, default value is time()
+ * @param type $format, default is datetime for mysql
+ * @return string ready for DB
+ */
+function dbDatetime($time = null, $format = "Y-m-d H:i:s"){
+    if ($time === null){
+        $time = time();
+    }
+    return date($format, $time);
+}

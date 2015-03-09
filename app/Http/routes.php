@@ -11,6 +11,8 @@
 |
 */
 
+use Phonex\TrialRequest;
+
 Route::get('home', 'HomeController@index');
 Route::get('/', 'HomeController@index');
 
@@ -30,7 +32,5 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 });
 
-//Route::get('trial/captcha', function(){
-//
-
-//});
+Route::get('x', function(){
+});
