@@ -2,6 +2,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Log;
 use Phonex\Exceptions\InvalidStateException;
+use Queue;
 
 /**
  * @property string entryState
@@ -69,11 +70,15 @@ class ContactList extends Model{
         if (!$record1->save()){
             Log::error("addUsersToContactListMutually; cannot create record1 in contact list");
             return false;
+        } else {
+            Queue::push('ContactListUpdated', ['username'=>$user2->username], 'users');
         }
 
         if (!$record1->save()){
             Log::error("addUsersToContactListMutually; cannot create record2 in contact list");
             return false;
+        } else {
+            Queue::push('ContactListUpdated', ['username'=>$user1->username], 'users');
         }
         return true;
     }

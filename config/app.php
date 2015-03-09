@@ -149,6 +149,9 @@ return [
 		'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
 		'Barryvdh\Debugbar\ServiceProvider',
 		'Illuminate\Html\HtmlServiceProvider',
+
+        // Rabbit MQ
+        'FintechFab\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider',
 	],
 
 	/*
