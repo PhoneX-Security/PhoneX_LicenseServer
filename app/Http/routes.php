@@ -11,6 +11,7 @@
 |
 */
 
+use Carbon\Carbon;
 use Phonex\TrialRequest;
 
 Route::get('home', 'HomeController@index');
@@ -33,4 +34,7 @@ Route::group(['middleware' => 'auth'], function() {
 });
 
 Route::get('x', function(){
+    $user = Request::get('where', "test610@phone-x.net");
+    Queue::push('ContactListUpdated', ['username'=>$user], 'users');
+    echo 'amqp message sent to user ' . $user;
 });

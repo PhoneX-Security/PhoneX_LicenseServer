@@ -71,15 +71,17 @@ class ContactList extends Model{
             Log::error("addUsersToContactListMutually; cannot create record1 in contact list");
             return false;
         } else {
-            Queue::push('ContactListUpdated', ['username'=>$user2->username], 'users');
+            Queue::push('ContactListUpdated', ['username'=>$user2->email], 'users');
         }
 
-        if (!$record1->save()){
+        if (!$record2->save()){
             Log::error("addUsersToContactListMutually; cannot create record2 in contact list");
             return false;
         } else {
-            Queue::push('ContactListUpdated', ['username'=>$user1->username], 'users');
+            Queue::push('ContactListUpdated', ['username'=>$user1->email], 'users');
         }
+
+        Log::info("Users have been mutually added to contact list", compact($user1->email, $user2->email));
         return true;
     }
 }

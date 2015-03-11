@@ -33,6 +33,7 @@ class CreateUsersTable extends Migration {
 			$table->unsignedInteger('subscriber_id'); // referencing opensips db, table subscriber
 			$table->unsignedInteger('parent_id'); // self referencing
 
+            $table->text('comment');
 			$table->timestamps();
 		});
 	}
