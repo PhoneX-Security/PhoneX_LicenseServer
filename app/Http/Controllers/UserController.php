@@ -93,8 +93,8 @@ class UserController extends Controller {
             $user->save();
 
             // add support to contact list
-            $supportAdded = ContactList::addSupportToContactListMutually($user);
-
+//            $supportAdded = ContactList::addSupportToContactListMutually($user);
+            $supportAdded = false;
             return Redirect::route('users.index')
                 ->with('success', 'The new user ' . $user->username . ' + license has been created.' . ($supportAdded ? "Support account has been mutually added to contact list" : ""));
         }

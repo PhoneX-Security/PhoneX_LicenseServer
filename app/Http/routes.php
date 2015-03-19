@@ -31,6 +31,9 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::resource('users', 'UserController');
     Route::patch('users/{users}/change-sip-pass', ['as' => 'users.change_sip_pass', 'uses' => 'UserController@patchChangeSipPassword']);
 	Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
+
+    // dev tools
+    Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index'); // logs viewer
 });
 
 Route::get('x', function(){

@@ -18,6 +18,10 @@ class TrialController extends Controller {
     const badCaptchaJson = '{"version":1,"responseCode":401}';
     const trialExistsJson = '{"version":1,"responseCode":402}';
     const unknownErrorJson = '{"version":1,"responseCode":403}';
+    const existingUsernameJson = '{"version":1,"responseCode":404}';
+    const usernameBadFormatJson = '{"version":1,"responseCode":405}';
+
+    const USERNAME_REGEX = "/^[A-Za-z0-9_-]{3,18}$/";
 
     private $securimage;
     private $phonexIP;
@@ -39,7 +43,7 @@ class TrialController extends Controller {
         //$img->case_sensitive  = true;                              // true to use case sensitve codes - not recommended
         $img->image_height    = $captchaHeight;                                // height in pixels of the image
         $img->image_width     = $img->image_height * M_E;          // a good formula for image size based on the height
-//        $img->perturbation    = 1.2;                               // 1.0 = high distortion, higher numbers = more distortion
+        $img->perturbation    = 1.4;                               // 1.0 = high distortion, higher numbers = more distortion
         //$img->image_bg_color  = new Securimage_Color("#0099CC");   // image background color
         //$img->text_color      = new Securimage_Color("#EAEAEA");   // captcha text color
 //        $img->num_lines       = 15;                                 // how many lines to draw over the image
@@ -54,6 +58,10 @@ class TrialController extends Controller {
         $img->show();  // outputs the image and content headers to the browser
         // alternate use:
         // $img->show('/path/to/background_image.jpg');
+    }
+
+    public function getTrial(){
+        return $this->postTrial();
     }
 
     public function postTrial(){
@@ -75,9 +83,24 @@ class TrialController extends Controller {
         $ip = $_SERVER['REMOTE_ADDR'];
 
         if (!$this->correctCaptcha($captcha)){
-            Log::error("Bad captcha entered [received=" . $captcha . ", correct=" . $this->securimage->getCode() . "]");
+            Log::error("Bad captcha entered [received=" . $captcha . " ]");
             return TrialController::badCaptchaJson;
         }
+
+        // check username validity
+        $username = null;
+        if (Request::has('username')){
+            $username = Request::get('username');
+            if (User::where('username', $username)->count() > 0 ||
+                Subscriber::where('username', $username)->count() > 0){
+                Log::error("Username with name " . $username . " already exists");
+                return TrialController::existingUsernameJson;
+            } else if (!preg_match(TrialController::USERNAME_REGEX, $username)){
+                Log::error("Username " . $username . " doesn't match username regex.");
+                return TrialController::usernameBadFormatJson;
+            }
+        }
+
         $isValid = $this->isValidRequest($imei, $ip);
 
         $trialRequest = new TrialRequest();
@@ -85,6 +108,9 @@ class TrialController extends Controller {
         $trialRequest->ip = $ip;
         $trialRequest->imei = $imei;
         $trialRequest->isApproved = $isValid;
+        if ($username){
+            $trialRequest->username = $username;
+        }
         $trialRequest->save();
 
         if ($isValid) {
@@ -94,6 +120,7 @@ class TrialController extends Controller {
             return TrialController::trialExistsJson;
         }
     }
+
 
     private function isValidRequest($imei, $ip){
         $dateThresholdStart = dbDatetime(strtotime('-14 days'));
@@ -115,10 +142,11 @@ class TrialController extends Controller {
     private function issueTrial(TrialRequest $trialRequest){
         $isQaTrial = $this->isPhonexIp();
         $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
-        $username = 'trial' . $trialNumber;
+
+        $username = ($trialRequest->username) ? $trialRequest->username : 'trial' . $trialNumber;
 
         if ($isQaTrial){
-            $username = 'qa_' . $username;
+            $username = 'qa_trial' . $trialNumber;
         }
 
         // all data should be valid at the moment
@@ -172,7 +200,7 @@ class TrialController extends Controller {
         $trialRequest->save();
 
         // add support to contact list
-        if (!$isQaTrial){
+        if ($isQaTrial){
             ContactList::addSupportToContactListMutually($user);
         }
 
@@ -208,7 +236,7 @@ class TrialController extends Controller {
 
     private function isPhonexIp(){
         $remote = $_SERVER['REMOTE_ADDR'];
-        return $remote == $this->getPhonexIp();
+        return $remote == $this->getPhonexIp() || $remote == '89.176.153.219';
     }
 
     private function correctCaptcha($captcha) {

@@ -43,6 +43,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     }
 
     public static function getSupportUser(){
-        return User::where('username', "support")->first();
+//        return User::where('username', "support")->first();
+        return User::where('username', "phonex-support")->first();
     }
 }

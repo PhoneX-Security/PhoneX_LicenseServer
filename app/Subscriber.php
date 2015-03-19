@@ -6,6 +6,7 @@ use Phonex\Exceptions\InvalidStateException;
  * @property  username
  * @property mixed id
  * @property mixed email_address
+ * @property string turnPasswd
  */
 class Subscriber extends Model{
     protected $connection = 'mysql_opensips';
@@ -33,22 +34,26 @@ class Subscriber extends Model{
         $ha1 = getHA1_1($sip, $password);
         $ha1b = getHA1_2($sip, $domain, $password);
 
-        $sipUser = new Subscriber();
-        $sipUser->username = $username;
-        $sipUser->domain = $domain;
+        $subscriber = new Subscriber();
+        $subscriber->username = $username;
+        $subscriber->domain = $domain;
 //        $sipUser->password =
-        $sipUser->email_address = $sip;
+        $subscriber->email_address = $sip;
 
-        $sipUser->ha1 = $ha1;
-        $sipUser->ha1b = $ha1b;
-        $sipUser->rpid = 0;
-        $sipUser->isAdmin = 0;
-        $sipUser->primaryGroup = 0;
-        $sipUser->canSignNewCert = 1;
-        $sipUser->forcePasswordChange = 1;
-        $sipUser->issued_on = $startsAt;
-        $sipUser->expires_on = $expiresAt;
-        return $sipUser;
+        $subscriber->ha1 = $ha1;
+        $subscriber->ha1b = $ha1b;
+        $subscriber->rpid = 0;
+        $subscriber->isAdmin = 0;
+        $subscriber->primaryGroup = 0;
+        $subscriber->canSignNewCert = 1;
+        $subscriber->forcePasswordChange = 1;
+        $subscriber->issued_on = $startsAt;
+        $subscriber->expires_on = $expiresAt;
+
+        // LS-5 Initialize TURN password for new users.
+        $subscriber->turnPasswd = getRandomString(24);
+
+        return $subscriber;
     }
 
 

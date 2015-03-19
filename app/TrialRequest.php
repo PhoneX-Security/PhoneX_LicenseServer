@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool isApproved
  * @property  ip
  * @property mixed phonexUserId
+ * @property mixed username
  */
 class TrialRequest extends Model{
     protected $table = 'phonex_trial_requests';

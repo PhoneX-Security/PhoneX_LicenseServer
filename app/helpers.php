@@ -76,15 +76,29 @@ if (!function_exists('getHA1_2')) {
     }
 }
 
-/**
- *
- * @param timestamp the optional timestamp parameter is an integer Unix timestamp, default value is time()
- * @param type $format, default is datetime for mysql
- * @return string ready for DB
- */
-function dbDatetime($time = null, $format = "Y-m-d H:i:s"){
-    if ($time === null){
-        $time = time();
+if (!function_exists('dbDatetime')){
+    /**
+     *
+     * @param timestamp the optional timestamp parameter is an integer Unix timestamp, default value is time()
+     * @param type $format, default is datetime for mysql
+     * @return string ready for DB
+     */
+    function dbDatetime($time = null, $format = "Y-m-d H:i:s"){
+        if ($time === null){
+            $time = time();
+        }
+        return date($format, $time);
     }
-    return date($format, $time);
+}
+
+if (!function_exists('getRandomString')) {
+    function getRandomString($len = 80, $characters = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789_.-"){
+        $characters = str_shuffle($characters);
+        $cons = '';
+
+        for ($i = 0; $i < $len; $i++){
+            $cons .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $cons;
+    }
 }
