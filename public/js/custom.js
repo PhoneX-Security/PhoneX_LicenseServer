@@ -17,7 +17,8 @@ $readyFn = function(){
     /* Create user functionality */
     $('.input-group.date').datepicker({
         format: "dd-mm-yyyy",
-        language: "en-GB"
+        language: "en-GB",
+        todayBtn: "linked"
     });
 
 
@@ -36,10 +37,6 @@ $readyFn = function(){
     });
 
 };
-
-$initDatePicker = function(e){
-    alert('x');
-}
 
 $initDatePickerLangs = function(){
     //https://eternicode.github.io/bootstrap-datepicker/
