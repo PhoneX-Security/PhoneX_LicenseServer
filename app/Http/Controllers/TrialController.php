@@ -90,7 +90,8 @@ class TrialController extends Controller {
         // check username validity
         $username = null;
         if (Request::has('username')){
-            $username = Request::get('username');
+            // username has to be lowercase
+            $username = strtolower(Request::get('username'));
             if (User::where('username', $username)->count() > 0 ||
                 Subscriber::where('username', $username)->count() > 0){
                 Log::error("Username with name " . $username . " already exists");
@@ -200,7 +201,7 @@ class TrialController extends Controller {
         $trialRequest->save();
 
         // add support to contact list
-        if ($isQaTrial){
+        if (!$isQaTrial){
             ContactList::addSupportToContactListMutually($user);
         }
 
