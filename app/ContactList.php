@@ -27,17 +27,19 @@ class ContactList extends Model{
         if (!$supportUser){
             throw new \Exception("ContactList; no support user exists");
         }
-        return ContactList::addUsersToContactListMutually($user, $supportUser);
+        return ContactList::addUsersToContactListMutually($user, $supportUser, null, "PhoneX Support");
 
     }
 
     /**
      * @param User $user1
      * @param User $user2
+     * @param null $displayName1
+     * @param null $displayName2
      * @return bool
      * @throws InvalidStateException
      */
-    public static function addUsersToContactListMutually(User $user1, User $user2){
+    public static function addUsersToContactListMutually(User $user1, User $user2, $displayName1 = null, $displayName2 = null){
         if (!$user1->subscriber_id){
             throw new InvalidStateException("Cannot add user '" . $user1->username . "' as contact because he has no subscriber id");
         }
@@ -60,12 +62,12 @@ class ContactList extends Model{
         // first record
         $record1->int_usr_id = $user1->subscriber_id;
         $record1->subscriber_id = $user2->subscriber_id; // owner
-        $record1->displayName = $user1->username;
+        $record1->displayName = ($displayName1) ? $displayName1 : $user1->username;
 
         // second record
         $record2->int_usr_id = $user2->subscriber_id;
         $record2->subscriber_id = $user1->subscriber_id; // owner
-        $record2->displayName = $user2->username;
+        $record2->displayName = ($displayName2) ? $displayName2 : $user2->username;
 
         if (!$record1->save()){
             Log::error("addUsersToContactListMutually; cannot create record1 in contact list");

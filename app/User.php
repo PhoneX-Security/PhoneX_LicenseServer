@@ -29,6 +29,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
 	protected $hidden = ['password', 'remember_token'];
 
+    /* relations */
 	public function licenses(){
 		return $this->hasMany('Phonex\License', 'user_id');
 	}
@@ -42,6 +43,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->hasOne('Phonex\Subscriber', 'id', 'subscriber_id');
     }
 
+    public function organizations(){
+        return $this->belongsToMany('Phonex\Organization', 'user_organization', 'user_id', 'organization_id');
+    }
+
+    /* helper functions */
     public static function getSupportUser(){
 //        return User::where('username', "support")->first();
         return User::where('username', "phonex-support")->first();
