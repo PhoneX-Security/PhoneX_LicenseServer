@@ -43,8 +43,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->hasOne('Phonex\Subscriber', 'id', 'subscriber_id');
     }
 
-    public function organizations(){
-        return $this->belongsToMany('Phonex\Organization', 'user_organization', 'user_id', 'organization_id');
+    public function groups(){
+        return $this->belongsToMany('Phonex\Group', 'user_group', 'user_id', 'group_id');
     }
 
     /* helper functions */

@@ -2,6 +2,6 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class Organization extends Model{
+class BusinessCode extends Model{
 	protected $table = 'business_codes';
 }

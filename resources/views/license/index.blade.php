@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container">
+{{--<div class="container">--}}
     <section class="content-header">
         <div class="row">
             <div class="col-sm-12">
@@ -21,12 +21,9 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <div style="margin-bottom: 10px">
-                    <form class="form-inline">
-                        {{--<a class="btn btn-sm btn-primary view-btn-create" href="/users/create">--}}
-                            {{--<i class="fa fa-plus-circle"></i> New User--}}
-                        {{--</a>--}}
 
+                <div style="margin-bottom: 10px" class="phonex-table-div clearfix">
+                    <div class="left-cell">
                         <form class="form-horizontal" style="width: 10%" action="{{ \URL::route('licenses.index') }}" method="get">
 
                             <div class="input-group">
@@ -36,7 +33,10 @@
                         </span>
                             </div>
                         </form>
-                    </form>
+                    </div>
+                    <div class="right-cell">
+
+                    </div>
                 </div>
 
                 <div class="panel panel-default">
@@ -113,6 +113,6 @@
 
     </section>
 
-</div>
+{{--</div>--}}
 
 @endsection

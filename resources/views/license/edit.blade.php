@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container">
+{{--<div class="container">--}}
 
 	<section class="content-header">
 		<div class="row">
@@ -133,7 +133,7 @@
 
 	</section>
 
-</div>
+{{--</div>--}}
 
 
 @endsection

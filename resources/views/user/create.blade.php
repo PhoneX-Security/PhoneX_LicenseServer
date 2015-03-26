@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container">
+{{--<div class="container">--}}
 
 	<section class="content-header">
 		<div class="row">
@@ -59,7 +59,7 @@
 
 								{{--</div>--}}
 							{{--</div>--}}
-						{{--</div>--}}
+						{{--</div>--}}<li><a href="/licenses"><i class="fa fa-book"></i> Licenses</a></li>
 
 						<h4>Access</h4>
 						<div class="panel panel-default">
@@ -165,7 +165,7 @@
 
 	</section>
 
-</div>
+{{--</div>--}}
 
 
 @endsection

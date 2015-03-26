@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserOrganization extends Migration {
+class CreateUserGroup extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,12 +12,12 @@ class CreateUserOrganization extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('user_organization', function(Blueprint $table)
+		Schema::create('user_group', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->timestamps();
             $table->unsignedInteger('user_id');
-            $table->unsignedInteger('organization_id');
+            $table->unsignedInteger('group_id');
         });
 	}
 
@@ -28,7 +28,7 @@ class CreateUserOrganization extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('user_organization');
+		Schema::drop('user_group');
 	}
 
 }

@@ -47,13 +47,7 @@
 			</div>
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				@if (Auth::check())
-				<ul class="nav navbar-nav">
-					{{--<li><a href="/">Home</a></li>--}}
-					<li><a href="/users">Users</a></li>
-					<li><a href="/licenses">Licenses</a></li>
-				</ul>
-				@endif
+
 
 				<ul class="nav navbar-nav navbar-right">
 					@if (Auth::guest())
@@ -73,9 +67,25 @@
 		</div>
 	</nav>
 
-	@yield('content')
+    @if (Auth::check())
+    <div class="container-fluid">
+        <div class="row ">
+            <div class="col-sm-3 col-md-2 nav-side-menu">
+                @include('navigation.sidebar')
+            </div>
 
-	<footer class="panel-footer navbar-fixed-bottom">
+            <div class="col-sm-9 col-md-9 main">
+                @yield('content')
+            </div>
+        </div>
+    </div>
+    @else
+        <div class="container">
+            @yield('content')
+        </div>
+    @endif
+
+	<footer class="panel-footer navbar-bottom">
 		<div class="container-fluid">
 			&copy; 2015 PhoneX Security <i class="icon-large icon-search"></i>
 		</div>
