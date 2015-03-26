@@ -18,10 +18,11 @@
 	<!-- Scripts -->
 	<script src="/js/jquery-2.1.3.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/js/bootstrap.min.js"></script>
-	{{--https://eternicode.github.io/bootstrap-datepicker/--}}
 	<script src="/js/bootstrap-datepicker.js"></script>
 
-	<script src="/js/custom.js"></script>
+    <!-- Bootstrap multiselect -->
+    <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+    <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css"/>
 
 	{{--<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->--}}
 	{{--<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->--}}
@@ -90,6 +91,8 @@
 			&copy; 2015 PhoneX Security <i class="icon-large icon-search"></i>
 		</div>
 	</footer>
+
+    <script src="/js/custom.js"></script>
 
 </body>
 </html>

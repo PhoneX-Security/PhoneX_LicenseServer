@@ -43,7 +43,21 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<div class="row">
-						<div class="col-xs-2">[Filters to add]</div>
+                        <div class="col-xs-8 pull-left">
+                            {{--Filters--}}
+                            <form class="form-inline" action="{{ \URL::route('users.index') }}" method="get">
+                                <div class="form-group">
+                                    <label for="group_input">Group</label>
+                                    <select id="group_input" name="user_group[]" class="multiselect-basic"  multiple="multiple">
+                                        @foreach($groups as $group)
+                                        <option value="{{ $group->id }}" @if($group->selected) selected="selected" @endif>{{ $group->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-default">Filter</button>
+                            </form>
+
+                        </div>
 						<div class="text-right pull-right col-xs-2">Total: {{ $users->total() }}</div>
 					</div>
 				</div>
@@ -53,6 +67,7 @@
 						<th>{!! link_to_sort('username', 'Username') !!}</th>
 						<th>{!! link_to_sort('email', 'E-mail') !!}</th>
 						<th>{!! link_to_sort('has_access', 'Has access') !!}</th>
+                        <th width="15%">Groups</th>
                         <th>SIP - Last activity</th>
 						<th>Roles</th>
 						<th class="text-center">Options</th>
@@ -66,6 +81,13 @@
                             </td>
 							<td>{{ $user->email or '' }}</td>
 							<td>@if($user->has_access) Yes @else No @endif</td>
+                            <td>
+                                @foreach($user->groups as $k => $group)
+                                    @if($k > 0), @endif
+                                    {{ $group->name }}
+                                @endforeach
+                            </td>
+
                             <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
 
 							<td>

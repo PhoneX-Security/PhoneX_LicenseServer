@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Phonex\ContactList;
 use Phonex\Events\AuditEvent;
+use Phonex\Group;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
@@ -28,11 +29,20 @@ class UserController extends Controller {
 	}
 
 
-	public function index()
-	{
+	public function index(){
         $limit = InputGet::getInteger('limit', 15);
 
-		$query = User::sortable()->with('subscriber');
+        $query = User::sortable()->with('subscriber', 'groups');
+        $filteredGroups = [];
+        // Filter groups
+        if (\Request::has('user_group')){
+            $filteredGroups = \Request::get('user_group');
+            $query = User::join('user_group', 'phonex_users.id', '=', 'user_group.user_id')
+                ->whereIn('group_id', $filteredGroups)
+                ->sortable()
+                ->with('subscriber', 'groups');
+        }
+
         // avoid qa users
         $query = $query->where('qa_trial', false);
 
@@ -41,7 +51,12 @@ class UserController extends Controller {
         }
 
         $users = $query->paginate($limit);
-		return view('user.index', compact('users'));
+        $groups = Group::all();
+        foreach($groups as $group){
+            $group->selected = in_array($group->id, $filteredGroups);
+        }
+
+		return view('user.index', compact('users', 'groups'));
 	}
 
 	public function create()

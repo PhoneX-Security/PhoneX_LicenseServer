@@ -62,7 +62,7 @@
                                         </label>
 
                                     </div>
-                                    <button type="submit" style="margin-left: 10px; padding: 2px 10px" class="btn btn-default">Submit</button>
+                                    <button type="submit" class="btn btn-default">Submit</button>
                                 </form>
                             </div>
 

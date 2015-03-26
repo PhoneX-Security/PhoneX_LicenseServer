@@ -9,11 +9,17 @@ $readyFn = function(){
         //alert(jQuery.fn.jquery);
     }
 
-
     console.log( "JS Document ready!" );
     console.log( "JQuery version loaded:" + jQuery.fn.jquery );
 
 
+};
+
+$initMultiSelect = function(){
+    $('.multiselect-basic').multiselect();
+};
+
+$initDatePicker = function(){
     /* Create user functionality */
     $('.input-group.date').datepicker({
         format: "dd-mm-yyyy",
@@ -35,7 +41,6 @@ $readyFn = function(){
             .not("#users_create_issue_license")
             .attr("disabled", !this.checked);
     });
-
 };
 
 $initDatePickerLangs = function(){
@@ -70,11 +75,13 @@ $initDatePickerLangs = function(){
         monthsShort: ["Jan", "Feb", "Mar", "Apr", "Máj", "Jún", "Júl", "Aug", "Sep", "Okt", "Nov", "Dec"],
         today: "Dnes"
     };
+};
 
-
-}
-
+/* Bring it all up */
 $(document).ready(function(){
+    $initMultiSelect();
     $initDatePickerLangs();
+    $initDatePicker();
+
     $readyFn();
 });

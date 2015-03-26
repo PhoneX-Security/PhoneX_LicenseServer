@@ -10,14 +10,7 @@ class GroupController extends Controller {
 
 
 	public function index(){
-		$users = Group::all();
-        dd($users);
-
-//        if(InputGet::has('username')){
-//            $query = $query->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
-//        }
-
-//        $users = $query->paginate($limit);
-		return view('group.index', compact('users'));
+		$groups = Group::paginate(15);
+		return view('group.index', compact('groups'));
 	}
 }

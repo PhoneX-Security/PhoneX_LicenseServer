@@ -16,7 +16,7 @@ class CreateGroupsTable extends Migration {
 		{
 			$table->increments('id');
 			$table->timestamps();
-            $table->string('username');
+            $table->string('name');
             $table->text('comment');
         });
 	}
