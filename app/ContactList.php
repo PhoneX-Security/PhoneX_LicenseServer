@@ -13,6 +13,7 @@ use Queue;
  * @property mixed subscriber_id
  * @property bool|mixed displayName
  * @property mixed int_usr_id
+ * @property mixed id
  */
 class ContactList extends Model{
     protected $connection = 'mysql_opensips';

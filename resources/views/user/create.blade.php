@@ -38,7 +38,7 @@
 				<div class="panel-body">
 					@include('errors.notifications')
 
-					<form  role="form" method="POST" action="/users">
+					<form  role="form" method="POST" action="/bcodes/generate-mp-codes">
 						<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 						<h4>Details</h4>

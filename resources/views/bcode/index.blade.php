@@ -22,10 +22,10 @@
                     <div class="left-cell">
                     </div>
                     <div class="right-cell">
-                        <a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
-                           Export MP codes
-                        </a>
-                        <a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
+                        {{--<a class="btn btn-sm btn-primary view-btn-create" href="/users/create">--}}
+                           {{--Export MP codes--}}
+                        {{--</a>--}}
+                        <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-mp-codes/">
                             <i class="fa fa-plus-circle"></i> Generate MP codes
                         </a>
                     </div>
@@ -54,7 +54,7 @@
                                 <td>{{ $bcode->group->name }}</td>
                                 <td>@if($bcode->exported) Yes @else No @endif</td>
 
-                                <td>{{ $group->licenses_limit  }}</td>
+                                <td>{{ $bcode->licenses_limit  }}</td>
                                 <td>...</td>
                                 <td class="text-center">
                                     <div class="btn-group  btn-group-xs">
