@@ -59,7 +59,7 @@
 
 								{{--</div>--}}
 							{{--</div>--}}
-						{{--</div>--}}<li><a href="/licenses"><i class="fa fa-book"></i> Licenses</a></li>
+						{{--</div>--}}
 
 						<h4>Access</h4>
 						<div class="panel panel-default">

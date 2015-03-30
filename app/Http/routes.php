@@ -36,6 +36,8 @@ Route::group(['middleware' => 'auth'], function() {
 
     // dev tools
     Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index'); // logs viewer
+
+    Route::controller('bcodes', 'BusinessCodeController');
 });
 
 
@@ -47,8 +49,8 @@ Route::get('x', function(){
 });
 
 
-Route::get('passr', function(){
-    $user = User::where('email', 'test318@phone-x.net')->first();
-    $user->password = bcrypt("to be done");
-//    $user->save();
-});
+//Route::get('passr', function(){
+//    $user = User::where('email', 'test318@phone-x.net')->first();
+//    $user->password = bcrypt("to be done");
+////    $user->save();
+//});

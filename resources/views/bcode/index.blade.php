@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <h1>
-                    Groups
+                    Business codes
                     <small>Manage</small>
                 </h1>
                 @include('navigation.breadcrumb')
@@ -22,29 +22,40 @@
                     <div class="left-cell">
                     </div>
                     <div class="right-cell">
+                        <a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
+                           Export MP codes
+                        </a>
+                        <a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
+                            <i class="fa fa-plus-circle"></i> Generate MP codes
+                        </a>
                     </div>
                 </div>
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <div class="row">
-                            <div class="text-right pull-right col-xs-2">Total: {{ $groups->total() }}</div>
+                            <div class="text-right pull-right col-xs-2">Total: {{ $bcodes->total() }}</div>
                         </div>
                     </div>
                     <table class="table table-condensed phonex-table-sortable">
                         <tr>
                             <th>ID</th>
-                            <th>Group name</th>
-                            <th>Comment</th>
-                            <th>Users count</th>
+                            <th>Code</th>
+                            <th>Group</th>
+                            <th>Exported</th>
+                            <th>Licenses limit</th>
+                            <th>Licenses acquired</th>
                             <th class="text-center">Options</th>
                         </tr>
-                        @foreach($groups as $group)
+                        @foreach($bcodes as $bcode)
                             <tr>
-                                <td>{{ $group->id }}</td>
-                                <td><a href="{{ \URL::route('users.index', [ 'user_group[]' => $group->id ]) }}">{{ $group->name or '' }}</a></td>
-                                <td>{{ $group->comment }}</td>
-                                <td>{{ $group->users()->count()  }}</td>
+                                <td>{{ $bcode->id }}</td>
+                                <td>{{ $bcode->code }}</td>
+                                <td>{{ $bcode->group->name }}</td>
+                                <td>@if($bcode->exported) Yes @else No @endif</td>
+
+                                <td>{{ $group->licenses_limit  }}</td>
+                                <td>...</td>
                                 <td class="text-center">
                                     <div class="btn-group  btn-group-xs">
                                         {{--<a type="button" class="btn btn-info view-btn-edit" href="{{ \URL::route('users.edit', $user->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>--}}
@@ -57,7 +68,7 @@
                 </div>
 
                 <div class="text-center">
-                    {!! $groups->appends(Request::except('page'))->render(); !!}
+                    {!! $bcodes->appends(Request::except('page'))->render(); !!}
                 </div>
             </div>
         </div>

@@ -8,7 +8,7 @@
 			<div class="col-sm-12">
 				<h1>
 					Users
-					<small>Manage users</small>
+					<small>Manage</small>
 				</h1>
                 @include('navigation.breadcrumb')
 			</div>

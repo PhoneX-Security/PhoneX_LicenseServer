@@ -38,6 +38,7 @@ class UserController extends Controller {
         if (\Request::has('user_group')){
             $filteredGroups = \Request::get('user_group');
             $query = User::join('user_group', 'phonex_users.id', '=', 'user_group.user_id')
+                ->groupBy('phonex_users.id')
                 ->whereIn('group_id', $filteredGroups)
                 ->sortable()
                 ->with('subscriber', 'groups');
