@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddBusinessCodeToLicensesTable extends Migration {
+class AddBusinessCodeToUsersTable extends Migration {
 
 	/**
 	 * Run the migrations.

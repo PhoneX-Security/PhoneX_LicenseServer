@@ -14,7 +14,8 @@ class DatabaseSeeder extends Seeder {
 	{
 		Model::unguard();
 
-		// $this->call('UserTableSeeder');
+		$this->call('LicenseTypesSeeder');
+        $this->command->info('License Types table seeded!');
 	}
 
 }

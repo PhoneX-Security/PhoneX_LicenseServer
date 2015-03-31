@@ -58,7 +58,7 @@ class BusinessCodeController extends Controller {
             $bc1->creator_id = \Auth::user()->id;
 
             $bc1->license_type_id = $mpLicenseType->id;
-            $bc1->licenses_limit = 1; // only one license per this code
+            $bc1->users_limit = 1; // only one license per this code
             $bc1->is_active = 1;
             $bc1->exported = 1;
 
