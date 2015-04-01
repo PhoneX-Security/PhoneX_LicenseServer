@@ -13,6 +13,7 @@ use Phonex\Group;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\GenerateMPCodesRequest;
+use Phonex\Http\Requests\Request;
 use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\License;
 use Phonex\LicenseType;
@@ -94,13 +95,4 @@ class BusinessCodeController extends Controller {
         return redirect('bcodes')
             ->with('success', "New $numberOfPairs MP business code pairs generated and sent to $email.");
     }
-
-    public function getShow($id){
-        if (!is_numeric($id)){
-            abort(404);
-        }
-    }
-
-
-
 }

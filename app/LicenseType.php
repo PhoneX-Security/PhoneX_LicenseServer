@@ -2,6 +2,10 @@
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed days
+ * @property mixed id
+ */
 class LicenseType extends Model{
     protected $table = "phonex_license_types";
     

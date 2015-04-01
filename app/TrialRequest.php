@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class TrialRequest extends Model{
     protected $table = 'phonex_trial_requests';
+    protected $fillable = ['imei', 'captcha'];
 
     // legacy names
     const CREATED_AT = 'dateCreated';

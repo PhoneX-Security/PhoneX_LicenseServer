@@ -51,7 +51,7 @@ class BusinessCode extends Model{
         return $code;
     }
 
-    public static function verifyCode($code){
+    public static function parityCheck($code){
         if (!$code || strlen($code) != self::TOTAL_LENGTH){
             return false;
         }
