@@ -14,6 +14,8 @@ class CreateAuditTrailTable extends Migration {
 	{
 		Schema::create('audit_trail', function(Blueprint $table)
 		{
+            $table->engine = 'InnoDB';
+
 			$table->increments('id');
 			$table->timestamps();
             $table->unsignedInteger('user_id');

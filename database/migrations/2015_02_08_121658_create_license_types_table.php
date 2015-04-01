@@ -14,6 +14,8 @@ class CreateLicenseTypesTable extends Migration {
 	{
 		Schema::create('phonex_license_types', function(Blueprint $table)
 		{
+            $table->engine = 'InnoDB';
+
 			$table->increments('id');
 			$table->timestamps();
 			$table->string('name');

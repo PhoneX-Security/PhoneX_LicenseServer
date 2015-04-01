@@ -14,6 +14,8 @@ class CreateBusinessCodeUserClMappingsTable extends Migration {
 	{
 		Schema::create('business_code_user_cl_mappings', function(Blueprint $table)
 		{
+            $table->engine = 'InnoDB';
+
 			$table->increments('id');
 			$table->timestamps();
             $table->unsignedInteger('bcode_id');

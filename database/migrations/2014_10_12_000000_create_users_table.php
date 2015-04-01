@@ -14,6 +14,8 @@ class CreateUsersTable extends Migration {
 	{
 		Schema::create('phonex_users', function(Blueprint $table)
 		{
+            $table->engine = 'InnoDB';
+
 			$table->increments('id');
 			$table->string('username');
 			$table->string('email')->unique()->nullable();

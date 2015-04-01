@@ -14,6 +14,8 @@ class CreateUserGroup extends Migration {
 	{
 		Schema::create('user_group', function(Blueprint $table)
 		{
+            $table->engine = 'InnoDB';
+
 			$table->increments('id');
 			$table->timestamps();
             $table->unsignedInteger('user_id');

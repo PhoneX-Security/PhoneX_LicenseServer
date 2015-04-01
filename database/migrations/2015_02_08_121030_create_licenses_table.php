@@ -14,6 +14,8 @@ class CreateLicensesTable extends Migration {
 	{
 		Schema::create('phonex_licenses', function(Blueprint $table)
 		{
+            $table->engine = 'InnoDB';
+
 			$table->increments('id');
 			$table->unsignedInteger('user_id');
 			$table->unsignedInteger('license_type_id');

@@ -14,6 +14,8 @@ class CreateBusinessCodesTable extends Migration {
 	{
 		Schema::create('business_codes', function(Blueprint $table)
 		{
+            $table->engine = 'InnoDB';
+
 			$table->increments('id');
 			$table->timestamps();
             $table->string('code');
