@@ -1,6 +1,8 @@
 <?php
 
+use Phonex\Commands\CreateBusinessCodePair;
 use Phonex\Commands\CreateUserWithLicense;
+use Phonex\Group;
 use Phonex\Http\Controllers\AccountController;
 use Phonex\License;
 use Phonex\LicenseType;
@@ -78,60 +80,97 @@ class BusinessAccountCreationTest extends TestCase {
         $this->assertEquals(AccountController::RESP_ERR_BAD_BUSINESS_CODE, $json->responseCode);
     }
 
-//    public function testKajsmentke(){
-//        $licenseType = LicenseType::find(1);
-//        $command = new CreateUserWithLicense("fasirka", "fasirka_heslo", $licenseType);
-//
-//        $r = Bus::dispatch($command);
-//        dd($r);
-//    }
-
     /**
      * Main test
      */
     public function testAccountCreation(){
         $username1 = "kajsmentke";
         $username2 = "kozmeker";
+        $username3 = "fajnsmeker";
 
         // first delete users if exist
-        $oldUser = User::where('username', $username1)->first();
-        if ($oldUser != null){
-            $oldUser->deleteWithLicenses();
-        }
-        $oldUser = User::where('username', $username2)->first();
-        if ($oldUser != null){
-            $oldUser->deleteWithLicenses();
-        }
+        $this->deleteUsers([$username1, $username2, $username3]);
 
         // now create user1 and issue Mobil Pohotovost business code
+        $trialLic = LicenseType::find(1);
+        $command = new CreateUserWithLicense($username1, "fasirka_heslo", $trialLic);
+        $user1 = Bus::dispatch($command);
+
+        // predefined group + license type
+        $mpGroup = Group::where('name', 'Mobil Pohotovost')->first();
+        $mpLicenseType = LicenseType::where('name', 'mp_half_year')->first();
+
+        $command = new CreateBusinessCodePair($user1, $mpLicenseType, $mpGroup);
+        $codePair = Bus::dispatch($command);
+
+        // remember counts
+        $userCount = User::all()->count();
+        $licenseCount = License::all()->count();
+        $subscriberCount = Subscriber::all()->count();
+        // now use first code to get a license
+        $response1 = $this->call(
+            'POST',
+            self::URL,
+            [
+                'version' => AccountController::VERSION,
+                'imei' => 'a',
+                'captcha' =>'captcha',
+                'username' => $username2,
+                'bcode' => $codePair[0]->code
+            ]
+            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
+        );
+
+        $json = json_decode($response1->getContent());
+        $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
+        $this->assertEquals($username2, $json->username);
+
+        // assert all records created
+        $this->assertEquals($userCount + 1, User::all()->count());
+        $this->assertEquals($licenseCount + 1, License::all()->count());
+        $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
+
+        // check we cannot create another license on the same business code
+        $responseX = $this->call(
+            'POST',
+            self::URL,
+            [
+                'version' => AccountController::VERSION,
+                'imei' => 'a',
+                'captcha' =>'captcha',
+                'username' => $username3,
+                'bcode' => $codePair[0]->code
+            ]
+            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
+        );
+
+        $json = json_decode($responseX->getContent());
+        $this->assertEquals(AccountController::RESP_ERR_ALREADY_USED_BUSINESS_CODE, $json->responseCode);
 
 
-//        $userCount = User::all()->count();
-//        $licenseCount = License::all()->count();
-//        $subscriberCount = Subscriber::all()->count();
-//        $trialReqCount = TrialRequest::all()->count();
-//
-//        $response = $this->call(
+
+        // now use the second code to get a license
+//        $response2 = $this->call(
 //            'POST',
 //            self::URL,
 //            [
 //                'version' => AccountController::VERSION,
 //                'imei' => 'a',
 //                'captcha' =>'captcha',
-//                'username' => self::TEST_USERNAME
+//                'username' => $username3,
+//                'bcode' => $codePair[1]->code
 //            ]
 //            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
 //        );
-//        $json = json_decode($response->getContent());
-//
+//        $json = json_decode($response2->getContent());//
 //        $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
-//        $this->assertEquals(self::TEST_USERNAME, $json->username);
+//        $this->assertEquals(self::TEST_USERNAME, $username3);
 //
 //        // assert all records created
-//        $this->assertEquals($userCount + 1, User::all()->count());
-//        $this->assertEquals($licenseCount + 1, License::all()->count());
-//        $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
-//        $this->assertEquals($trialReqCount + 1, TrialRequest::all()->count());
+//        $this->assertEquals($userCount + 2, User::all()->count());
+//        $this->assertEquals($licenseCount + 2, License::all()->count());
+//        $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
+
 //
 //        // delete all
 //        $user = User::where('username', $json->username)->first();
@@ -148,6 +187,15 @@ class BusinessAccountCreationTest extends TestCase {
         $response = $this->call('POST', self::URL, $params);
         $json = json_decode($response->getContent());
         $this->assertEquals($expectedJsonCode, $json->responseCode);
+    }
+
+    private function deleteUsers(array $usernames){
+        foreach ($usernames as $username){
+            $oldUser = User::where('username', $username)->first();
+            if ($oldUser != null){
+                $oldUser->deleteWithLicenses();
+            }
+        }
     }
 
     private function callNonQa(array $params){

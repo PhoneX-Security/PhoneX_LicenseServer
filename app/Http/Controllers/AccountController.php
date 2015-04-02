@@ -149,22 +149,26 @@ class AccountController extends Controller {
         $businessCode = BusinessCode::where('code', $request->get('bcode'))->first();
 
         try {
+            $licType = $businessCode->licenseType;
 
             $command = new CreateUserWithLicense($username,
                 $password,
-                $businessCode->licenseType(),
+                $licType,
                 [$businessCode->group->id],
                 $isQaTrial,
                 $trialNumber);
             $user = $this->dispatch($command);
 
+            $user->business_code_id = $businessCode->id;
+            $user->save();
             // TODO add contact list mappings
 
         } catch (\Exception $e){
-            return $this->responseError($e->getCode());
+            Log::error("issueBusinessAccount, error", [$e]);
+            return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
         }
 
-        $expiresAtUnixTime = strtotime($user->subscriber()->expires_on);
+        $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
         return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
     }
 
@@ -214,9 +218,12 @@ class AccountController extends Controller {
         }
 
         $numberOfUsers = count($code->users);
+
+//        var_dump($numberOfUsers);
+
         if ($numberOfUsers >= $code->users_limit){
             Log::error("Requested business code is already used by #" . $numberOfUsers . " users", [$request->all()]);
-            throw new \Exception("", self::RESP_ERR_BAD_BUSINESS_CODE);
+            throw new \Exception("", self::RESP_ERR_ALREADY_USED_BUSINESS_CODE);
         }
     }
 
