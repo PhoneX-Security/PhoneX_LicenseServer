@@ -79,9 +79,10 @@ $initDatePickerLangs = function(){
 
 /* Bring it all up */
 $(document).ready(function(){
-    $initMultiSelect();
     $initDatePickerLangs();
     $initDatePicker();
+
+    $initMultiSelect();
 
     $readyFn();
 });

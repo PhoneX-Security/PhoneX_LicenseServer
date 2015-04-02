@@ -36,7 +36,9 @@ class CreateUsersTable extends Migration {
 			$table->unsignedInteger('parent_id'); // self referencing
 
             $table->text('comment');
-			$table->timestamps();
+
+            $table->timestamp('dateCreated');
+            $table->timestamp('dateUpdated');
 		});
 	}
 

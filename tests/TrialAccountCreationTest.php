@@ -8,6 +8,7 @@ use Phonex\User;
 
 class TrialAccountCreationTest extends TestCase {
     const URL = '/account/trial';
+    const TEST_USERNAME = "kexo_test123_kexo";
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -85,10 +86,59 @@ class TrialAccountCreationTest extends TestCase {
         $this->assertEquals($licenseCount + 1, License::all()->count());
         $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
         $this->assertEquals($trialReqCount + 1, TrialRequest::all()->count());
+
+        // delete all
+        $user = User::where('username', $json->username)->first();
+        $user->deleteWithLicenses();
+
+        // assert again
+        $this->assertEquals($userCount, User::all()->count());
+        $this->assertEquals($licenseCount, License::all()->count());
+        $this->assertEquals($subscriberCount, Subscriber::all()->count());
     }
 
+    public function testTrialCreationWithUsername(){
+        $oldUser = User::where('username', self::TEST_USERNAME)->first();
+        if ($oldUser != null){
+            $oldUser->deleteWithLicenses();
+        }
 
 
+        $userCount = User::all()->count();
+        $licenseCount = License::all()->count();
+        $subscriberCount = Subscriber::all()->count();
+        $trialReqCount = TrialRequest::all()->count();
 
+        $response = $this->call(
+            'POST',
+            self::URL,
+            [
+                'version' => AccountController::VERSION,
+                'imei' => 'a',
+                'captcha' =>'captcha',
+                'username' => self::TEST_USERNAME
+            ]
+            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
+        );
+        $json = json_decode($response->getContent());
+
+        $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
+        $this->assertEquals(self::TEST_USERNAME, $json->username);
+
+        // assert all records created
+        $this->assertEquals($userCount + 1, User::all()->count());
+        $this->assertEquals($licenseCount + 1, License::all()->count());
+        $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
+        $this->assertEquals($trialReqCount + 1, TrialRequest::all()->count());
+
+        // delete all
+        $user = User::where('username', $json->username)->first();
+        $user->deleteWithLicenses();
+
+        // assert again
+        $this->assertEquals($userCount, User::all()->count());
+        $this->assertEquals($licenseCount, License::all()->count());
+        $this->assertEquals($subscriberCount, Subscriber::all()->count());
+    }
 
 }

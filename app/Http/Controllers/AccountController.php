@@ -28,6 +28,8 @@ class AccountController extends Controller {
 
     const USERNAME_REGEX = "/^[A-Za-z0-9_-]{3,18}$/";
 
+    const TEST_NON_QA_IP = "127.0.0.2";
+
     private $securimage;
     private $phonexIP;
 
@@ -93,6 +95,7 @@ class AccountController extends Controller {
                 $this->checkUsernameValid($username);
             }
         } catch (\Exception $e){
+            Log::error("postTrial; verification checked failed", [$e]);
             return $this->responseError($e->getCode());
         }
 
@@ -178,9 +181,8 @@ class AccountController extends Controller {
             $user = $this->issueAccount($username, $password, $licenseType, array(), $isQaTrial, $trialNumber);
         } catch (\Exception $e){
             Log::error("issueTrial; cannot create trial account", [$e]);
-            return $this->responseError($e->getCode());
+            return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
         }
-
 
         // save user id to trial request
         $trialRequest->phonexUserId = $user->id;
@@ -216,7 +218,7 @@ class AccountController extends Controller {
         // allow user to try again
         if(!$saved){
             Log::error("Cannot create record in PhoneX_users table");
-            return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
+            throw new \Exception("Cannot save User");
         }
 
         // assign groups
@@ -246,7 +248,7 @@ class AccountController extends Controller {
         // if sip user creation fails, allow to try again
         if (!$savedSipUser) {
             Log::error("Cannot create subscriber in SOAP subscriber list.");
-            throw new \Exception("", self::RESP_ERR_UNKNOWN_ERROR);
+            throw new \Exception("Cannot save User");
         }
 
         // add support to contact list
@@ -312,6 +314,11 @@ class AccountController extends Controller {
     }
 
     private function checkCorrectCaptcha(Request $request) {
+        // for testing purposes
+        if (\Input::getClientIp() == self::TEST_NON_QA_IP){
+            return;
+        }
+
         $captcha = $request->get('captcha');
 
         $this->isPhonexIp();

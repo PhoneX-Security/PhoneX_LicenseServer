@@ -38,6 +38,10 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->hasMany('Phonex\License', 'issuer_id');
     }
 
+    public function createdBusinessCodes(){
+        return $this->hasMany('Phonex\BusinessCode', 'creator_id');
+    }
+
     public function subscriber(){
         // weird, parameters 2 + 3 are switched ()
 //        return $this->hasOne('Phonex\Subscriber', 'subscriber_id', );
@@ -52,5 +56,18 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     public static function getSupportUser(){
 //        return User::where('username', "support")->first();
         return User::where('username', "phonex-support")->first();
+    }
+
+    public function deleteWithLicenses(){
+        $licenses = $this->licenses;
+        foreach($licenses as $license){
+            $license->delete();
+        }
+
+        $subscriber = $this->subscriber();
+        $subscriber->delete();
+
+        $this->groups()->detach();
+        $this->delete();
     }
 }
