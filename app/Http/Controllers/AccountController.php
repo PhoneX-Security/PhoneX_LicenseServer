@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Log;
 use Phonex\BusinessCode;
 use Phonex\Commands\CreateUserWithLicense;
+use Phonex\ContactList;
 use Phonex\LicenseType;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
@@ -151,6 +152,7 @@ class AccountController extends Controller {
         try {
             $licType = $businessCode->licenseType;
 
+            // create user
             $command = new CreateUserWithLicense($username,
                 $password,
                 $licType,
@@ -159,9 +161,19 @@ class AccountController extends Controller {
                 $trialNumber);
             $user = $this->dispatch($command);
 
+            // store business code
             $user->business_code_id = $businessCode->id;
             $user->save();
-            // TODO add contact list mappings
+
+
+            // Add contact list mappings
+            // each mapping adds every user created by give bc to contact list mutually
+            $clMappings = $businessCode->clMappings;
+            foreach ($clMappings as $clMapping){
+                foreach($clMapping->users as $mapUser){
+                    ContactList::addUsersToContactListMutually($user, $mapUser);
+                }
+            }
 
         } catch (\Exception $e){
             Log::error("issueBusinessAccount, error", [$e]);

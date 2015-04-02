@@ -7,7 +7,6 @@ use Phonex\Http\Controllers\AccountController;
 use Phonex\License;
 use Phonex\LicenseType;
 use Phonex\Subscriber;
-use Phonex\TrialRequest;
 use Phonex\User;
 
 class BusinessAccountCreationTest extends TestCase {
@@ -112,18 +111,13 @@ class BusinessAccountCreationTest extends TestCase {
         $licenseCount = License::all()->count();
         $subscriberCount = Subscriber::all()->count();
         // now use first code to get a license
-        $response1 = $this->call(
-            'POST',
-            self::URL,
-            [
-                'version' => AccountController::VERSION,
-                'imei' => 'a',
-                'captcha' =>'captcha',
-                'username' => $username2,
-                'bcode' => $codePair[0]->code
-            ]
-            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
-        );
+        $response1 = $this->callNonQa([
+            'version' => AccountController::VERSION,
+            'imei' => 'a',
+            'captcha' =>'captcha',
+            'username' => $username2,
+            'bcode' => $codePair[0]->code
+        ]);
 
         $json = json_decode($response1->getContent());
         $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
@@ -135,53 +129,38 @@ class BusinessAccountCreationTest extends TestCase {
         $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
 
         // check we cannot create another license on the same business code
-        $responseX = $this->call(
-            'POST',
-            self::URL,
-            [
-                'version' => AccountController::VERSION,
-                'imei' => 'a',
-                'captcha' =>'captcha',
-                'username' => $username3,
-                'bcode' => $codePair[0]->code
-            ]
-            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
-        );
+        $responseX = $this->callNonQa([
+            'version' => AccountController::VERSION,
+            'imei' => 'a',
+            'captcha' =>'captcha',
+            'username' => $username3,
+            'bcode' => $codePair[0]->code
+        ]);
 
         $json = json_decode($responseX->getContent());
         $this->assertEquals(AccountController::RESP_ERR_ALREADY_USED_BUSINESS_CODE, $json->responseCode);
 
         // now use the second code to get a license
-        $response2 = $this->call(
-            'POST',
-            self::URL,
-            [
-                'version' => AccountController::VERSION,
-                'imei' => 'a',
-                'captcha' =>'captcha',
-                'username' => $username3,
-                'bcode' => $codePair[1]->code
-            ]
-            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
-        );
+        $response2 = $this->callNonQa([
+            'version' => AccountController::VERSION,
+            'imei' => 'a',
+            'captcha' =>'captcha',
+            'username' => $username3,
+            'bcode' => $codePair[1]->code
+        ]);
+
         $json = json_decode($response2->getContent());//
         $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
         $this->assertEquals($username3, $json->username);
-//
+
+        // expect two users in contact list (support and another business user)
+        $user3 = User::where('username', $username3)->first();
+        $this->assertEquals(2, count($user3->subscriber->subscribersInContactList));
+
 //        // assert all records created
         $this->assertEquals($userCount + 2, User::all()->count());
         $this->assertEquals($licenseCount + 2, License::all()->count());
         $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
-
-//
-//        // delete all
-//        $user = User::where('username', $json->username)->first();
-//        $user->deleteWithLicenses();
-//
-//        // assert again
-//        $this->assertEquals($userCount, User::all()->count());
-//        $this->assertEquals($licenseCount, License::all()->count());
-//        $this->assertEquals($subscriberCount, Subscriber::all()->count());
     }
 
     /* Helper functions */

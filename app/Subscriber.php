@@ -15,6 +15,10 @@ class Subscriber extends Model{
     // legacy - Subscriber table doesn't have timestamps
     public $timestamps = false;
 
+    public function subscribersInContactList(){
+        return $this->belongsToMany('Phonex\Subscriber', 'contactlist', 'subscriber_id', 'int_usr_id');
+    }
+
     public function setPasswordFields($password){
         if (empty($this->username) || empty($this->domain)){
             throw new InvalidStateException('Cannot set password fields (HA1_1, HA1_2) because username or domain is empty in this object.');
