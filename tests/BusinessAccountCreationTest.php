@@ -84,6 +84,10 @@ class BusinessAccountCreationTest extends TestCase {
      * Main test
      */
     public function testAccountCreation(){
+        // Mock Queue push because it might trigger Stack Overflow
+        Queue::shouldReceive('push');
+        Queue::shouldReceive('connected');
+
         $username1 = "kajsmentke";
         $username2 = "kozmeker";
         $username3 = "fajnsmeker";
@@ -147,29 +151,27 @@ class BusinessAccountCreationTest extends TestCase {
         $json = json_decode($responseX->getContent());
         $this->assertEquals(AccountController::RESP_ERR_ALREADY_USED_BUSINESS_CODE, $json->responseCode);
 
-
-
         // now use the second code to get a license
-//        $response2 = $this->call(
-//            'POST',
-//            self::URL,
-//            [
-//                'version' => AccountController::VERSION,
-//                'imei' => 'a',
-//                'captcha' =>'captcha',
-//                'username' => $username3,
-//                'bcode' => $codePair[1]->code
-//            ]
-//            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
-//        );
-//        $json = json_decode($response2->getContent());//
-//        $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
-//        $this->assertEquals(self::TEST_USERNAME, $username3);
+        $response2 = $this->call(
+            'POST',
+            self::URL,
+            [
+                'version' => AccountController::VERSION,
+                'imei' => 'a',
+                'captcha' =>'captcha',
+                'username' => $username3,
+                'bcode' => $codePair[1]->code
+            ]
+            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
+        );
+        $json = json_decode($response2->getContent());//
+        $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
+        $this->assertEquals($username3, $json->username);
 //
 //        // assert all records created
-//        $this->assertEquals($userCount + 2, User::all()->count());
-//        $this->assertEquals($licenseCount + 2, License::all()->count());
-//        $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
+        $this->assertEquals($userCount + 2, User::all()->count());
+        $this->assertEquals($licenseCount + 2, License::all()->count());
+        $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
 
 //
 //        // delete all

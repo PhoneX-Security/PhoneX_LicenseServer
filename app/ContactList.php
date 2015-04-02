@@ -29,7 +29,6 @@ class ContactList extends Model{
             throw new \Exception("ContactList; no support user exists");
         }
         return ContactList::addUsersToContactListMutually($user, $supportUser, null, "PhoneX Support");
-
     }
 
     /**
@@ -47,7 +46,6 @@ class ContactList extends Model{
         if (!$user2->subscriber_id){
             throw new InvalidStateException("Cannot add user '" . $user2->username . "' as contact because he has no subscriber id");
         }
-
 
         // mutual attributes
         $record1 = new ContactList();
@@ -74,6 +72,7 @@ class ContactList extends Model{
             Log::error("addUsersToContactListMutually; cannot create record1 in contact list");
             return false;
         } else {
+            // in phpunit, this may cause stackoverflow, please mock it!
             Queue::push('ContactListUpdated', ['username'=>$user2->email], 'users');
         }
 
@@ -81,6 +80,7 @@ class ContactList extends Model{
             Log::error("addUsersToContactListMutually; cannot create record2 in contact list");
             return false;
         } else {
+            // in phpunit, this may cause stackoverflow, please mock it!
             Queue::push('ContactListUpdated', ['username'=>$user1->email], 'users');
         }
 
