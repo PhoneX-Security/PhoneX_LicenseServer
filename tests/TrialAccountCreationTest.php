@@ -8,7 +8,7 @@ use Phonex\User;
 
 class TrialAccountCreationTest extends TestCase {
     const URL = '/account/trial';
-    const TEST_USERNAME = "kexo_test123_kexo";
+    const TEST_USERNAME = "kexo_test123_trial";
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -103,7 +103,6 @@ class TrialAccountCreationTest extends TestCase {
             $oldUser->deleteWithLicenses();
         }
 
-
         $userCount = User::all()->count();
         $licenseCount = License::all()->count();
         $subscriberCount = Subscriber::all()->count();
@@ -140,5 +139,4 @@ class TrialAccountCreationTest extends TestCase {
         $this->assertEquals($licenseCount, License::all()->count());
         $this->assertEquals($subscriberCount, Subscriber::all()->count());
     }
-
 }

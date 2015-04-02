@@ -1,11 +1,9 @@
 <?php namespace Phonex\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Log;
 use Phonex\BusinessCode;
-use Phonex\ContactList;
-use Phonex\License;
+use Phonex\Commands\CreateUserWithLicense;
 use Phonex\LicenseType;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
@@ -28,7 +26,10 @@ class AccountController extends Controller {
 
     const USERNAME_REGEX = "/^[A-Za-z0-9_-]{3,18}$/";
 
+    // testing constants
     const TEST_NON_QA_IP = "127.0.0.2";
+    const QA_CAPTCHA = "captcha";
+    const QA_CODE = "qacodeqac";
 
     private $securimage;
     private $phonexIP;
@@ -37,10 +38,10 @@ class AccountController extends Controller {
         $this->securimage = new Securimage();
     }
 
-    public function getCaptcha(){
+    public function getCaptcha(Request $request){
         $img = new Securimage();
 
-        $captchaHeight =  intval(Request::input("height", 120));
+        $captchaHeight =  intval($request->get('height', 120));
         $captchaHeight = min($captchaHeight, 384);
 
         // You can customize the image by making changes below, some examples are included - remove the "//" to uncomment
@@ -111,7 +112,7 @@ class AccountController extends Controller {
         $trialRequest->save();
 
         if ($isValid) {
-            return $this->issueTrial($trialRequest);
+            return $this->issueTrialAccount($trialRequest);
         } else {
             Log::error("Request is not valid.");
             return $this->responseError(self::RESP_ERR_TRIAL_EXISTS);
@@ -123,7 +124,7 @@ class AccountController extends Controller {
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response|void
      */
-    public function postCreateCodeAccount(Request $request){
+    public function postBusinessAccount(Request $request){
         try {
             $this->checkCompulsoryFields($request, ['version', 'captcha', 'imei', 'username', 'bcode']);
             $this->checkValidRequestVersion($request);
@@ -136,10 +137,10 @@ class AccountController extends Controller {
         } catch (\Exception $e){
             return $this->responseError($e->getCode());
         }
-        return $this->issueCodeAccount($request);
+        return $this->issueBusinessAccount($request);
     }
 
-    private function issueCodeAccount(Request $request){
+    private function issueBusinessAccount(Request $request){
         $isQaTrial = $this->isPhonexIp();
         $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
 
@@ -148,12 +149,14 @@ class AccountController extends Controller {
         $businessCode = BusinessCode::where('code', $request->get('bcode'))->first();
 
         try {
-            $user = $this->issueAccount($username,
+
+            $command = new CreateUserWithLicense($username,
                 $password,
                 $businessCode->licenseType(),
                 [$businessCode->group->id],
                 $isQaTrial,
                 $trialNumber);
+            $user = $this->dispatch($command);
 
             // TODO add contact list mappings
 
@@ -165,7 +168,7 @@ class AccountController extends Controller {
         return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
     }
 
-    private function issueTrial(TrialRequest $trialRequest){
+    private function issueTrialAccount(TrialRequest $trialRequest){
         $isQaTrial = $this->isPhonexIp(\Input::getClientIp());
         $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
 
@@ -178,7 +181,9 @@ class AccountController extends Controller {
         $password = rand(100000, 999999);
 
         try {
-            $user = $this->issueAccount($username, $password, $licenseType, array(), $isQaTrial, $trialNumber);
+//            $user = $this->issueAccount($username, $password, $licenseType, array(), $isQaTrial, $trialNumber);
+            $command = new CreateUserWithLicense($username, $password, $licenseType, array(), $isQaTrial, $trialNumber);
+            $user = $this->dispatch($command);
         } catch (\Exception $e){
             Log::error("issueTrial; cannot create trial account", [$e]);
             return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
@@ -191,72 +196,6 @@ class AccountController extends Controller {
         $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
 
         return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
-    }
-
-    /**
-     * Main function for account creation
-     * TODO Should be unified with account creation in UserController and moved to Commands folder as a command type
-     * @param $username
-     * @param $password
-     * @param LicenseType $licenseType
-     * @param array $groupsId
-     * @param bool $isQaTrial
-     * @param null $trialNumber
-     * @return User
-     * @throws \Exception
-     */
-    private function issueAccount($username, $password, LicenseType $licenseType, $groupsId = array(), $isQaTrial = false, $trialNumber = null){
-        $user = new User();
-        $user->username = $username;
-        $user->email = $user->username . "@phone-x.net";
-        $user->has_access = 0;
-        $user->trialNumber = $trialNumber;
-        $user->confirmed = 1;
-        $user->qa_trial = $isQaTrial ? 1 : 0;
-        $saved = $user->save();
-
-        // allow user to try again
-        if(!$saved){
-            Log::error("Cannot create record in PhoneX_users table");
-            throw new \Exception("Cannot save User");
-        }
-
-        // assign groups
-        if (!empty($groupsId)){
-            $user->groups()->attach($groupsId);
-        }
-
-        $startsAt = Carbon::now()->toDateTimeString();
-        $c_expiresAt = Carbon::now()->addDays($licenseType->days);
-        $expiresAt = $c_expiresAt->toDateTimeString();
-
-        $license = new License();
-        $license->user_id = $user->id;
-        $license->license_type_id = $licenseType->id;
-        $license->starts_at = $startsAt;
-        $license->expires_at = $expiresAt;
-        $license->save();
-
-
-        // Create a new user on the SOAP server
-        $subscriber = Subscriber::createSubscriber($user->username, $password, $startsAt, $expiresAt);
-        $savedSipUser = $subscriber->save();
-
-        $user->subscriber_id = $subscriber->id;
-        $user->save();
-
-        // if sip user creation fails, allow to try again
-        if (!$savedSipUser) {
-            Log::error("Cannot create subscriber in SOAP subscriber list.");
-            throw new \Exception("Cannot save User");
-        }
-
-        // add support to contact list
-        if (!$isQaTrial){
-            ContactList::addSupportToContactListMutually($user);
-        }
-
-        return $user;
     }
 
     private function checkCorrectBusinessCode(Request $request){
@@ -323,7 +262,7 @@ class AccountController extends Controller {
 
         $this->isPhonexIp();
 
-        if ($this->isPhonexIp() && $captcha === 'captcha'){
+        if ($this->isPhonexIp() && $captcha === self::QA_CAPTCHA){
             return;
         }
 
