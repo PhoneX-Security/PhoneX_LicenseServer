@@ -24,6 +24,7 @@ class AccountController extends Controller {
     const RESP_ERR_USERNAME_BAD_FORMAT = 405;
     const RESP_ERR_BAD_BUSINESS_CODE = 406;
     const RESP_ERR_ALREADY_USED_BUSINESS_CODE = 407;
+    const RESP_ERR_UNSUPPORTED_VERSION = 408;
 
     const USERNAME_REGEX = "/^[A-Za-z0-9_-]{3,18}$/";
 
@@ -162,7 +163,7 @@ class AccountController extends Controller {
     }
 
     private function issueTrial(TrialRequest $trialRequest){
-        $isQaTrial = $this->isPhonexIp();
+        $isQaTrial = $this->isPhonexIp(\Input::getClientIp());
         $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
 
         $username = ($trialRequest->username) ? $trialRequest->username : 'trial' . $trialNumber;
@@ -176,14 +177,16 @@ class AccountController extends Controller {
         try {
             $user = $this->issueAccount($username, $password, $licenseType, array(), $isQaTrial, $trialNumber);
         } catch (\Exception $e){
+            Log::error("issueTrial; cannot create trial account", [$e]);
             return $this->responseError($e->getCode());
         }
+
 
         // save user id to trial request
         $trialRequest->phonexUserId = $user->id;
         $trialRequest->save();
 
-        $expiresAtUnixTime = strtotime($user->subscriber()->expires_on);
+        $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
 
         return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
     }
@@ -221,11 +224,9 @@ class AccountController extends Controller {
             $user->groups()->attach($groupsId);
         }
 
-
         $startsAt = Carbon::now()->toDateTimeString();
         $c_expiresAt = Carbon::now()->addDays($licenseType->days);
         $expiresAt = $c_expiresAt->toDateTimeString();
-        $expiresAtUnixTime = $c_expiresAt->format("U");
 
         $license = new License();
         $license->user_id = $user->id;
@@ -233,6 +234,7 @@ class AccountController extends Controller {
         $license->starts_at = $startsAt;
         $license->expires_at = $expiresAt;
         $license->save();
+
 
         // Create a new user on the SOAP server
         $subscriber = Subscriber::createSubscriber($user->username, $password, $startsAt, $expiresAt);
@@ -285,18 +287,18 @@ class AccountController extends Controller {
         $version = intval($request->get('version'));
         if ($version != AccountController::VERSION){
             Log::error("Invalid version ".$version.", only ". AccountController::VERSION . " is supported.");
-            throw new \Exception("", self::RESP_ERR_INVALID_REQUEST);
+            throw new \Exception("", self::RESP_ERR_UNSUPPORTED_VERSION);
         }
     }
 
     private function checkUsernameValid($username){
-        if (User::where('username', $username)->count() > 0 ||
+        if (!preg_match(AccountController::USERNAME_REGEX, $username)){
+            Log::error("Username " . $username . " doesn't match username regex.");
+            throw new \Exception("", self::RESP_ERR_USERNAME_BAD_FORMAT);
+        } else if (User::where('username', $username)->count() > 0 ||
             Subscriber::where('username', $username)->count() > 0){
             Log::error("Username with name " . $username . " already exists");
             throw new \Exception("", self::RESP_ERR_EXISTING_USERNAME);
-        } else if (!preg_match(AccountController::USERNAME_REGEX, $username)){
-            Log::error("Username " . $username . " doesn't match username regex.");
-            throw new \Exception("", self::RESP_ERR_USERNAME_BAD_FORMAT);
         }
     }
 
@@ -311,18 +313,21 @@ class AccountController extends Controller {
 
     private function checkCorrectCaptcha(Request $request) {
         $captcha = $request->get('captcha');
+
+        $this->isPhonexIp();
+
         if ($this->isPhonexIp() && $captcha === 'captcha'){
             return;
         }
 
         if ($this->securimage->check($captcha) == false) {
             Log::error("Bad captcha entered [received=" . $captcha . " ]");
-            throw new \Exception("", AccountController::badCaptchaJson);
+            throw new \Exception("", self::RESP_ERR_BAD_CAPTCHA);
         }
     }
 
     private function isValidRequest(Request $request){
-        $ip = $_SERVER['REMOTE_ADDR'];
+        $ip = $request->getClientIp();
         $imei = $request->get('imei');
         $dateThresholdStart = dbDatetime(strtotime('-14 days'));
         $dateThresholdEnd = dbDatetime(strtotime('-6 days'));
@@ -368,7 +373,7 @@ class AccountController extends Controller {
     }
 
     private function isPhonexIp(){
-        $remote = $_SERVER['REMOTE_ADDR'];
-        return $remote == $this->getPhonexIp() || $remote == '89.176.153.219';
+        $remote = \Input::getClientIp();
+        return $remote == $this->getPhonexIp() || $remote == '127.0.0.1';
     }
 }

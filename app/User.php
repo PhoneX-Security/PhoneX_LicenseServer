@@ -40,6 +40,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function subscriber(){
         // weird, parameters 2 + 3 are switched ()
+//        return $this->hasOne('Phonex\Subscriber', 'subscriber_id', );
         return $this->hasOne('Phonex\Subscriber', 'id', 'subscriber_id');
     }
 

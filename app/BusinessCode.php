@@ -40,7 +40,10 @@ class BusinessCode extends Model{
 
     /**
      *
-     * @param null $prefix, possible prefix, CANNOT contain '1','i','o' or '0' characters, max length 2 chars
+     * @param null $prefix, possible le = 'business_codes';
+    public static $chars = 'abcdefghjklmnpqrstuvwxyz23456789'; // i,1,0,o characters are skipped
+    const MODULO = 29; // 32 characters, therefore modulo 29
+    const BASE_LENGTH = 8; // base length +prefix, CANNOT contain '1','i','o' or '0' characters, max length 2 chars
      * @return string
      */
     public static function generateUniqueCode($prefix = null){

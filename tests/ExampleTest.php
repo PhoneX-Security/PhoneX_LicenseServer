@@ -9,9 +9,11 @@ class ExampleTest extends TestCase {
 	 */
 	public function testBasicExample()
 	{
-//		$response = $this->call('GET', '/');
+		$response = $this->call('GET', '/');
 
-//		$this->assertEquals(200, $response->getStatusCode());
+        // without login, we should be redirected first
+		$this->assertEquals(302, $response->getStatusCode());
+
 	}
 
 }
