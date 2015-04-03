@@ -37,7 +37,7 @@ class BusinessCodeController extends Controller {
         $bcodes = array();
 
         for ($i=0; $i < $numberOfPairs; $i++){
-            $command = new CreateBusinessCodePair($creator, $mpLicenseType, $mpGroup, 1);
+            $command = new CreateBusinessCodePair($creator, $mpLicenseType, $mpGroup, 1, 'mp');
             $newCodes = $this->dispatch($command);
             array_merge($bcodes, $newCodes);
         }

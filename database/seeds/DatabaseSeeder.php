@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder {
 
 		$this->call('LicenseTypesSeeder');
         $this->command->info('License Types table seeded!');
+
+        $this->call('GroupsSeeder');
+        $this->command->info('Groups table seeded!');
 	}
 
 }

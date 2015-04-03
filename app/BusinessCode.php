@@ -77,8 +77,8 @@ class BusinessCode extends Model{
         $code = getRandomString(self::BASE_LENGTH, self::$chars);
 
         if ($prefix != null){
-            if (strlen($prefix) > 2){
-                throw new \LengthException("getCode; prefix can be max 2 characters long");
+            if (strlen($prefix) > 7){
+                throw new \LengthException("getCode; prefix can be max 7 characters long");
             }
 
             $code = $prefix . substr($code, strlen($prefix));

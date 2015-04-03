@@ -145,7 +145,8 @@ class AccountController extends Controller {
         $isQaTrial = $this->isPhonexIp();
         $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
 
-        $username = (!$isQaTrial) ? $request->get('username') : 'trial' . $trialNumber;
+        $username = (!$isQaTrial) ? $request->get('username') : 'qa_trial' . $trialNumber;
+        Log::info("Creating business account", [$username]);
         $password = rand(100000, 999999);
         $businessCode = BusinessCode::where('code', $request->get('bcode'))->first();
 

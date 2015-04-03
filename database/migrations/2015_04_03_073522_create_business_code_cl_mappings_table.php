@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBusinessCodesClMappingsTable extends Migration {
+class CreateBusinessCodeClMappingsTable extends Migration {
 
 	/**
 	 * Run the migrations.

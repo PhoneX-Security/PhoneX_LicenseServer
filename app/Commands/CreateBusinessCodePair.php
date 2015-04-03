@@ -30,19 +30,25 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
      * @var int
      */
     private $exported;
+    /**
+     * @var string
+     */
+    private $prefix;
 
     /**
      * @param User $creator
      * @param LicenseType $licenseType
      * @param Group $group
      * @param int $exported
+     * @param string $prefix
      */
-    public function __construct(User $creator, LicenseType $licenseType, Group $group, $exported = 0){
+    public function __construct(User $creator, LicenseType $licenseType, Group $group, $exported = 0, $prefix = ''){
 
         $this->creator = $creator;
         $this->licenseType = $licenseType;
         $this->group = $group;
         $this->exported = $exported;
+        $this->prefix = $prefix;
     }
 
 	public function handle(){
@@ -50,7 +56,7 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
         // first code
 
         $bc1 = new BusinessCode();
-        $bc1->code = BusinessCode::generateUniqueCode();
+        $bc1->code = BusinessCode::generateUniqueCode($this->prefix);
         $bc1->group_id = $this->group->id;
         $bc1->creator_id = $this->creator->id;
 
@@ -61,7 +67,7 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
 
         // second code
         $bc2 = clone $bc1;
-        $bc2->code = BusinessCode::generateUniqueCode();
+        $bc2->code = BusinessCode::generateUniqueCode($this->prefix);
 
         $bc1->save();
         $bc2->save();

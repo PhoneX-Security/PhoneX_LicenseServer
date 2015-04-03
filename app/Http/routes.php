@@ -11,8 +11,7 @@
 |
 */
 
-use Carbon\Carbon;
-use Phonex\TrialRequest;
+use Phonex\BusinessCode;
 use Phonex\User;
 
 Route::get('home', 'HomeController@index');
@@ -48,6 +47,30 @@ Route::get('x', function(){
     Queue::push('ContactListUpdated', ['username'=>$user], 'users');
     echo 'amqp message sent to requested user ';
 });
+
+Route::get('test_del', function(){
+//    $u = User::where('username', 'qa_trial128')->first();
+//    $u->deleteWithLicenses();
+});
+
+
+Route::get('test_code', function(){
+    $code = BusinessCode::getCode('qqqqqqq');
+    echo "$code";
+});
+
+Route::get('test_mail', function(){
+    $email = 'svitok@phone-x.net';
+
+    $r = Mail::raw('check me out2', function($message) use ($email)
+    {
+        $message->from('license-server@phone-x.net', 'License server');
+        $message->to($email)->subject('Mobil Pohotovost: new code pairs');
+    });
+    dd($r);
+});
+
+
 
 
 //Route::get('passr', function(){
