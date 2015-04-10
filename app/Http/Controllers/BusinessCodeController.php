@@ -39,10 +39,17 @@ class BusinessCodeController extends Controller {
         for ($i=0; $i < $numberOfPairs; $i++){
             $command = new CreateBusinessCodePair($creator, $mpLicenseType, $mpGroup, 1, 'mp');
             $newCodes = $this->dispatch($command);
-            array_merge($bcodes, $newCodes);
+            $bcodes = array_merge($bcodes, $newCodes);
         }
 
-        Mail::send('emails.mp_bcodes', [ 'bcodes' => $bcodes], function($message) use ($email)
+
+        foreach($bcodes as $c){
+            // add dashes
+            $c->code = substr($c->code, 0, 3) . "-" . substr($c->code, 3, 3) . "-" . substr($c->code, 6);
+        }
+//        dd($bcodes);
+
+        Mail::send('emails.mp_bcodes', ['bcodes' => $bcodes], function($message) use ($email)
         {
             $message->from('license-server@phone-x.net', 'License server');
             $message->to($email)->subject('Mobil Pohotovost: new code pairs');

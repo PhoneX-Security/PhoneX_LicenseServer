@@ -90,7 +90,6 @@ class BusinessCode extends Model{
     }
 
     private static function getParityCharacter($code){
-//        echo "\ncode $code\n";
         if (!$code || strlen($code) != self::BASE_LENGTH){
             throw new \LengthException("To generate parity character, we require 7 characters long code.");
         }

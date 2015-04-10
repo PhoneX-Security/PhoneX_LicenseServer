@@ -97,7 +97,7 @@ class AccountController extends Controller {
                 $this->checkUsernameValid($username);
             }
         } catch (\Exception $e){
-            Log::error("postTrial; verification checked failed", [$e]);
+//            Log::error("postTrial; verification checked failed", [$e]);
             return $this->responseError($e->getCode());
         }
 
@@ -115,7 +115,7 @@ class AccountController extends Controller {
         if ($isValid) {
             return $this->issueTrialAccount($trialRequest);
         } else {
-            Log::error("Request is not valid.");
+//            Log::error("Request is not valid.");
             return $this->responseError(self::RESP_ERR_TRIAL_EXISTS);
         }
     }
@@ -202,7 +202,7 @@ class AccountController extends Controller {
             $command = new CreateUserWithLicense($username, $password, $licenseType, array(), $isQaTrial, $trialNumber);
             $user = $this->dispatch($command);
         } catch (\Exception $e){
-            Log::error("issueTrial; cannot create trial account", [$e]);
+//            Log::error("issueTrial; cannot create trial account", [$e]);
             return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
         }
 
@@ -221,12 +221,12 @@ class AccountController extends Controller {
         // parity check
         try {
             if (!BusinessCode::parityCheck($codeParam)){
-                Log::error("Requested business code has bad parity", [$request->all()]);
+//                Log::error("Requested business code has bad parity", [$request->all()]);
                 throw new \Exception("", self::RESP_ERR_BAD_BUSINESS_CODE);
             }
             $code = BusinessCode::where('code', $codeParam)->firstOrFail();
         } catch (\Exception $e){
-            Log::error("Requested business code was not found in DB or has invalid format", [$e, $request->all()]);
+//            Log::error("Requested business code was not found in DB or has invalid format", [$e, $request->all()]);
             throw new \Exception("", self::RESP_ERR_BAD_BUSINESS_CODE);
         }
 
@@ -235,7 +235,7 @@ class AccountController extends Controller {
 //        var_dump($numberOfUsers);
 
         if ($numberOfUsers >= $code->users_limit){
-            Log::error("Requested business code is already used by #" . $numberOfUsers . " users", [$request->all()]);
+//            Log::error("Requested business code is already used by #" . $numberOfUsers . " users", [$request->all()]);
             throw new \Exception("", self::RESP_ERR_ALREADY_USED_BUSINESS_CODE);
         }
     }
@@ -247,18 +247,18 @@ class AccountController extends Controller {
     private function checkValidRequestVersion(Request $request){
         $version = intval($request->get('version'));
         if ($version != AccountController::VERSION){
-            Log::error("Invalid version ".$version.", only ". AccountController::VERSION . " is supported.");
+//            Log::error("Invalid version ".$version.", only ". AccountController::VERSION . " is supported.");
             throw new \Exception("", self::RESP_ERR_UNSUPPORTED_VERSION);
         }
     }
 
     private function checkUsernameValid($username){
         if (!preg_match(AccountController::USERNAME_REGEX, $username)){
-            Log::error("Username " . $username . " doesn't match username regex.");
+//            Log::error("Username " . $username . " doesn't match username regex.");
             throw new \Exception("", self::RESP_ERR_USERNAME_BAD_FORMAT);
         } else if (User::where('username', $username)->count() > 0 ||
             Subscriber::where('username', $username)->count() > 0){
-            Log::error("Username with name " . $username . " already exists");
+//            Log::error("Username with name " . $username . " already exists");
             throw new \Exception("", self::RESP_ERR_EXISTING_USERNAME);
         }
     }
@@ -266,7 +266,7 @@ class AccountController extends Controller {
     private function checkCompulsoryFields(Request $request, array $fields){
         foreach($fields as $field){
             if (!$request->has($field)){
-                Log::error("Missing some of the compulsory fields", $fields, $_REQUEST);
+//                Log::error("Missing some of the compulsory fields", $fields, $_REQUEST);
                 throw new \Exception("", self::RESP_ERR_INVALID_REQUEST);
             }
         }
@@ -287,7 +287,7 @@ class AccountController extends Controller {
         }
 
         if ($this->securimage->check($captcha) == false) {
-            Log::error("Bad captcha entered [received=" . $captcha . " ]");
+//            Log::error("Bad captcha entered [received=" . $captcha . " ]");
             throw new \Exception("", self::RESP_ERR_BAD_CAPTCHA);
         }
     }
