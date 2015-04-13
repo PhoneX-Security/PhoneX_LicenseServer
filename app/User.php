@@ -14,6 +14,7 @@ use Phonex\Utils\SortableTrait;
  * @property int has_access
  * @property int confirmed
  * @property mixed subscriber_id
+ * @property mixed subscriber
  */
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract {
 	use Authenticatable, CanResetPassword, SortableTrait;
