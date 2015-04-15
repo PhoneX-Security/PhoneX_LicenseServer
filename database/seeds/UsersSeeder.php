@@ -22,6 +22,7 @@ class UsersSeeder extends Seeder {
         $user = Bus::dispatch($command);
 
         $user->password = bcrypt('admin');
+        $user->has_access = 1;
         $user->save();
     }
 
