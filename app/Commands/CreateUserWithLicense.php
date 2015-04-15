@@ -35,14 +35,16 @@ class CreateUserWithLicense extends Command implements SelfHandling {
      * @var null
      */
     private $trialNumber;
+    public $addSupportContact;
 
-    public function __construct($username, $password, LicenseType $licenseType, $groupsId = array(), $isQaTrial = false, $trialNumber = null){
+    public function __construct($username, $password, LicenseType $licenseType, $groupsId = array(), $isQaTrial = false, $trialNumber = null, $addSupportContact = true){
         $this->username = $username;
         $this->password = $password;
         $this->licenseType = $licenseType;
         $this->groupsId = $groupsId;
         $this->isQaTrial = $isQaTrial;
         $this->trialNumber = $trialNumber;
+        $this->addSupportContact = $addSupportContact;
     }
 
 	public function handle(){
@@ -92,7 +94,7 @@ class CreateUserWithLicense extends Command implements SelfHandling {
         }
 
         // add support to contact list
-        if (!$this->isQaTrial){
+        if (!$this->isQaTrial && $this->addSupportContact){
             ContactList::addSupportToContactListMutually($user);
         }
 

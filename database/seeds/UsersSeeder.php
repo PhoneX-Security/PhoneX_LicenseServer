@@ -18,6 +18,7 @@ class UsersSeeder extends Seeder {
         // create user + license + subscription
         $command = new CreateUserWithLicense('admin',
             'admin', $licenseType);
+        $command->addSupportContact = false;
         $user = Bus::dispatch($command);
 
         $user->password = bcrypt('admin');
