@@ -21,6 +21,7 @@ class CreateLicenseTypesTable extends Migration {
 			$table->string('name');
 			$table->integer('days')->nullable();
 			$table->boolean('is_trial');
+            $table->integer('order');
 		});
 	}
 

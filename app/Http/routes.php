@@ -12,6 +12,8 @@
 */
 
 use Phonex\BusinessCode;
+use Phonex\Commands\IssueLicense;
+use Phonex\LicenseType;
 use Phonex\User;
 
 Route::get('home', 'HomeController@index');
@@ -43,9 +45,9 @@ Route::group(['middleware' => 'auth'], function() {
 
 /* Helper routes */
 Route::get('x', function(){
-    $user = Request::get('where', "test610@phone-x.net");
-    Queue::push('ContactListUpdated', ['username'=>$user], 'users');
-    echo 'amqp message sent to requested user ';
+    //$user = Request::get('where', "test610@phone-x.net");
+    //Queue::push('ContactListUpdated', ['username'=>$user], 'users');
+    //echo 'amqp message sent to requested user ';
 });
 
 Route::get('test_del', function(){
@@ -53,24 +55,23 @@ Route::get('test_del', function(){
 //    $u->deleteWithLicenses();
 });
 
+Route::get('test_issue', function(){
+//    $licType = LicenseType::find(3); // month license
+//
+//    $u1 = User::where('username', 'trial01')->first();
+//    $u2 = User::where('username', 'trial02')->first();
+//
+//    $command1 = new IssueLicense($u1, $licType);
+//    $command2 = new IssueLicense($u2, $licType);
+//    Bus::dispatch($command1);
+//    Bus::dispatch($command2);
+});
+
 
 Route::get('test_code', function(){
     $code = BusinessCode::getCode('qqqqqqq');
     echo "$code";
 });
-
-Route::get('test_mail', function(){
-    $email = 'svitok@phone-x.net';
-
-    $r = Mail::raw('check me out2', function($message) use ($email)
-    {
-        $message->from('license-server@phone-x.net', 'License server');
-        $message->to($email)->subject('Mobil Pohotovost: new code pairs');
-    });
-    dd($r);
-});
-
-
 
 
 //Route::get('passr', function(){

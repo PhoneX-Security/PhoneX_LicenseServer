@@ -30,7 +30,7 @@ class CreateUsersTable extends Migration {
 			$table->boolean('isTrial')->default(false);
             // QA trial user - flag to mark users that are for QA testing
             $table->boolean('qa_trial')->default(false);
-			$table->integer('trialNumber');
+			$table->integer('trialNumber')->nullable();
 			// foreign keys
 			$table->unsignedInteger('subscriber_id'); // referencing opensips db, table subscriber
 			$table->unsignedInteger('parent_id'); // self referencing
