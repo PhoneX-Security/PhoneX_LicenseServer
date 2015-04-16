@@ -74,12 +74,12 @@
                         <tr>
                             <th >{!! link_to_sort('id', 'ID') !!}</th>
                             <th >{!! link_to_sort('username', 'Username') !!}</th>
-                            <th>{!! link_to_sort('license_type', 'License type') !!}</th>
-                            <th>{!! link_to_sort('is_trial', 'Trial') !!}</th>
+                            <th>{!! link_to_sort('license_type', 'Expiration') !!}</th>
+                            <th>{!! link_to_sort('license_func_type', 'Type') !!}</th>
                             <th>Active</th>
                             <th>{!! link_to_sort('starts_at', 'Start date') !!}</th>
                             <th>{!! link_to_sort('expires_at', 'Expiration date') !!}</th>
-                            <th width="25%">Comment</th>
+                            <th width="22%">Comment</th>
                             <th>Options</th>
                         </tr>
                         @foreach($licenses as $lic)
@@ -87,7 +87,7 @@
                                 <td>{{ $lic->id}}</td>
                                 <td><a href="{{ \URL::route('users.show', [$lic->user_id]) }}">{{ $lic->username }}</a></td>
                                 <td>{{ ucfirst($lic->license_type) }}</td>
-                                <td>@if($lic->is_trial) Yes @else No @endif</td>
+                                <td>{{ ucfirst($lic->license_func_type) }}</td>
                                 <td>@if($lic->active) Yes @else No @endif</td>
                                 <td>{{ $lic->formatted_starts_at}}</td>
                                 <td>{{ $lic->formatted_expires_at }}</td>

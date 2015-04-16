@@ -50,10 +50,16 @@
                                     <dd><a href="{{ \URL::route('users.show', $license->user_id) }}">{{ $license->user->username }}</a></dd>
                                 </dl>
                             </div>
-                            <div class="col-md-6 ">
+                            <div class="col-md-3 ">
+                                <dl>
+                                    <dt>Expiration</dt>
+                                    <dd>{{ $license->licenseType->readableType() }}</dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-3 ">
                                 <dl>
                                     <dt>Type</dt>
-                                    <dd>{{ $license->licenseType->readableType() }}</dd>
+                                    <dd>{{ ucfirst($license->licenseFuncType->name) }}</dd>
                                 </dl>
                             </div>
                         </div>

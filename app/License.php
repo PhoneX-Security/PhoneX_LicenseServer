@@ -33,6 +33,10 @@ class License extends Model{
 		return $this->belongsTo('Phonex\LicenseType', 'license_type_id');
 	}
 
+    public function licenseFuncType() {
+        return $this->belongsTo('Phonex\LicenseFuncType', 'license_func_type_id');
+    }
+
     public function isActive(){
         if (!$this->expires_at || Carbon::now()->gt(Carbon::parse($this->expires_at))) {
             return false;
