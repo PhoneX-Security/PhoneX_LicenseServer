@@ -108,8 +108,8 @@
 											</div>
 										</div>
 
-										<div class="col-md-3">
-											<label for="password" class="control-label">Type</label>
+										<div class="col-md-2">
+											<label for="password" class="control-label">Expiration</label>
 											<select name="license_type_id" class="form-control" disabled>
 												@foreach($licenseTypes as $type)
 													<option value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
@@ -117,7 +117,16 @@
 											</select>
 										</div>
 
-										<div class="col-md-6 ">
+                                        <div class="col-md-2">
+                                            <label for="password" class="control-label">Type</label>
+                                            <select name="license_func_type_id" class="form-control" disabled>
+                                                @foreach($licenseFuncTypes as $type)
+                                                    <option value="{{ $type->id }}">{{ ucfirst($type->name) }} </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+										<div class="col-md-5 ">
 											<div class="form-group"><label for="sip_default_password" class="control-label">SIP default password</label>
 												<input class="form-control" value="{{ old('sip_default_password','phonexxx') }}" id="sip_default_password" type="text" name="sip_default_password" disabled>
 												<span class="help-block">Password will be changed on first login.</span>

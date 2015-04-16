@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Phonex\Commands\CreateUserWithLicense;
+use Phonex\Commands\CreateUser;
 use Phonex\LicenseType;
 
 class UsersSeeder extends Seeder {
@@ -13,17 +13,10 @@ class UsersSeeder extends Seeder {
      */
     public function run()
     {
-        $licenseType = LicenseType::find(4); // should be infinite license type
-
-        // create user + license + subscription
-        $command = new CreateUserWithLicense('admin',
-            'admin', $licenseType);
-        $command->addSupportContact = false;
+        // create user with access
+        $command = new CreateUser('admin');
+        $command->addAccess('admin');
         $user = Bus::dispatch($command);
-
-        $user->password = bcrypt('admin');
-        $user->has_access = 1;
-        $user->save();
     }
 
 }

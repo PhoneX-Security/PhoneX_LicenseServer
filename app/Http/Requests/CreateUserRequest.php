@@ -30,6 +30,7 @@ class CreateUserRequest extends Request {
 			'starts_at' => 'date_format:"d-m-Y"|required_with:issue_license',
 			'sip_default_password' => 'min:8|max:255|required_with:issue_license',
 			'license_type_id' => 'exists:phonex_license_types,id|required_with:issue_license',
+			'license_func_type_id' => 'exists:license_func_types,id|required_with:issue_license',
             'issuer_username' => 'exists:phonex_users,username|required_with:issue_license',
 		];
 	}

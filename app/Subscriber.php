@@ -7,6 +7,7 @@ use Phonex\Exceptions\InvalidStateException;
  * @property mixed id
  * @property mixed email_address
  * @property string turnPasswd
+ * @property  license_type
  */
 class Subscriber extends Model{
     protected $connection = 'mysql_opensips';
@@ -33,7 +34,7 @@ class Subscriber extends Model{
         $this->ha1b = $ha1b;
     }
 
-    public static function createSubscriber($username, $password, $startsAt, $expiresAt, $domain = 'phone-x.net'){
+    public static function createSubscriber($username, $password, $startsAt, $expiresAt, $licenseType, $domain = 'phone-x.net'){
         $sip = $username . "@" . $domain;
         $ha1 = getHA1_1($sip, $password);
         $ha1b = getHA1_2($sip, $domain, $password);
@@ -43,6 +44,8 @@ class Subscriber extends Model{
         $subscriber->domain = $domain;
 //        $sipUser->password =
         $subscriber->email_address = $sip;
+
+        $subscriber->license_type = $licenseType;
 
         $subscriber->ha1 = $ha1;
         $subscriber->ha1b = $ha1b;

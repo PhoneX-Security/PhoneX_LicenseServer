@@ -25,6 +25,10 @@ class BusinessCode extends Model{
         return $this->belongsTo('Phonex\LicenseType', 'license_type_id');
     }
 
+    public function licenseFuncType(){
+        return $this->belongsTo('Phonex\LicenseFuncType', 'license_func_type_id');
+    }
+
     public function users(){
         return $this->hasMany('Phonex\User', 'business_code_id');
     }

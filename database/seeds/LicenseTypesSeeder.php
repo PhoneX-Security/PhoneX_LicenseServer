@@ -20,7 +20,7 @@ class LicenseTypesSeeder extends Seeder {
         LicenseType::create(['name' => 'half_year', 'days' => 182, 'is_trial' => 0, 'order' => 5]);
         LicenseType::create(['name' => 'day', 'days' => 1, 'is_trial' => 0, 'order' => 1]);
         // mobil pohotovost
-        LicenseType::create(['name' => 'mp_half_year', 'days' => 91, 'is_trial' => 0, 'order' => 8]);
+//        LicenseType::create(['name' => 'mp_half_year', 'days' => 91, 'is_trial' => 0, 'order' => 8]);
 	}
 
 }

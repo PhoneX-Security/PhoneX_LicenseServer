@@ -6,6 +6,7 @@ use Phonex\Commands\CreateBusinessCodePair;
 use Phonex\Group;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\GenerateMPCodesRequest;
+use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 
 class BusinessCodeController extends Controller {
@@ -28,7 +29,8 @@ class BusinessCodeController extends Controller {
     public function postGenerateMpCodes(GenerateMPCodesRequest $request){
 
         $mpGroup = Group::where('name', 'Mobil Pohotovost')->first();
-        $mpLicenseType = LicenseType::where('name', 'mp_half_year')->first();
+        $mpLicenseType = LicenseType::where('name', 'half_year')->first();
+        $mpLicenseFuncType = LicenseFuncType::getFull();
 
         $numberOfPairs = $request->get('number_of_pairs');
         $email = $request->get('email');
@@ -37,7 +39,7 @@ class BusinessCodeController extends Controller {
         $bcodes = array();
 
         for ($i=0; $i < $numberOfPairs; $i++){
-            $command = new CreateBusinessCodePair($creator, $mpLicenseType, $mpGroup, 1, 'mp');
+            $command = new CreateBusinessCodePair($creator, $mpLicenseType, $mpLicenseFuncType, $mpGroup, 1, 'mp');
             $newCodes = $this->dispatch($command);
             $bcodes = array_merge($bcodes, $newCodes);
         }

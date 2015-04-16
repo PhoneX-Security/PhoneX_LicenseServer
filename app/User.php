@@ -67,11 +67,14 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
         $subscriber = $this->subscriber;
         // delete cl
-        ContactList::where('subscriber_id', $subscriber->id)
-            ->orWhere('int_usr_id', $subscriber->id)
-            ->delete();
+        if ($subscriber){
+            ContactList::where('subscriber_id', $subscriber->id)
+                ->orWhere('int_usr_id', $subscriber->id)
+                ->delete();
 
-        $subscriber->delete();
+            $subscriber->delete();
+        }
+
 
         $this->groups()->detach();
         $this->delete();

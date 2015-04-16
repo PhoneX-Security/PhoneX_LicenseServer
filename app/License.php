@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property  issuer_id
  * @property bool|mixed comment
  * @property  issuer_id
+ * @property mixed license_func_type_id
  */
 class License extends Model{
 //	use SortableTrait;

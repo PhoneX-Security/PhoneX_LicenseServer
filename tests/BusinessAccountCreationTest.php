@@ -1,10 +1,12 @@
 <?php
 
 use Phonex\Commands\CreateBusinessCodePair;
-use Phonex\Commands\CreateUserWithLicense;
+use Phonex\Commands\CreateSubscriberWithLicense;
+use Phonex\Commands\CreateUser;
 use Phonex\Group;
 use Phonex\Http\Controllers\AccountController;
 use Phonex\License;
+use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\Subscriber;
 use Phonex\User;
@@ -96,14 +98,18 @@ class BusinessAccountCreationTest extends TestCase {
 
         // now create user1 and issue Mobil Pohotovost business code
         $trialLic = LicenseType::find(1);
-        $command = new CreateUserWithLicense($username1, "fasirka_heslo", $trialLic);
+        $trialLicFunc = \Phonex\LicenseFuncType::getTrial();
+        $command = new CreateUser($username1);
         $user1 = Bus::dispatch($command);
+        $commandSub = new CreateSubscriberWithLicense($user1, $trialLic, $trialLicFunc, 'fasirka_heslo');
+        Bus::dispatch($commandSub);
 
         // predefined group + license type
         $mpGroup = Group::where('name', 'Mobil Pohotovost')->first();
-        $mpLicenseType = LicenseType::where('name', 'mp_half_year')->first();
+        $mpLicenseType = LicenseType::where('name', 'half_year')->first();
+        $mpLicenseFuncType = LicenseFuncType::getFull();
 
-        $command = new CreateBusinessCodePair($user1, $mpLicenseType, $mpGroup);
+        $command = new CreateBusinessCodePair($user1, $mpLicenseType, $mpLicenseFuncType, $mpGroup);
         $codePair = Bus::dispatch($command);
 
         // remember counts

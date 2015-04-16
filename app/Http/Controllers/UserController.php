@@ -4,6 +4,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Phonex\Commands\CreateSubscriberWithLicense;
+use Phonex\Commands\CreateUser;
 use Phonex\ContactList;
 use Phonex\Events\AuditEvent;
 use Phonex\Group;
@@ -11,6 +13,7 @@ use Phonex\Http\Requests;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\License;
+use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\Subscriber;
 use Phonex\User;
@@ -63,54 +66,29 @@ class UserController extends Controller {
 	public function create()
 	{
 		$licenseTypes = LicenseType::all()->sortBy('order');
-		return view('user.create', compact('licenseTypes'));
+        $licenseFuncTypes = LicenseFuncType::all()->sortBy('order');
+		return view('user.create', compact('licenseTypes', 'licenseFuncTypes'));
 	}
 
 
-	public function store(CreateUserRequest $request)
-	{
+	public function store(CreateUserRequest $request)	{
 		// all data should be valid at the moment (see @CreateUserRequest#rules)
-		$user = new User();
-		$user->username = InputPost::get('username');
-		$user->email = $user->username . "@phone-x.net"; //InputPost::get('email');
-		if (InputPost::has('has_access')){
-			$user->password = bcrypt(InputPost::get('password'));
-			$user->has_access = 1;
-		} else {
-			$user->has_access = 0;
-		}
-		$user->save();
+        $userRequest = new CreateUser($request->get('username'));
+        if ($request->has('has_access')){
+            $userRequest->addAccess($request->get('password'));
+        }
+        $user = $this->dispatch($userRequest);
 
-        event(AuditEvent::create('user', $user->id));
-
-        // store license
         if (InputPost::has('issue_license')){
-            $licenseType = LicenseType::find(InputPost::getInteger('license_type_id'));
-            $issuer = User::where('username', InputPost::get('issuer_username'))->first();
+            $licenseType = LicenseType::find($request->get('license_type_id'));
+            $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
+            $defaultSipPass = $request->get('sip_default_password');
 
-            $startsAt = InputPost::getCarbonTime('starts_at')->toDateTimeString();
-            $expiresAt = InputPost::getCarbonTime('starts_at')->addDays($licenseType->days);
-
-            $license = new License();
-            $license->user_id = $user->id;
-            $license->license_type_id = $licenseType->id;
-            $license->issuer_id = $issuer->id;
-            $license->comment = InputPost::get('comment');
-            $license->starts_at = $startsAt;
-            $license->expires_at = $expiresAt;
-            $license->save();
-
-            event(AuditEvent::create('license', $license->id));
-
-            $sipUser = Subscriber::createSubscriber($user->username, InputPost::get('sip_default_password'), $startsAt, $expiresAt);
-            $sipUser->save();
-
-            $user->subscriber_id = $sipUser->id;
-            $user->save();
+            $licRequest = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $defaultSipPass);
+            $this->dispatch($licRequest);
 
             // add support to contact list
             $supportAdded = ContactList::addSupportToContactListMutually($user);
-//            $supportAdded = false;
             return Redirect::route('users.index')
                 ->with('success', 'The new user ' . $user->username . ' + license has been created.' . ($supportAdded ? "Support account has been mutually added to contact list" : ""));
         }

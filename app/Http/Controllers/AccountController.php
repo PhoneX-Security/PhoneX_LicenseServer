@@ -3,8 +3,10 @@
 use Illuminate\Http\Request;
 use Log;
 use Phonex\BusinessCode;
-use Phonex\Commands\CreateUserWithLicense;
+use Phonex\Commands\CreateSubscriberWithLicense;
+use Phonex\Commands\CreateUser;
 use Phonex\ContactList;
+use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
@@ -147,24 +149,31 @@ class AccountController extends Controller {
 
         $username = (!$isQaTrial) ? $request->get('username') : 'qa_trial' . $trialNumber;
         Log::info("Creating business account", [$username]);
-        $password = rand(100000, 999999);
+        $sipPassword = rand(100000, 999999);
         $businessCode = BusinessCode::where('code', $request->get('bcode'))->first();
 
         try {
             $licType = $businessCode->licenseType;
+            $licFuncType = $businessCode->licenseFuncType;
 
             // create user
-            $command = new CreateUserWithLicense($username,
-                $password,
-                $licType,
+            $command = new CreateUser($username,
                 [$businessCode->group->id],
                 $isQaTrial,
                 $trialNumber);
             $user = $this->dispatch($command);
 
+            $createSubscriberCommand = new CreateSubscriberWithLicense($user, $licType, $licFuncType, $sipPassword);
+            $this->dispatch($createSubscriberCommand);
+
             // store business code
             $user->business_code_id = $businessCode->id;
             $user->save();
+
+            // add support if not trial
+            if (!$isQaTrial){
+                ContactList::addSupportToContactListMutually($user);
+            }
 
 
             // Add contact list mappings
@@ -182,7 +191,7 @@ class AccountController extends Controller {
         }
 
         $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
-        return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
+        return $this->responseOk($user->username, $user->email, $sipPassword, $expiresAtUnixTime);
     }
 
     private function issueTrialAccount(TrialRequest $trialRequest){
@@ -194,15 +203,23 @@ class AccountController extends Controller {
         if ($isQaTrial){
             $username = 'qa_trial' . $trialNumber;
         }
-        $licenseType = LicenseType::find(1); // MAGIC ID - trial is #1
-        $password = rand(100000, 999999);
+
+        $licenseType = LicenseType::find(1); // MAGIC ID - week is #1
+        $licenseFuncType = LicenseFuncType::getTrial();
+        $sipPassword = rand(100000, 999999);
 
         try {
-//            $user = $this->issueAccount($username, $password, $licenseType, array(), $isQaTrial, $trialNumber);
-            $command = new CreateUserWithLicense($username, $password, $licenseType, array(), $isQaTrial, $trialNumber);
-            $user = $this->dispatch($command);
+            $createUserCommand = new CreateUser($username, [], $isQaTrial, $trialNumber);
+            $user = $this->dispatch($createUserCommand);
+
+            $createLicCommand = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $sipPassword);
+            $license = $this->dispatch($createLicCommand);
+
+            if (!$isQaTrial){
+                ContactList::addSupportToContactListMutually($user);
+            }
         } catch (\Exception $e){
-//            Log::error("issueTrial; cannot create trial account", [$e]);
+            Log::error("issueTrial; cannot create trial account", [$e]);
             return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
         }
 
@@ -211,8 +228,7 @@ class AccountController extends Controller {
         $trialRequest->save();
 
         $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
-
-        return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
+        return $this->responseOk($user->username, $user->email, $sipPassword, $expiresAtUnixTime);
     }
 
     private function checkCorrectBusinessCode(Request $request){

@@ -5,6 +5,7 @@ use Phonex\BusinessCode;
 use Phonex\BusinessCodeClMapping;
 use Phonex\Events\AuditEvent;
 use Phonex\Group;
+use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\User;
 
@@ -22,6 +23,7 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
      * @var LicenseType
      */
     private $licenseType;
+    private $licenseFuncType;
     /**
      * @var Group
      */
@@ -38,17 +40,19 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
     /**
      * @param User $creator
      * @param LicenseType $licenseType
+     * @param LicenseFuncType $licenseFuncType
      * @param Group $group
      * @param int $exported
      * @param string $prefix
      */
-    public function __construct(User $creator, LicenseType $licenseType, Group $group, $exported = 0, $prefix = ''){
+    public function __construct(User $creator, LicenseType $licenseType, LicenseFuncType $licenseFuncType, Group $group, $exported = 0, $prefix = ''){
 
         $this->creator = $creator;
         $this->licenseType = $licenseType;
         $this->group = $group;
         $this->exported = $exported;
         $this->prefix = $prefix;
+        $this->licenseFuncType = $licenseFuncType;
     }
 
 	public function handle(){
@@ -61,6 +65,7 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
         $bc1->creator_id = $this->creator->id;
 
         $bc1->license_type_id = $this->licenseType->id;
+        $bc1->license_func_type_id = $this->licenseFuncType->id;
         $bc1->users_limit = 1; // only one license per this code
         $bc1->is_active = 1;
         $bc1->exported = $this->exported;
