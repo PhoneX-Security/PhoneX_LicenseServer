@@ -1,11 +1,13 @@
 <?php namespace Phonex;
 
 use Illuminate\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Database\Eloquent\Model;
+use Log;
 use Phonex\Utils\SortableTrait;
+use Queue;
 
 /**
  * @property bool|mixed email
@@ -54,6 +56,18 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     }
 
     /* helper functions */
+    public function addToContactList(User $user, $displayName = null){
+        $subscriber1 = $this->subscriber;
+        $subscriber2 = $user->subscriber;
+        $subscriber1->addToContactList($subscriber2, $displayName ? $displayName : $user->username);
+        Log::info('addToContactList; user has been added to contact list', [$this->username, $user->username]);
+        Queue::push('ContactListUpdated', ['username'=>$user->email], 'users');
+    }
+
+    public static function getByUsername($username){
+        return User::where('username', $username)->first();
+    }
+
     public static function getSupportUser(){
 //        return User::where('username', "support")->first();
         return User::where('username', "phonex-support")->first();

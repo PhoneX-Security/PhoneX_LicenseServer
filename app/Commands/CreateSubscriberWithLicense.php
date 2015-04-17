@@ -44,7 +44,6 @@ class CreateSubscriberWithLicense extends Command implements SelfHandling {
         $license->save();
         event(AuditEvent::create('license', $license->id));
 
-
         // Create a new user on the SOAP server
         $subscriber = Subscriber::createSubscriber($this->user->username, $this->sipPassword, $startsAt, $expiresAt, $this->licenseFuncType->name);
         $subscriber->save();

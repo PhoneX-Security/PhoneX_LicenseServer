@@ -76,10 +76,8 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
 
         $bc1->save();
         $bc2->save();
-        if (!\Auth::guest()){
-            event(AuditEvent::create('business_code', $bc1->id));
-            event(AuditEvent::create('business_code', $bc2->id));
-        }
+        event(AuditEvent::create('business_code', $bc1->id));
+        event(AuditEvent::create('business_code', $bc2->id));
 
         $codes[] = $bc1;
         $codes[] = $bc2;

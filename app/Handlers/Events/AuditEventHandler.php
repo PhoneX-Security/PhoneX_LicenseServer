@@ -1,11 +1,10 @@
 <?php namespace Phonex\Handlers\Events;
 
-use App;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Support\Facades\Auth;
+use Log;
 use Phonex\AuditTrail;
 use Phonex\Events\AuditEvent;
-use Phonex\Exceptions\UserLoggedOutException;
 
 class AuditEventHandler {
 
@@ -13,13 +12,9 @@ class AuditEventHandler {
 	}
 
     public function onEventReceived(AuditEvent $event){
-        if (App::runningUnitTests()){
-            // no need to audit
-            return;
-        }
-
         if (Auth::guest()){
-            throw new UserLoggedOutException("Cannot audit received event, user is logged out.");
+            Log::warning("AuditEventHandler; onEventReceived - cannot log because user is not logged in. This should not happen! ");
+            return;
         }
 
         $auditTrial = AuditTrail::fillFrom($event);

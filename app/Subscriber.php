@@ -1,6 +1,7 @@
 <?php namespace Phonex;
 use Illuminate\Database\Eloquent\Model;
 use Phonex\Exceptions\InvalidStateException;
+use Phonex\Exceptions\SubscriberAlreadyInCLException;
 
 /**
  * @property  username
@@ -32,6 +33,26 @@ class Subscriber extends Model{
 
         $this->ha1 = $ha1;
         $this->ha1b = $ha1b;
+    }
+
+    public function addToContactList(Subscriber $subscriber, $displayName){
+        $count = ContactList::whereRaw('subscriber_id=? and int_usr_id=?', [$this->id, $subscriber->id])->count();
+        if ($count > 0){
+            throw new SubscriberAlreadyInCLException($this, $subscriber);
+        }
+        // mutual attributes
+        $record1 = new ContactList();
+        $record1->entryState = "ENABLED";
+        $record1->objType = "INTERNAL_USER";
+        $record1->hideInContactList = 0;
+        $record1->inBlacklist = 0;
+        $record1->inWhitelist = 1;
+
+        $record1->int_usr_id = $subscriber->id;
+        $record1->subscriber_id = $this->id; // owner
+        $record1->displayName = $displayName;
+
+        return $record1->save();
     }
 
     public static function createSubscriber($username, $password, $startsAt, $expiresAt, $licenseType, $domain = 'phone-x.net'){

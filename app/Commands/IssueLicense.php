@@ -41,6 +41,10 @@ class IssueLicense extends Command implements SelfHandling {
         $subscriber->issued_on = $startsAt;
         $subscriber->expires_on = $expiresAt;
         $subscriber->license_type = $this->licenseFuncType->name;
+
+        // in case flag deleted is turned on, turn it off
+        $subscriber->deleted = 0;
+
         $subscriber->save();
 
         return $license;

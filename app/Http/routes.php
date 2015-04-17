@@ -13,6 +13,8 @@
 
 use Phonex\BusinessCode;
 use Phonex\Commands\IssueLicense;
+use Phonex\ContactList;
+use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\User;
 
@@ -46,25 +48,8 @@ Route::group(['middleware' => 'auth'], function() {
 /* Helper routes */
 Route::get('x', function(){
     //$user = Request::get('where', "test610@phone-x.net");
-    //Queue::push('ContactListUpdated', ['username'=>$user], 'users');
+    //eue::push('ContactListUpdated', ['username'=>$user], 'users');
     //echo 'amqp message sent to requested user ';
-});
-
-Route::get('test_del', function(){
-//    $u = User::where('username', 'qa_trial128')->first();
-//    $u->deleteWithLicenses();
-});
-
-Route::get('test_issue', function(){
-//    $licType = LicenseType::find(3); // month license
-//
-//    $u1 = User::where('username', 'trial01')->first();
-//    $u2 = User::where('username', 'trial02')->first();
-//
-//    $command1 = new IssueLicense($u1, $licType);
-//    $command2 = new IssueLicense($u2, $licType);
-//    Bus::dispatch($command1);
-//    Bus::dispatch($command2);
 });
 
 
@@ -73,9 +58,59 @@ Route::get('test_code', function(){
     echo "$code";
 });
 
+Route::get('test_issue', function(){
+//    $user = User::getByUsername('smoulinka');
+//    $licType = LicenseType::where('name', 'month')->first();
+//    $licFuncType = LicenseFuncType::getFull();
+//
+//    Bus::dispatch(new IssueLicense($user, $licType, $licFuncType));
+});
 
-//Route::get('passr', function(){
-//    $user = User::where('email', 'test318@phone-x.net')->first();
-//    $user->password = bcrypt("to be done");
-////    $user->save();
-//});
+
+
+Route::get('test_connect', function(){
+//    $prefix = "miro";
+//    $masterNum = 5;
+//    $poolNum = 20;
+//
+//    $masters = [];
+//    $pools = [];
+//
+//    for ($i=1; $i<=5; $i++){
+//        $masters[] = $prefix . '0' . $i;
+//    }
+//
+//    for ($i=6; $i<=9; $i++){
+//        $pools[] = $prefix . '0' . $i;
+//    }
+//
+//    for ($i=10; $i<=25; $i++){
+//        $pools[] = $prefix . $i;
+//    }
+//
+//    $mainUser = User::where('username', 'miro01')->first();
+//    $masterUsers = [];
+//    $poolUsers = [];
+//
+//    foreach($masters as $name){
+//        $masterUsers[] = User::where('username', $name)->first();
+//    }
+//
+//    foreach($pools as $name){
+//        $poolUsers[] = User::where('username', $name)->first();
+//    }
+//
+////    // pool licenses have only main user
+////    foreach($poolUsers as $user){
+////        ContactList::addUsersToContactListMutually($mainUser, $user);
+////    }
+//
+//    foreach($masterUsers as $u){
+//        foreach($masterUsers as $uu){
+//            if ($u != $uu){
+////                echo $u->username . ' + ' . $uu->username . '<br />';
+//                $u->addToContactList($uu);
+//            }
+//        }
+//    }
+});
