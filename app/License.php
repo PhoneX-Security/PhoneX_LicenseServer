@@ -19,6 +19,7 @@ class License extends Model{
 	protected $table = 'phonex_licenses';
 
 	protected $fillable = ['comment'];
+    protected $dates = ['starts_at', 'expires_at'];
 //	protected $sortable = ['username', 'email', 'has_access', 'id'];
 
 	public function user(){

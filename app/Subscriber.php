@@ -16,6 +16,7 @@ class Subscriber extends Model{
 
     // legacy - Subscriber table doesn't have timestamps
     public $timestamps = false;
+    protected $dates = ['expires_on', 'issued_on'];
 
     public function subscribersInContactList(){
         return $this->belongsToMany('Phonex\Subscriber', 'contactlist', 'subscriber_id', 'int_usr_id');

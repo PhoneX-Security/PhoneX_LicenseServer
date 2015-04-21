@@ -1,5 +1,8 @@
 /vendor
 /node_modules
+/scripts
+/.vagrant
+Vagrantfile
 .env
 .idea
 _ide_helper.php

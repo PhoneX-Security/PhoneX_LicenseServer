@@ -75,40 +75,5 @@ class CreateUser extends Command implements SelfHandling {
         }
 
         return $user;
-
-//        $startsAt = Carbon::now()->toDateTimeString();
-//        $c_expiresAt = Carbon::now()->addDays($this->licenseType->days);
-//        $expiresAt = $c_expiresAt->toDateTimeString();
-//
-//        $license = new License();
-//        $license->user_id = $user->id;
-//        $license->license_type_id = $this->licenseType->id;
-//        $license->starts_at = $startsAt;
-//        $license->expires_at = $expiresAt;
-//        $license->save();
-//
-//
-//        // Create a new user on the SOAP server
-//        $subscriber = Subscriber::createSubscriber($user->username, $this->password, $startsAt, $expiresAt);
-//        $savedSipUser = $subscriber->save();
-//
-//        $user->subscriber_id = $subscriber->id;
-//        $user->save();
-//
-//        // if sip user creation fails, allow to try again
-//        if (!$savedSipUser) {
-//            Log::error("Cannot create subscriber in SOAP subscriber list.");
-//            throw new \Exception("Cannot save User");
-//        }
-
-
-
-        // add support to contact list
-//        if (!$this->isQaTrial && $this->addSupportContact){
-//            ContactList::addSupportToContactListMutually($user);
-//        }
-
-//        return $user;
 	}
-
 }

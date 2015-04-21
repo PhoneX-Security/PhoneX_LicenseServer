@@ -14,6 +14,8 @@ class CreateSubscriberWithLicense extends Command implements SelfHandling {
     private $licenseType;
     private $licenseFuncType;
     private $sipPassword;
+    private $startsAt;
+
 
     // publicly settable attributes
     public $comment;
@@ -25,9 +27,19 @@ class CreateSubscriberWithLicense extends Command implements SelfHandling {
         $this->sipPassword = $sipPassword;
     }
 
+    public function startingAt(Carbon $startsAt){
+        $this->startsAt = $startsAt->copy();
+        return $this;
+    }
+
 	public function handle(){
-        $startsAt = Carbon::now()->toDateTimeString();
-        $c_expiresAt = Carbon::now()->addDays($this->licenseType->days);
+        // if not set, license starts now
+        if (!$this->startsAt){
+            $this->startsAt = Carbon::now();
+        }
+
+        $startsAt = $this->startsAt->toDateTimeString();
+        $c_expiresAt = $this->startsAt->addDays($this->licenseType->days);
         $expiresAt = $c_expiresAt->toDateTimeString();
 
         // create license

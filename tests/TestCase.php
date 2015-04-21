@@ -1,6 +1,9 @@
 <?php
 
+use Phonex\Utils\TestUtils;
+
 class TestCase extends Illuminate\Foundation\Testing\TestCase {
+    use TestUtils;
 
 	/**
 	 * Creates the application.

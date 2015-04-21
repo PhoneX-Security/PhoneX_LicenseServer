@@ -8,8 +8,8 @@ use Phonex\LicenseType;
 use Phonex\User;
 
 class ContactListUpdateTest extends TestCase {
-    const TEST_USER1 = "smajdova_mamka1";
-    const TEST_USER2 = "smajdova_mamka2";
+    const TEST_USER1 = "smajda";
+    const TEST_USER2 = "smajdova_mamka";
 
     public function testContactListUpdate(){
 
