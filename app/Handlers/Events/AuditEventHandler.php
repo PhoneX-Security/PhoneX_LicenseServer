@@ -13,7 +13,7 @@ class AuditEventHandler {
 
     public function onEventReceived(AuditEvent $event){
         if (Auth::guest()){
-            Log::warning("AuditEventHandler; onEventReceived - cannot log because user is not logged in. This should not happen! ");
+//            Log::warning("AuditEventHandler; onEventReceived - cannot log because user is not logged in. This should not happen! ");
             return;
         }
 
