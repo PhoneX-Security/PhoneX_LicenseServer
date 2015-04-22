@@ -175,7 +175,6 @@ class AccountController extends Controller {
                 ContactList::addSupportToContactListMutually($user);
             }
 
-
             // Add contact list mappings
             // each mapping adds every user created by give bc to contact list mutually
             $clMappings = $businessCode->clMappings;

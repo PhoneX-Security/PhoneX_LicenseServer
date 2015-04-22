@@ -2,17 +2,24 @@
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
+use Log;
 use Phonex\License;
 use Phonex\User;
 
+/**
+ * Refresh subscriber table from existing licenses (start time, expiration time, license type)
+ * Class RefreshSubscribers
+ * @package Phonex\Commands
+ */
 class RefreshSubscribers extends Command implements SelfHandling {
 
     public function __construct(){
     }
 
 	public function handle(){
+        Log::info('RefreshSubscribers is started');
         // Process users in chunks
-        $chunk = 30;
+        $chunk = 20;
         User::with(['licenses', 'subscriber'])->chunk($chunk, function($users){
             foreach ($users as $user){
                 if(!$user->subscriber){
@@ -25,6 +32,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
                     $subscriber->expires_on = $license->expires_at;
                     $subscriber->license_type = $license->licenseFuncType->name;
                     $subscriber->deleted = 0;
+
                     $subscriber->save();
                 }
             }
@@ -43,14 +51,6 @@ class RefreshSubscribers extends Command implements SelfHandling {
 
         // first determinate what is active or not
         $lics = $user->licenses->map(function ($lic) {
-//            // if null, add limit values
-//            if ($lic->starts_at == null) {
-//                $lic->starts_at = Carbon::createFromTimestampUTC(0);
-//            }
-//            if ($lic->expires_at == null) {
-//                $lic->expires_at = Carbon::createFromDate(2033);
-//            }
-
             $now = Carbon::now();
 
             if ($lic->starts_at->lte($now) && $lic->expires_at->gte($now)) {

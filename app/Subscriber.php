@@ -84,6 +84,4 @@ class Subscriber extends Model{
 
         return $subscriber;
     }
-
-
 }
