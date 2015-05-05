@@ -99,7 +99,11 @@ class UserController extends Controller {
 
 	public function show($id)
     {
-		$user = User::with(['licenses.licenseType', 'issuedLicenses.licenseType'])->find($id);
+		$user = User::with([
+            'licenses.licenseType',
+            'issuedLicenses.licenseType',
+            'subscriber.subscribersInContactList.user'])->find($id);
+
 		if ($user == null){
 			throw new NotFoundHttpException;
 		}

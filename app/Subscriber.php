@@ -36,6 +36,10 @@ class Subscriber extends Model{
         $this->ha1b = $ha1b;
     }
 
+    public function user(){
+        return $this->hasOne('Phonex\User'); // looks for subscriber_id in User table
+    }
+
     public function addToContactList(Subscriber $subscriber, $displayName){
         $count = ContactList::whereRaw('subscriber_id=? and int_usr_id=?', [$this->id, $subscriber->id])->count();
         if ($count > 0){
