@@ -33,6 +33,8 @@ class CreateUser extends Command implements SelfHandling {
      */
     private $trialNumber;
 
+    private $subscriberId;
+
 
     public function __construct($username, $groupsId = array(), $isQaTrial = false, $trialNumber = null){
         $this->username = $username;
@@ -44,6 +46,11 @@ class CreateUser extends Command implements SelfHandling {
     public function addAccess($password){
         $this->password = $password;
         return $this;
+    }
+
+    // for legacy users already existing in subscriber table
+    public function setSubscriberId($subscriberId){
+        $this->subscriberId = $subscriberId;
     }
 
 	public function handle(){
@@ -59,6 +66,10 @@ class CreateUser extends Command implements SelfHandling {
             $user->has_access = 1;
             $user->password = bcrypt($this->password);
         }
+        if ($this->subscriberId){
+            $user->subscriber_id = $this->subscriberId;
+        }
+
 
         $saved = $user->save();
         event(AuditEvent::create('user', $user->id));

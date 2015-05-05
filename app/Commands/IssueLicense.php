@@ -6,6 +6,7 @@ use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\User;
+use Queue;
 
 class IssueLicense extends Command implements SelfHandling {
     private $user;
@@ -69,6 +70,7 @@ class IssueLicense extends Command implements SelfHandling {
 
         $subscriber->save();
 
+        Queue::push('licenseUpdated', ['username'=>$this->user->email], 'users');
         return $license;
 	}
 }

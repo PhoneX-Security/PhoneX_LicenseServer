@@ -31,7 +31,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
                     $subscriber->issued_on = $license->starts_at;
                     $subscriber->expires_on = $license->expires_at;
                     $subscriber->license_type = $license->licenseFuncType->name;
-                    $subscriber->deleted = 0;
+//                    $subscriber->deleted = 0;
 
                     $subscriber->save();
                 }

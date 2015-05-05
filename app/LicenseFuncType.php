@@ -24,6 +24,18 @@ class LicenseFuncType extends Model{
         return self::getByType(self::TYPE_TRIAL);
     }
 
+    public static function getCompanyClient(){
+        return self::getByType(self::TYPE_COMPANY_CLIENT);
+    }
+
+    public static function getCallMeClient(){
+        return self::getByType(self::TYPE_CALL_ME_CLIENT);
+    }
+
+    public static function getPoolClient(){
+        return self::getByType(self::TYPE_POOL_CLIENT);
+    }
+
     public static function getByType($funcType){
         return LicenseFuncType::where('name', $funcType)->first();
     }
