@@ -19,7 +19,9 @@ class Subscriber extends Model{
     protected $dates = ['expires_on', 'issued_on'];
 
     public function subscribersInContactList(){
-        return $this->belongsToMany('Phonex\Subscriber', 'contactlist', 'subscriber_id', 'int_usr_id');
+        return $this
+            ->belongsToMany('Phonex\Subscriber', 'contactlist', 'subscriber_id', 'int_usr_id')
+            ->withPivot('displayName');
     }
 
     public function setPasswordFields($password){

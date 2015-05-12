@@ -30,6 +30,20 @@
     text-align: right;
 }
 
+
+/* Inlined form right and left margins */
+.inline-form-left-margin {
+    margin-left: 5px;
+}
+.inline-form-right-margin {
+    margin-right: 5px;
+}
+.inline-form-side-margin {
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+
 /*
 Sidebar
 */

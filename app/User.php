@@ -59,9 +59,14 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     public function addToContactList(User $user, $displayName = null){
         $subscriber1 = $this->subscriber;
         $subscriber2 = $user->subscriber;
-        $subscriber1->addToContactList($subscriber2, $displayName ? $displayName : $user->username);
-        Log::info('addToContactList; user has been added to contact list', [$this->username, $user->username]);
-        Queue::push('ContactListUpdated', ['username'=>$user->email], 'users');
+        $dn = $displayName ? $displayName : $user->username;
+        $subscriber1->addToContactList($subscriber2, $dn);
+        Log::info('addToContactList; user has been added to contact list', [$this->username, $user->username, $dn]);
+        try {
+            Queue::push('ContactListUpdated', ['username'=>$user->email], 'users');
+        } catch (\Exception $e){
+            Log::error('cannot push ContactListUpdated message', [$e]);
+        }
     }
 
     public static function getByUsername($username){

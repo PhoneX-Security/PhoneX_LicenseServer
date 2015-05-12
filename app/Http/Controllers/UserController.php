@@ -10,6 +10,7 @@ use Phonex\ContactList;
 use Phonex\Events\AuditEvent;
 use Phonex\Group;
 use Phonex\Http\Requests;
+use Phonex\Http\Requests\AddUserToClRequest;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\License;
@@ -204,4 +205,31 @@ class UserController extends Controller {
             ->with('success', 'User SIP password has been reset.');
     }
 
+    public function patchAddUserToCl($user_id, AddUserToClRequest $request)
+    {
+        $user = User::find($user_id);
+        $userToAdd = User::getByUsername($request->get('username'));
+        try {
+            if ($user->subscriber->subscribersInContactList->contains($userToAdd->subscriber)){
+                redirect()
+                    ->back()
+                    ->withErrors(['User is already in contact list.']);
+            } else {
+                if (!$request->has('alias')){
+                    $user->addToContactList($userToAdd);
+                } else {
+                    $user->addToContactList($userToAdd, $request->get('alias'));
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error("patchAddUserToCl; cannot check if user is in cl", [$user->username, $userToAdd->username, $e]);
+            return redirect()
+                ->back()
+                ->withErrors(['Server error: Cannot add user to contact list']);
+
+        }
+        return Redirect::route('users.show', [$user->id])
+            ->with('success', 'User has been added to contact list');
+
+    }
 }

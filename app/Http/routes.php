@@ -12,10 +12,6 @@
 */
 
 use Phonex\BusinessCode;
-use Phonex\Commands\IssueLicense;
-use Phonex\ContactList;
-use Phonex\LicenseFuncType;
-use Phonex\LicenseType;
 use Phonex\User;
 
 Route::get('home', 'HomeController@index');
@@ -36,36 +32,26 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::resource('users', 'UserController');
     Route::resource('groups', 'GroupController');
     Route::patch('users/{users}/change-sip-pass', ['as' => 'users.change_sip_pass', 'uses' => 'UserController@patchChangeSipPassword']);
+    Route::patch('users/{users}/add-user-to-cl', ['as' => 'users.add_user_to_cl', 'uses' => 'UserController@patchAddUserToCl']);
 	Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 
     // dev tools
     Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index'); // logs viewer
-
     Route::controller('bcodes', 'BusinessCodeController');
 });
-
-
-/* Helper routes */
-Route::get('x', function(){
-    //$user = Request::get('where', "test610@phone-x.net");
-    //eue::push('ContactListUpdated', ['username'=>$user], 'users');
-    //echo 'amqp message sent to requested user ';
-});
-
 
 Route::get('test_code', function(){
     $code = BusinessCode::getCode('qqqqqqq');
     echo "$code";
 });
 
-Route::get('test_issue', function(){
-//    $user = User::getByUsername('smoulinka');
-//    $licType = LicenseType::where('name', 'month')->first();
-//    $licFuncType = LicenseFuncType::getFull();
-//
-//    Bus::dispatch(new IssueLicense($user, $licType, $licFuncType));
-});
+Route::get('qa_push_test_xuiwtq7', function(){
+    $user1 = User::getByUsername(Input::get('c1'));
+    $user2 = User::getByUsername(Input::get('c2'));
 
+    $user1->addToContactList($user2);
+    echo "user $user2->username has been added to contactList of $user1->username";
+});
 
 
 Route::get('test_connect', function(){
