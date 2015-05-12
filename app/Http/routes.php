@@ -27,6 +27,10 @@ Route::controllers([
 Route::get('login', 'Auth\AuthController@getLogin');
 Route::get('logout', 'Auth\AuthController@getLogout');
 
+
+// Non authenticated pages
+Route::resource('products', 'Api\ProductController', ['only' => ['show']]);
+
 // Authenticated pages
 Route::group(['middleware' => 'auth'], function() {
 	Route::resource('users', 'UserController');
