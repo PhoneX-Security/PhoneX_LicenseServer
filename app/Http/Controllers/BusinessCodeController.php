@@ -6,6 +6,7 @@ use Phonex\Commands\CreateBusinessCodePair;
 use Phonex\Group;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\GenerateMPCodesRequest;
+use Phonex\Http\Requests\GenerateSingleCodesRequest;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 
@@ -19,8 +20,51 @@ class BusinessCodeController extends Controller {
 	}
 
     public function getGenerateMpCodes(){
-        return view('bcode.create');
+        $groups = Group::all();
+        return view('bcode.create', compact('groups'));
     }
+
+    public function getGenerateSingleCodes(){
+        die('TODO');
+//        $licenseTypes = LicenseType::all()->sortBy('order');
+//        $licenseFuncTypes = LicenseFuncType::all()->sortBy('order');
+//        return view('bcode.create_single', compact('licenseTypes', 'licenseFuncTypes'));
+    }
+
+//    public function postGenerateSingleCodes(GenerateSingleCodesRequest $request){
+//
+//        $mpGroup = Group::where('name', 'Pioneers2015')->first();
+//        $mpLicenseType = LicenseType::where('name', 'half_year')->first();
+//        $mpLicenseFuncType = LicenseFuncType::();
+//
+//        $numberOfPairs = $request->get('number_of_pairs');
+//        $email = $request->get('email');
+//
+//        $creator = \Auth::user();
+//        $bcodes = array();
+//
+//        for ($i=0; $i < $numberOfPairs; $i++){
+//            $command = new CreateBusinessCodePair($creator, $mpLicenseType, $mpLicenseFuncType, $mpGroup, 1, 'mp');
+//            $newCodes = $this->dispatch($command);
+//            $bcodes = array_merge($bcodes, $newCodes);
+//        }
+//
+//
+//        foreach($bcodes as $c){
+//            // add dashes
+//            $c->code = substr($c->code, 0, 3) . "-" . substr($c->code, 3, 3) . "-" . substr($c->code, 6);
+//        }
+////        dd($bcodes);
+//
+//        Mail::send('emails.mp_bcodes', ['bcodes' => $bcodes], function($message) use ($email)
+//        {
+//            $message->from('license-server@phone-x.net', 'License server');
+//            $message->to($email)->subject('Mobil Pohotovost: new code pairs');
+//        });
+//
+//        return redirect('bcodes')
+//            ->with('success', "New $numberOfPairs MP business code pairs generated and sent to $email.");
+//    }
 
     /**
      * @param GenerateMPCodesRequest $request
@@ -28,9 +72,11 @@ class BusinessCodeController extends Controller {
      */
     public function postGenerateMpCodes(GenerateMPCodesRequest $request){
 
-        $mpGroup = Group::where('name', 'Mobil Pohotovost')->first();
-        $mpLicenseType = LicenseType::where('name', 'half_year')->first();
-        $mpLicenseFuncType = LicenseFuncType::getFull();
+//        $group = Group::where('name', 'Mobil Pohotovost')->first();
+        $group = Group::find($request->get('group_id'));
+//        $licenseType = LicenseType::where('name', 'half_year')->first();
+        $licenseType = LicenseType::where('name', 'quarter')->first();
+        $licenseFuncType = LicenseFuncType::getFull();
 
         $numberOfPairs = $request->get('number_of_pairs');
         $email = $request->get('email');
@@ -39,7 +85,7 @@ class BusinessCodeController extends Controller {
         $bcodes = array();
 
         for ($i=0; $i < $numberOfPairs; $i++){
-            $command = new CreateBusinessCodePair($creator, $mpLicenseType, $mpLicenseFuncType, $mpGroup, 1, 'mp');
+            $command = new CreateBusinessCodePair($creator, $licenseType, $licenseFuncType, $group, 1, '');
             $newCodes = $this->dispatch($command);
             $bcodes = array_merge($bcodes, $newCodes);
         }
@@ -51,13 +97,13 @@ class BusinessCodeController extends Controller {
         }
 //        dd($bcodes);
 
-        Mail::send('emails.mp_bcodes', ['bcodes' => $bcodes], function($message) use ($email)
+        Mail::send('emails.mp_bcodes', ['bcodes' => $bcodes], function($message) use ($email, $group)
         {
             $message->from('license-server@phone-x.net', 'License server');
-            $message->to($email)->subject('Mobil Pohotovost: new code pairs');
+            $message->to($email)->subject('New code pairs (' . $group->name . ')');
         });
 
         return redirect('bcodes')
-            ->with('success', "New $numberOfPairs MP business code pairs generated and sent to $email.");
+            ->with('success', "New $numberOfPairs business code pairs generated and sent to $email.");
     }
 }

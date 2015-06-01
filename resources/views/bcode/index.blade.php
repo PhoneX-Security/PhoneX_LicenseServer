@@ -25,8 +25,11 @@
                         {{--<a class="btn btn-sm btn-primary view-btn-create" href="/users/create">--}}
                            {{--Export MP codes--}}
                         {{--</a>--}}
+                        <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-single-codes/">
+                            <i class="fa fa-plus-circle"></i> New single codes
+                        </a>
                         <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-mp-codes/">
-                            <i class="fa fa-plus-circle"></i> Generate MP codes
+                            <i class="fa fa-plus-circle"></i> New code pairs
                         </a>
                     </div>
                 </div>

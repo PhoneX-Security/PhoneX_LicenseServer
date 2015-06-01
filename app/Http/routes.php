@@ -12,6 +12,9 @@
 */
 
 use Phonex\BusinessCode;
+use Phonex\Commands\IssueLicense;
+use Phonex\LicenseFuncType;
+use Phonex\LicenseType;
 use Phonex\User;
 
 Route::get('home', 'HomeController@index');
@@ -27,9 +30,9 @@ Route::controllers([
 Route::get('login', 'Auth\AuthController@getLogin');
 Route::get('logout', 'Auth\AuthController@getLogout');
 
-
 // Non authenticated pages
-Route::resource('products', 'Api\ProductController', ['only' => ['show']]);
+Route::resource('products', 'Api\ProductController', ['only' => ['show', 'index']]);
+Route::controller('qa', 'QaController'); // qa tools
 
 // Authenticated pages
 Route::group(['middleware' => 'auth'], function() {
@@ -44,18 +47,28 @@ Route::group(['middleware' => 'auth'], function() {
     Route::controller('bcodes', 'BusinessCodeController');
 });
 
-Route::get('test_code', function(){
-    $code = BusinessCode::getCode('qqqqqqq');
-    echo "$code";
+
+
+
+
+Route::get('x', function(){
+    $x = User::findByUsername('test318');
+    $x->password = bcrypt('bbbbbbbb1');
+    $x->save();
+
+
+//    $code = BusinessCode::getCode('qqqqqqq');
+//    echo "$code";
 });
 
-Route::get('qa_push_test_xuiwtq7', function(){
-    $user1 = User::getByUsername(Input::get('c1'));
-    $user2 = User::getByUsername(Input::get('c2'));
-
-    $user1->addToContactList($user2);
-    echo "user $user2->username has been added to contactList of $user1->username";
-});
+//Route::get('test_i', function(){
+//    $u =  User::getByUsername('w1pko');
+//    $licFuncType = LicenseFuncType::getFull();
+//    $licType = LicenseType::findByName('half_year');
+//
+//    $c = new IssueLicense($u, $licType, $licFuncType);
+//    Bus::dispatch($c);
+//});
 
 
 Route::get('test_connect', function(){

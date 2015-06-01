@@ -20,7 +20,7 @@
 
 			<div class="phonex-table-div clearfix">
 				<div class="left-cell">
-					<h2>Generate Code pairs</h2>
+					<h2>New single business codes</h2>
 				</div>
 				<div class="right-cell">
 
@@ -35,23 +35,22 @@
 				<div class="panel-body">
 					@include('errors.notifications')
 
-					<form  role="form" method="POST" action="/bcodes/generate-mp-codes">
+					<form  role="form" method="POST" action="/bcodes/generate-single-codes">
 						<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 						{{--<h4>Details</h4>--}}
 
 						<div class="row">
 							<div class="col-md-4 ">
-								<div class="form-group"><label for="number_of_pairs" class="control-label">Number of pairs*</label>
-									<input class="form-control" required value="{{ old('number_of_pairs') }}" placeholder="" id="number_of_pairs" type="number" name="number_of_pairs">
-									<span class="help-block">Mobil Pohotovost requires pairs of business codes to be generated. Each pair is printed on a separated card and handed to customer.</span>
+								<div class="form-group"><label for="number" class="control-label">Number</label>
+									<input class="form-control" required value="{{ old('number') }}" placeholder="" id="number" type="number" name="number">
 								</div>
 							</div>
-                            <div class="col-md-2">
-                                <label for="group_id" class="control-label">Group</label>
-                                <select name="group_id" class="form-control">
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}">{{ $group->name }} </option>
+                            <div class="col-md-3">
+                                <label for="license_type_id" class="control-label">Expiration</label>
+                                <select name="license_type_id" class="form-control">
+                                    @foreach($licenseTypes as $type)
+                                        <option value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
                                     @endforeach
                                 </select>
                             </div>

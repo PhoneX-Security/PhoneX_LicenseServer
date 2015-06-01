@@ -16,4 +16,8 @@ class LicenseType extends Model{
     public function readableType(){
         return ucfirst($this->name) . " (" .  $this->days . " days )";
     }
+
+    public static function findByName($name){
+        return LicenseType::where('name', $name)->first();
+    }
 }

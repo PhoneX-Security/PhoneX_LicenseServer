@@ -208,7 +208,7 @@ class UserController extends Controller {
     public function patchAddUserToCl($user_id, AddUserToClRequest $request)
     {
         $user = User::find($user_id);
-        $userToAdd = User::getByUsername($request->get('username'));
+        $userToAdd = User::findByUsername($request->get('username'));
         try {
             if ($user->subscriber->subscribersInContactList->contains($userToAdd->subscriber)){
                 redirect()

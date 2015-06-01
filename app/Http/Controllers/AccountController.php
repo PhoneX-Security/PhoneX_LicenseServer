@@ -144,7 +144,8 @@ class AccountController extends Controller {
     }
 
     private function issueBusinessAccount(Request $request){
-        $isQaTrial = $this->isPhonexIp();
+//        $isQaTrial = $this->isPhonexIp();
+        $isQaTrial = false; // Turn this cool feature off
         $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
 
         $username = (!$isQaTrial) ? $request->get('username') : 'qa_trial' . $trialNumber;
@@ -354,7 +355,9 @@ class AccountController extends Controller {
     }
 
     private function isPhonexIp(){
-        $remote = \Input::getClientIp();
-        return $remote == $this->getPhonexIp() || $remote == '127.0.0.1';
+        // turn this off, we do not want JIC have qa_trial accounts
+        return false;
+//        $remote = \Input::getClientIp();
+//        return $remote == $this->getPhonexIp() || $remote == '127.0.0.1';
     }
 }

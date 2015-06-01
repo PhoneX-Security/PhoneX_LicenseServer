@@ -11,7 +11,7 @@ class ProductController extends Controller {
 	}
 
     public function index(){
-
+        return Product::with('productPrices')->get()->toJson();
     }
 
     public function show($id)

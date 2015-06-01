@@ -69,7 +69,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         }
     }
 
-    public static function getByUsername($username){
+    public static function findByUsername($username){
         return User::where('username', $username)->first();
     }
 
