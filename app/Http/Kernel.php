@@ -16,7 +16,7 @@ class Kernel extends HttpKernel {
 		'Illuminate\Session\Middleware\StartSession',
 		'Illuminate\View\Middleware\ShareErrorsFromSession',
 //		 TODO allow this
-		'Phonex\Http\Middleware\CustomVerifyCsrfToken',
+//		'Phonex\Http\Middleware\CustomVerifyCsrfToken',
 	];
 
 	/**
