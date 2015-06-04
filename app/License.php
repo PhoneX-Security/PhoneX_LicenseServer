@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 class License extends Model{
 //	use SortableTrait;
 
-	protected $table = 'phonex_licenses';
+	protected $table = 'licenses';
 
 	protected $fillable = ['comment'];
     protected $dates = ['starts_at', 'expires_at'];

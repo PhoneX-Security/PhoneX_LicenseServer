@@ -3,6 +3,7 @@
 use Illuminate\Contracts\Bus\SelfHandling;
 use Phonex\BusinessCode;
 use Phonex\BusinessCodeClMapping;
+use Phonex\BusinessCodesExport;
 use Phonex\Events\AuditEvent;
 use Phonex\Group;
 use Phonex\LicenseFuncType;
@@ -10,49 +11,41 @@ use Phonex\LicenseType;
 use Phonex\User;
 
 /**
- * Class CreateBusinessCodePair - command primarily for MobilPohotovost business codes
+ * Class CreateBusinessCodePair
  * @package Phonex\Commands
  */
 class CreateBusinessCodePair extends Command implements SelfHandling {
-
-    /**
-     * @var User
-     */
     private $creator;
-    /**
-     * @var LicenseType
-     */
     private $licenseType;
     private $licenseFuncType;
-    /**
-     * @var Group
-     */
     private $group;
-    /**
-     * @var int
-     */
-    private $exported;
-    /**
-     * @var string
-     */
+    private $export;
     private $prefix;
+
+    private $parent;
 
     /**
      * @param User $creator
      * @param LicenseType $licenseType
      * @param LicenseFuncType $licenseFuncType
-     * @param Group $group
-     * @param int $exported
+     * @param BusinessCodesExport $export
      * @param string $prefix
      */
-    public function __construct(User $creator, LicenseType $licenseType, LicenseFuncType $licenseFuncType, Group $group, $exported = 0, $prefix = ''){
+    public function __construct(User $creator, LicenseType $licenseType, LicenseFuncType $licenseFuncType, BusinessCodesExport $export = null, $prefix = ''){
 
         $this->creator = $creator;
         $this->licenseType = $licenseType;
-        $this->group = $group;
-        $this->exported = $exported;
         $this->prefix = $prefix;
+        $this->export = $export;
         $this->licenseFuncType = $licenseFuncType;
+    }
+
+    public function addParent(User $parent){
+        $this->parent = $parent;
+    }
+
+    public function addGroup(Group $group){
+        $this->group = $group;
     }
 
 	public function handle(){
@@ -61,14 +54,22 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
 
         $bc1 = new BusinessCode();
         $bc1->code = BusinessCode::generateUniqueCode($this->prefix);
-        $bc1->group_id = $this->group->id;
         $bc1->creator_id = $this->creator->id;
+
+        if($this->group){
+            $bc1->group_id = $this->group->id;
+        }
+        if ($this->parent){
+            $bc1->parent_id = $this->parent->id;
+        }
 
         $bc1->license_type_id = $this->licenseType->id;
         $bc1->license_func_type_id = $this->licenseFuncType->id;
         $bc1->users_limit = 1; // only one license per this code
         $bc1->is_active = 1;
-        $bc1->exported = $this->exported;
+        if ($this->export){
+            $bc1->export_id = $this->export->id;
+        }
 
         // second code
         $bc2 = clone $bc1;

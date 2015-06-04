@@ -25,7 +25,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     const CREATED_AT = 'dateCreated';
     const UPDATED_AT = 'dateUpdated';
 
-    protected $table = 'phonex_users';
+    protected $table = 'users';
 
 	protected $fillable = ['username', 'email', 'password', 'has_access'];
 	protected $sortable = ['username', 'email', 'has_access', 'id'];

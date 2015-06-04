@@ -26,26 +26,26 @@ class LicenseController extends Controller {
 		}
 
 		$sortable = ['username', 'license_func_type', 'license_type', 'active', 'starts_at', 'expires_at'];
-		$s = InputGet::get('s','phonex_licenses.id');
+		$s = InputGet::get('s','licenses.id');
 		$o = InputGet::get('o', 'asc') == 'desc' ? 'desc' : 'asc';
 		if (!in_array($s, $sortable)){
-			$s = 'phonex_licenses.id';
+			$s = 'licenses.id';
 		}
 
 		$query = License
-            ::join('phonex_license_types', 'phonex_licenses.license_type_id', '=', 'phonex_license_types.id')
-            ->join('license_func_types', 'phonex_licenses.license_func_type_id', '=', 'license_func_types.id')
-			->join('phonex_users', 'phonex_licenses.user_id', '=', 'phonex_users.id')
+            ::join('license_types', 'licenses.license_type_id', '=', 'license_types.id')
+            ->join('license_func_types', 'licenses.license_func_type_id', '=', 'license_func_types.id')
+			->join('users', 'licenses.user_id', '=', 'users.id')
 			->orderBy($s, $o)
 			->select([
-                'phonex_users.username',
-                'phonex_license_types.name as license_type',
+                'users.username',
+                'license_types.name as license_type',
                 'license_func_types.name as license_func_type',
-                'phonex_licenses.*',
+                'licenses.*',
 				\DB::raw('IF(expires_at IS NULL OR expires_at >= NOW(), 1, 0) as active')
             ]); // Warning: MySQL specific syntax
 
-        $query = $query->where('phonex_users.qa_trial', false);
+        $query = $query->where('users.qa_trial', false);
 
 		if (InputGet::has('active_only')){
 			$query = $query->whereRaw('( expires_at IS NULL OR expires_at >= NOW() )');

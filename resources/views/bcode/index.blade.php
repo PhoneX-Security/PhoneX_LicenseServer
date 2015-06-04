@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <h1>
-                    Business codes
+                    Product codes
                     <small>Manage</small>
                 </h1>
                 @include('navigation.breadcrumb')
@@ -28,7 +28,7 @@
                         <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-single-codes/">
                             <i class="fa fa-plus-circle"></i> New single codes
                         </a>
-                        <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-mp-codes/">
+                        <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-code-pairs/">
                             <i class="fa fa-plus-circle"></i> New code pairs
                         </a>
                     </div>
@@ -45,6 +45,7 @@
                             <th>ID</th>
                             <th>Code</th>
                             <th>Group</th>
+                            <th>Parent</th>
                             <th>Exported</th>
                             <th>Licenses limit</th>
                             <th>Licenses acquired</th>
@@ -54,7 +55,8 @@
                             <tr>
                                 <td>{{ $bcode->id }}</td>
                                 <td>{{ $bcode->code }}</td>
-                                <td>{{ $bcode->group->name }}</td>
+                                <td>{{ $bcode->group->name or ''}}</td>
+                                <td>{{ $bcode->parent->username or ''}}</td>
                                 <td>@if($bcode->exported) Yes @else No @endif</td>
 
                                 <td>{{ $bcode->licenses_limit  }}</td>

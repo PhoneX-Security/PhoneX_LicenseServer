@@ -1,6 +1,6 @@
 <?php namespace Phonex\Http\Requests;
 
-class GenerateMPCodesRequest extends Request {
+class GenerateCodePairsRequest extends Request {
 
 	/**
 	 * Determine if the user is authorized to make this request.
@@ -21,8 +21,10 @@ class GenerateMPCodesRequest extends Request {
 	{
 		return [
             'group_id' => 'exists:groups,id',
+            'license_type_id' => 'exists:license_types,id',
 			'number_of_pairs' => 'required|integer|between:1,100',
-            'email' => 'required|email'
+            'email' => 'required|email',
+            'parent_username' => 'exists:users,username',
 		];
 	}
 

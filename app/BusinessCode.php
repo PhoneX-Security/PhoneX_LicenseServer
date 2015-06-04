@@ -21,6 +21,14 @@ class BusinessCode extends Model{
         return $this->belongsTo('Phonex\Group', 'group_id');
     }
 
+    public function creator(){
+        return $this->belongsTo('Phonex\User', 'creator_id');
+    }
+
+    public function parent(){
+        return $this->belongsTo('Phonex\User', 'parent_id');
+    }
+
     public function licenseType(){
         return $this->belongsTo('Phonex\LicenseType', 'license_type_id');
     }
@@ -31,6 +39,10 @@ class BusinessCode extends Model{
 
     public function users(){
         return $this->hasMany('Phonex\User', 'business_code_id');
+    }
+
+    public function export(){
+        return $this->belongsTo('Phonex\BusinessCodesExport', 'export_id');
     }
 
     /**

@@ -20,7 +20,7 @@ class AddUserToClRequest extends Request {
 	public function rules()
 	{
 		return [
-            'username' => 'required|exists:phonex_users',
+            'username' => 'required|exists:users',
 		];
 	}
 

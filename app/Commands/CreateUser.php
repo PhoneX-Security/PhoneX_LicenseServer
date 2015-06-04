@@ -76,7 +76,7 @@ class CreateUser extends Command implements SelfHandling {
 
         // allow user to try again
         if(!$saved){
-            Log::error("Cannot create record in PhoneX_users table");
+            Log::error("Cannot create record in users table");
             throw new \Exception("Cannot save User");
         }
 

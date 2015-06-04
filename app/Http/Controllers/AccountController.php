@@ -31,6 +31,7 @@ class AccountController extends Controller {
 
     // testing constants
     const TEST_NON_QA_IP = "127.0.0.2";
+    const TEST_QA_IP = "127.0.0.1";
     const QA_CAPTCHA = "captcha";
     const QA_CODE = "qacodeqac";
 
@@ -158,8 +159,9 @@ class AccountController extends Controller {
             $licFuncType = $businessCode->licenseFuncType;
 
             // create user
+            $groups = $businessCode->group ? [$businessCode->group->id] : [];
             $command = new CreateUser($username,
-                [$businessCode->group->id],
+                $groups,
                 $isQaTrial,
                 $trialNumber);
             $user = $this->dispatch($command);
@@ -173,7 +175,8 @@ class AccountController extends Controller {
 
             // add support if not trial
             if (!$isQaTrial){
-                ContactList::addSupportToContactListMutually($user);
+                // parent is taken as a support if available
+                ContactList::addSupportToContactListMutually($user, $businessCode->parent ? $businessCode->parent : null);
             }
 
             // Add contact list mappings
@@ -290,18 +293,16 @@ class AccountController extends Controller {
 
     private function checkCorrectCaptcha(Request $request) {
         // for testing purposes
-        if (\Input::getClientIp() == self::TEST_NON_QA_IP){
+        if (\Input::getClientIp() == self::TEST_QA_IP){
             return;
         }
 
+//        $this->isPhonexIp();
+
+//        if ($this->isPhonexIp() && $captcha === self::QA_CAPTCHA){
+//            return;
+//        }
         $captcha = $request->get('captcha');
-
-        $this->isPhonexIp();
-
-        if ($this->isPhonexIp() && $captcha === self::QA_CAPTCHA){
-            return;
-        }
-
         if ($this->securimage->check($captcha) == false) {
 //            Log::error("Bad captcha entered [received=" . $captcha . " ]");
             throw new \Exception("", self::RESP_ERR_BAD_CAPTCHA);

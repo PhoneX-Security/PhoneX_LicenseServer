@@ -21,7 +21,7 @@ class GenerateSingleCodesRequest extends Request {
 	{
 		return [
 			'number' => 'required|integer|between:1,30',
-            'license_type_id' => 'exists:phonex_license_types,id|required_with:issue_license',
+            'license_type_id' => 'exists:license_types,id|required_with:issue_license',
             'email' => 'required|email'
 		];
 	}

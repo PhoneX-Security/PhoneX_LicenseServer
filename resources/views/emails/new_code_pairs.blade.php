@@ -1,4 +1,10 @@
-<p>Generated code pairs:</p>
+<h2>Generated code pairs</h2>
+
+<p>
+    Parent user: @if($parent) {{ $parent->username  }} @else -non- @endif <br />
+    Group: @if($group) {{ $group->name  }} @else -non- @endif
+</p>
+
 <table>
     <tr>
         <td>Code 1</td>

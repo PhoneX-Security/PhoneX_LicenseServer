@@ -20,12 +20,15 @@ class ContactList extends Model{
     const CREATED_AT = 'dateCreated';
     const UPDATED_AT = 'dateLastEdit';
 
-    public static function addSupportToContactListMutually(User $user){
-        $supportUser = User::getSupportUser();
+    public static function addSupportToContactListMutually(User $user, User $supportUser = null){
+        if ($supportUser == null){
+            $supportUser = User::getSupportUser();
+        }
+
         if (!$supportUser){
             throw new \Exception("ContactList; no support user exists");
         }
-        return ContactList::addUsersToContactListMutually($user, $supportUser, null, "PhoneX Support");
+        ContactList::addUsersToContactListMutually($user, $supportUser, null, "Support");
     }
 
     /**

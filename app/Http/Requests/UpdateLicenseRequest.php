@@ -40,7 +40,7 @@ class UpdateLicenseRequest extends Request {
 	{
 		return [
             // sometimes = only if input is non-empty
-            'issuer_username' => 'sometimes|exists:phonex_users,username'
+            'issuer_username' => 'sometimes|exists:users,username'
 
 		];
 	}

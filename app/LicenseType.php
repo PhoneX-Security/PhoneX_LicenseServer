@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed id
  */
 class LicenseType extends Model{
-    protected $table = "phonex_license_types";
+    protected $table = "license_types";
     
     public function licenses(){
         return $this->hasMany('Phonex\License', 'license_type_id');

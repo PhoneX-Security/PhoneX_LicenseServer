@@ -41,8 +41,8 @@ class UserController extends Controller {
         // Filter groups
         if (\Request::has('user_group')){
             $filteredGroups = \Request::get('user_group');
-            $query = User::join('user_group', 'phonex_users.id', '=', 'user_group.user_id')
-                ->groupBy('phonex_users.id')
+            $query = User::join('user_group', 'users.id', '=', 'user_group.user_id')
+                ->groupBy('users.id')
                 ->whereIn('group_id', $filteredGroups)
                 ->sortable()
                 ->with('subscriber', 'groups');
@@ -176,7 +176,7 @@ class UserController extends Controller {
         $data = ['sip_default_password' => $newPass, 'id' => $id];
 
         $v = Validator::make($data, [
-            'id' => 'required|exists:phonex_users,id',
+            'id' => 'required|exists:users,id',
             'sip_default_password' => 'required|min:8',
         ]);
 
