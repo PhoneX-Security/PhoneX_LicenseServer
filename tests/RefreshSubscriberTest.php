@@ -11,6 +11,8 @@ class RefreshSubscriberTest extends TestCase {
     const TEST_NAME_1 = "jano";
 
     public function testRetrieveActiveLicense(){
+        $this->mockQueuePush(); //dirtyfix
+
         $user = $this->createUser(self::TEST_NAME_1);
 
         $licType = LicenseType::find(1);
@@ -28,6 +30,8 @@ class RefreshSubscriberTest extends TestCase {
     }
 
 	public function testRetrieveFutureLicense(){
+        $this->mockQueuePush(); //dirtyfix
+
         $user = $this->createUser(self::TEST_NAME_1);
 
         $licType = LicenseType::find(1);

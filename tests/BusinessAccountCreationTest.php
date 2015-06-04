@@ -38,21 +38,22 @@ class BusinessAccountCreationTest extends TestCase {
 	}
 
     public function testBadCaptcha(){
-        $this->callAndCheckResponse(
+        $this->callAndCheckResponse(self::URL,
             ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'bad_captcha', 'username' => '1', 'bcode' => 1],
-            AccountController::RESP_ERR_BAD_CAPTCHA
+            AccountController::RESP_ERR_BAD_CAPTCHA,
+            AccountController::TEST_NON_QA_IP
         );
     }
 
     public function testBadUsername(){
-        $this->callAndCheckResponse(
+        $this->callAndCheckResponse(self::URL,
             ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'captcha', 'username' => '1', 'bcode' => 1],
             AccountController::RESP_ERR_USERNAME_BAD_FORMAT
         );
     }
 //
     public function testExistingUsername(){
-        $this->callAndCheckResponse(
+        $this->callAndCheckResponse(self::URL,
             ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'captcha', 'username' => 'test318', 'bcode' => 1],
             AccountController::RESP_ERR_EXISTING_USERNAME
         );
@@ -67,18 +68,13 @@ class BusinessAccountCreationTest extends TestCase {
             $oldUser->deleteWithLicenses();
         }
 
-        $params = [
+        $this->callAndCheckResponse(self::URL, [
             'version' => AccountController::VERSION,
             'imei' => 'a',
             'captcha' =>'captcha',
             'username' => $nonExistingUsername,
             'bcode' => "too_short"
-        ];
-        $response = $this->callNonQa($params);
-
-        $json = json_decode($response->getContent());
-
-        $this->assertEquals(AccountController::RESP_ERR_BAD_BUSINESS_CODE, $json->responseCode);
+        ], AccountController::RESP_ERR_BAD_BUSINESS_CODE);
     }
 
     /**
@@ -86,8 +82,7 @@ class BusinessAccountCreationTest extends TestCase {
      */
     public function testAccountCreation(){
         // Mock Queue push because it might trigger Stack Overflow
-        Queue::shouldReceive('push');
-        Queue::shouldReceive('connected');
+        $this->mockQueuePush();
 
         $username1 = "kajsmentke";
         $username2 = "kozmeker";
@@ -109,7 +104,8 @@ class BusinessAccountCreationTest extends TestCase {
         $mpLicenseType = LicenseType::where('name', 'half_year')->first();
         $mpLicenseFuncType = LicenseFuncType::getFull();
 
-        $command = new CreateBusinessCodePair($user1, $mpLicenseType, $mpLicenseFuncType, $mpGroup);
+        $command = new CreateBusinessCodePair($user1, $mpLicenseType, $mpLicenseFuncType);
+        $command->addGroup($mpGroup);
         $codePair = Bus::dispatch($command);
 
         // remember counts
@@ -117,16 +113,14 @@ class BusinessAccountCreationTest extends TestCase {
         $licenseCount = License::all()->count();
         $subscriberCount = Subscriber::all()->count();
         // now use first code to get a license
-        $response1 = $this->callNonQa([
+
+        $json = $this->callAndCheckResponse(self::URL,[
             'version' => AccountController::VERSION,
             'imei' => 'a',
             'captcha' =>'captcha',
             'username' => $username2,
             'bcode' => $codePair[0]->code
-        ]);
-
-        $json = json_decode($response1->getContent());
-        $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
+        ], AccountController::RESP_OK);
         $this->assertEquals($username2, $json->username);
 
         // assert all records created
@@ -135,28 +129,22 @@ class BusinessAccountCreationTest extends TestCase {
         $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
 
         // check we cannot create another license on the same business code
-        $responseX = $this->callNonQa([
+        $json = $this->callAndCheckResponse(self::URL, [
             'version' => AccountController::VERSION,
             'imei' => 'a',
             'captcha' =>'captcha',
             'username' => $username3,
             'bcode' => $codePair[0]->code
-        ]);
-
-        $json = json_decode($responseX->getContent());
-        $this->assertEquals(AccountController::RESP_ERR_ALREADY_USED_BUSINESS_CODE, $json->responseCode);
+        ], AccountController::RESP_ERR_ALREADY_USED_BUSINESS_CODE);
 
         // now use the second code to get a license
-        $response2 = $this->callNonQa([
+        $json = $this->callAndCheckResponse(self::URL, [
             'version' => AccountController::VERSION,
             'imei' => 'a',
             'captcha' =>'captcha',
             'username' => $username3,
             'bcode' => $codePair[1]->code
-        ]);
-
-        $json = json_decode($response2->getContent());//
-        $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
+        ], AccountController::RESP_OK);
         $this->assertEquals($username3, $json->username);
 
         // expect two users in contact list (support and another business user)
@@ -167,29 +155,5 @@ class BusinessAccountCreationTest extends TestCase {
         $this->assertEquals($userCount + 2, User::all()->count());
         $this->assertEquals($licenseCount + 2, License::all()->count());
         $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
-    }
-
-    /* Helper functions */
-    private function callAndCheckResponse(array $params, $expectedJsonCode){
-        $response = $this->call('POST', self::URL, $params);
-        $json = json_decode($response->getContent());
-        $this->assertEquals($expectedJsonCode, $json->responseCode);
-    }
-
-    private function deleteUsers(array $usernames){
-        foreach ($usernames as $username){
-            $oldUser = User::where('username', $username)->first();
-            if ($oldUser != null){
-                $oldUser->deleteWithLicenses();
-            }
-        }
-    }
-
-    private function callNonQa(array $params){
-        return $this->call(
-            'POST',
-            self::URL, $params,
-            [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
-        );
     }
 }

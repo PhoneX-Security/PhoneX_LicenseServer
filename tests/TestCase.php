@@ -19,4 +19,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase {
 		return $app;
 	}
 
+
+
+
 }

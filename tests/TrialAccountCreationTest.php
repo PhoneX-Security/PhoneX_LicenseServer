@@ -37,38 +37,34 @@ class TrialAccountCreationTest extends TestCase {
 	}
 
     public function testInvalidVersion(){
-        $this->callAndCheckResponse(
+        $this->callAndCheckResponse(self::URL,
             ['version' => AccountController::VERSION + 1, 'imei' => 'a', 'captcha' =>'captcha'],
             AccountController::RESP_ERR_UNSUPPORTED_VERSION
         );
     }
 
     public function testBadCaptcha(){
-        $this->callAndCheckResponse(
+        $this->callAndCheckResponse(self::URL,
             ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'bad_captcha'],
-            AccountController::RESP_ERR_BAD_CAPTCHA
+            AccountController::RESP_ERR_BAD_CAPTCHA,
+            AccountController::TEST_NON_QA_IP
         );
     }
 
     public function testBadUsername(){
-        $this->callAndCheckResponse(
+        $this->callAndCheckResponse(self::URL,
             ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'captcha', 'username' => '1'],
             AccountController::RESP_ERR_USERNAME_BAD_FORMAT
         );
     }
 //
     public function testExistingUsername(){
-        $this->callAndCheckResponse(
+        $this->callAndCheckResponse(self::URL,
             ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'captcha', 'username' => 'test318'],
             AccountController::RESP_ERR_EXISTING_USERNAME
         );
     }
-    /* Helper functions */
-    private function callAndCheckResponse(array $params, $expectedJsonCode){
-        $response = $this->call('POST', self::URL, $params);
-        $json = json_decode($response->getContent());
-        $this->assertEquals($expectedJsonCode, $json->responseCode);
-    }
+
 
     // continue with normal tests
     public function testTrialCreation(){
@@ -108,20 +104,12 @@ class TrialAccountCreationTest extends TestCase {
         $subscriberCount = Subscriber::all()->count();
         $trialReqCount = TrialRequest::all()->count();
 
-        $response = $this->call(
-            'POST',
-            self::URL,
-            [
-                'version' => AccountController::VERSION,
-                'imei' => 'a',
-                'captcha' =>'captcha',
-                'username' => self::TEST_USERNAME
-            ]
-            , [], [], ['REMOTE_ADDR' => AccountController::TEST_NON_QA_IP]
-        );
-        $json = json_decode($response->getContent());
-
-        $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
+        $json = $this->callAndCheckResponse(self::URL, [
+            'version' => AccountController::VERSION,
+            'imei' => 'a',
+            'captcha' =>'captcha',
+            'username' => self::TEST_USERNAME
+        ], AccountController::RESP_OK);
         $this->assertEquals(self::TEST_USERNAME, $json->username);
 
         // assert all records created
