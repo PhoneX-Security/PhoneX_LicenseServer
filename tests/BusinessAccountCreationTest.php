@@ -19,6 +19,14 @@ class BusinessAccountCreationTest extends TestCase {
         // has to do this here before the framework is started because phpunit prints something before headers are sent
         @session_start();
         parent::setUp();
+//        DB::beginTransaction();
+//        echo "begin_transaction\n";
+    }
+
+    public function tearDown(){
+        parent::tearDown();
+//        DB::rollBack();
+//        echo "rollback\n";
     }
 
 	/**
@@ -84,14 +92,14 @@ class BusinessAccountCreationTest extends TestCase {
         // Mock Queue push because it might trigger Stack Overflow
         $this->mockQueuePush();
 
-        $username1 = "kajsmentke";
-        $username2 = "kozmeker";
-        $username3 = "fajnsmeker";
+        $username1 = "kajsmentke12";
+        $username2 = "kozmeker13";
+        $username3 = "fajnsmeker2";
 
         // first delete users if exist
         $this->deleteUsers([$username1, $username2, $username3]);
 
-        // now create user1 and issue Mobil Pohotovost business code
+        // now create user1 and generate code pair
         $trialLic = LicenseType::find(1);
         $trialLicFunc = \Phonex\LicenseFuncType::getTrial();
         $command = new CreateUser($username1);
@@ -112,8 +120,8 @@ class BusinessAccountCreationTest extends TestCase {
         $userCount = User::all()->count();
         $licenseCount = License::all()->count();
         $subscriberCount = Subscriber::all()->count();
-        // now use first code to get a license
 
+        // now use first code to get a license
         $json = $this->callAndCheckResponse(self::URL,[
             'version' => AccountController::VERSION,
             'imei' => 'a',
@@ -155,5 +163,54 @@ class BusinessAccountCreationTest extends TestCase {
         $this->assertEquals($userCount + 2, User::all()->count());
         $this->assertEquals($licenseCount + 2, License::all()->count());
         $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
+    }
+
+    public function testAccountCreationWithParent(){
+        // Mock Queue push because it might trigger Stack Overflow
+        $this->mockQueuePush();
+
+        $username1 = "kajsmentke1233";
+        $username2 = "kozmeker1333";
+        $username3 = "fajnsmeker1443";
+
+        $this->deleteUsers([$username1, $username2, $username3]);
+
+        // now create user1 and generate code pair
+        $licType = LicenseType::find(1);
+        $licFuncType = \Phonex\LicenseFuncType::getTrial();
+        $command = new CreateUser($username1);
+        $user1 = Bus::dispatch($command);
+        $commandSub = new CreateSubscriberWithLicense($user1, $licType, $licFuncType, 'fasirka_heslo');
+        Bus::dispatch($commandSub);
+
+        $command = new CreateBusinessCodePair($user1, $licType, $licFuncType);
+        // add parent - will be added as support account
+        $command->addParent($user1);
+        $codePair = Bus::dispatch($command);
+
+        // use 1. code
+        $this->callAndCheckResponse(
+            self::URL,
+            ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username2,'bcode' => $codePair[0]->code],
+            AccountController::RESP_OK
+        );
+
+        // use 2. code
+        $this->callAndCheckResponse(
+            self::URL,
+            ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username3,'bcode' => $codePair[1]->code],
+            AccountController::RESP_OK
+        );
+
+        // check both have themselves and support account in cl
+        $user1 = User::findByUsername($username1);
+        $user2 = User::findByUsername($username2);
+        $user3 = User::findByUsername($username3);
+
+        $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user1->subscriber));
+        $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user3->subscriber));
+
+        $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user1->subscriber));
+        $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user2->subscriber));
     }
 }

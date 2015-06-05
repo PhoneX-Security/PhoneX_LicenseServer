@@ -28,7 +28,16 @@ class ContactList extends Model{
         if (!$supportUser){
             throw new \Exception("ContactList; no support user exists");
         }
+
         ContactList::addUsersToContactListMutually($user, $supportUser, null, "Support");
+
+        // push support information onto sip server
+        $supportContact = new SupportContact();
+        $supportContact->owner_sip = $user->email;
+        $supportContact->support_sip = $supportUser->email;
+        $supportContact->order = 1;
+        $supportContact->save();
+
     }
 
     /**
