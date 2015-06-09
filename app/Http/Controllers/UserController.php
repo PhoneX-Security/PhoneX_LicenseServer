@@ -57,11 +57,8 @@ class UserController extends Controller {
         }
 
         $users = $query->paginate($limit);
+        // TODO when including groups, total count may not be correct, currently it's all 1, fix it
 
-//        foreach($users as $u){
-//            dd($u);
-//        }
-//        dd('x');
 
         $groups = Group::all();
         foreach($groups as $group){
