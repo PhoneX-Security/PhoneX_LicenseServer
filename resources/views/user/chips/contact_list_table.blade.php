@@ -32,7 +32,7 @@ Parameters: $user
     Empty contact list
 @endif
 
-@include('user.chips.modal_confirm_delete')
+@include('dialogs.confirm_delete')
 
 <hr />
 
