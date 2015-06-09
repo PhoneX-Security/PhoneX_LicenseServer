@@ -41,7 +41,8 @@ class UserController extends Controller {
         // Filter groups
         if (\Request::has('user_group')){
             $filteredGroups = \Request::get('user_group');
-            $query = User::join('user_group', 'users.id', '=', 'user_group.user_id')
+            $query = User::select('users.*')
+                ->join('user_group', 'users.id', '=', 'user_group.user_id')
                 ->groupBy('users.id')
                 ->whereIn('group_id', $filteredGroups)
                 ->sortable()
@@ -56,6 +57,12 @@ class UserController extends Controller {
         }
 
         $users = $query->paginate($limit);
+
+//        foreach($users as $u){
+//            dd($u);
+//        }
+//        dd('x');
+
         $groups = Group::all();
         foreach($groups as $group){
             $group->selected = in_array($group->id, $filteredGroups);

@@ -173,10 +173,12 @@ class AccountController extends Controller {
             $user->business_code_id = $businessCode->id;
             $user->save();
 
-            // add support if not trial
-            if (!$isQaTrial){
-                // parent is taken as a support if available
-                ContactList::addSupportToContactListMutually($user, $businessCode->parent ? $businessCode->parent : null);
+            // add support account
+            if ($businessCode->parent_id != null){
+                ContactList::addSupportToContactListMutually($user, $businessCode->parent);
+            } else {
+                // no parent id, add default support account
+                ContactList::addSupportToContactListMutually($user);
             }
 
             // Add contact list mappings
