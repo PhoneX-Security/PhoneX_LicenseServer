@@ -62,6 +62,10 @@ class Subscriber extends Model{
         return $record1->save();
     }
 
+    public function removeFromContactList(Subscriber $subscriber){
+        $this->subscribersInContactList()->detach($subscriber->id);
+    }
+
     public static function createSubscriber($username, $password, $startsAt, $expiresAt, $licenseType, $domain = 'phone-x.net'){
         $sip = $username . "@" . $domain;
         $ha1 = getHA1_1($sip, $password);

@@ -40,35 +40,30 @@ Route::group(['middleware' => 'auth'], function() {
     Route::resource('groups', 'GroupController');
     Route::patch('users/{users}/change-sip-pass', ['as' => 'users.change_sip_pass', 'uses' => 'UserController@patchChangeSipPassword']);
     Route::patch('users/{users}/add-user-to-cl', ['as' => 'users.add_user_to_cl', 'uses' => 'UserController@patchAddUserToCl']);
-	Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
+
+    // contact lists
+    Route::delete('users/{user}/cl/{contactUser}', ['uses' => 'UserController@deleteContact']);
+    // alternative via get
+    Route::get('users/{user}/cl/delete/{contactUser}', ['uses' => 'UserController@deleteContact']);
+
+    Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 
     // dev tools
     Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index'); // logs viewer
     Route::controller('bcodes', 'BusinessCodeController');
 });
 
-
-
-
-
 Route::get('x', function(){
-    $x = User::findByUsername('test318');
-    $x->password = bcrypt('bbbbbbbb1');
-    $x->save();
-
-
-//    $code = BusinessCode::getCode('qqqqqqq');
-//    echo "$code";
 });
 
-//Route::get('test_i', function(){
-//    $u =  User::getByUsername('w1pko');
+Route::get('test_i', function(){
+//    $u =  User::getByUsername('bberry2');
 //    $licFuncType = LicenseFuncType::getFull();
 //    $licType = LicenseType::findByName('half_year');
 //
 //    $c = new IssueLicense($u, $licType, $licFuncType);
-//    Bus::dispatch($c);
-//});
+
+});
 
 
 Route::get('test_connect', function(){

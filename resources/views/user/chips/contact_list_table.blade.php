@@ -21,7 +21,8 @@ Parameters: $user
                 <td>{{ $subscriberContact->pivot->displayName }}</td>
                 <td>
                     <div class="btn-group  btn-group-xs">
-                        {{--<a type="button" class="btn btn-info   view-btn-edit" href="{{ \URL::route('licenses.edit', $license->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>--}}
+                        <a type="button" class="btn btn-danger" href="#" title="Delete"
+                           data-href="/users/{{$user->id}}/cl/delete/{{$subscriberContact->user->id}}" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i> Delete</a>
                     </div>
                 </td>
             </tr>
@@ -30,6 +31,8 @@ Parameters: $user
 @else
     Empty contact list
 @endif
+
+@include('user.chips.modal_confirm_delete')
 
 <hr />
 

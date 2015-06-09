@@ -12,6 +12,7 @@ use Phonex\Group;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\AddUserToClRequest;
 use Phonex\Http\Requests\CreateUserRequest;
+use Phonex\Http\Requests\DeleteContactRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\License;
 use Phonex\LicenseFuncType;
@@ -235,5 +236,22 @@ class UserController extends Controller {
         return Redirect::route('users.show', [$user->id])
             ->with('success', 'User has been added to contact list');
 
+    }
+
+    public function deleteContact($userId, $contactUserId, DeleteContactRequest $request){
+        $user = User::find($userId);
+        $userToRemove = User::find($contactUserId);
+        try {
+            $user->removeFromContactList($userToRemove);
+        } catch (\Exception $e){
+
+            Log::error("deleteContact; problem", [$userId, $contactUserId, $e]);
+            return redirect()
+                ->back()
+                ->withErrors(['Server error: Cannot remove user']);
+
+        }
+        return Redirect::route('users.show', [$user->id])
+            ->with('success', 'User has been removed from contact list');
     }
 }

@@ -69,6 +69,20 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         }
     }
 
+    public function removeFromContactList(User $user){
+        $subscriber1 = $this->subscriber;
+        $subscriber2 = $user->subscriber;
+
+        Log::info('removeFromContactList; user is being removed to contact list', [$this->username, $user->username]);
+
+        $subscriber1->removeFromContactList($subscriber2);
+        try {
+            Queue::push('ContactListUpdated', ['username'=>$this->email], 'users');
+        } catch (\Exception $e){
+            Log::error('cannot push ContactListUpdated message', [$e]);
+        }
+    }
+
     public static function findByUsername($username){
         return User::where('username', $username)->first();
     }
