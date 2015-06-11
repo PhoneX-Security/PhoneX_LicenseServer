@@ -16,7 +16,15 @@ class Subscriber extends Model{
 
     // legacy - Subscriber table doesn't have timestamps
     public $timestamps = false;
-    protected $dates = ['expires_on', 'issued_on'];
+    protected $dates = ['expires_on', 'issued_on',
+        'date_last_activity',
+        'date_first_login',
+        'date_first_user_added',
+        'date_first_authCheck',
+        'date_last_activity',
+        'date_last_authCheck',
+        'date_last_pass_change'
+    ];
 
     public function subscribersInContactList(){
         return $this

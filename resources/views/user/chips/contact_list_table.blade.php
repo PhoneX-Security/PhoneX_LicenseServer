@@ -28,6 +28,7 @@ Parameters: $user
             </tr>
         @endforeach
     </table>
+    <p>Total: {{ $user->subscriber->subscribersInContactList->count() }}</p>
 @else
     Empty contact list
 @endif

@@ -23,10 +23,10 @@
 		<div class="col-sm-12">
             <div style="margin-bottom: 10px" class="phonex-table-div clearfix">
                 <div class="left-cell">
-                    <form class="form-horizontal" style="width: 10%" action="{{ \URL::route('users.index') }}" method="get">
+                    <form class="form-horizontal" style="width: 25%" action="{{ \URL::route('users.index') }}" method="get">
 
                         <div class="input-group">
-                            <input type="search" class="form-control input-sm" name="username" value="{{ Input::get('username') }}" placeholder="Search">
+                            <input type="search" class="form-control input-sm" name="username" value="{{ Input::get('username') }}" placeholder="Searchsssss">
                         <span class="input-group-btn">
                             <button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
                         </span>
