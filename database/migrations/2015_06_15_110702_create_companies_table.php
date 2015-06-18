@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBusinessCodeUserClMappingsTable extends Migration {
+class CreateCompaniesTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,14 +12,13 @@ class CreateBusinessCodeUserClMappingsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('business_code_user_cl_mappings', function(Blueprint $table)
+		Schema::create('companies', function(Blueprint $table)
 		{
             $table->engine = 'InnoDB';
-
 			$table->increments('id');
 			$table->timestamps();
-            $table->unsignedInteger('bcode_id');
-            $table->unsignedInteger('user_id');
+            $table->string('name');
+            $table->text('description');
 		});
 	}
 
@@ -30,7 +29,7 @@ class CreateBusinessCodeUserClMappingsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('business_code_user_cl_mappings');
+		Schema::drop('companies');
 	}
 
 }
