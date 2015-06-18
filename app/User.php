@@ -1,5 +1,7 @@
 <?php namespace Phonex;
 
+use BeatSwitch\Lock\Callers\Caller;
+use BeatSwitch\Lock\LockAware;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -18,8 +20,8 @@ use Queue;
  * @property mixed subscriber_id
  * @property mixed subscriber
  */
-class User extends Model implements AuthenticatableContract, CanResetPasswordContract {
-	use Authenticatable, CanResetPassword, SortableTrait;
+class User extends Model implements AuthenticatableContract, CanResetPasswordContract, Caller {
+	use Authenticatable, CanResetPassword, SortableTrait, LockAware;
 
     // legacy names
     const CREATED_AT = 'dateCreated';
@@ -47,7 +49,6 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function subscriber(){
         // weird, parameters 2 + 3 are switched ()
-//        return $this->hasOne('Phonex\Subscriber', 'subscriber_id', );
         return $this->hasOne('Phonex\Subscriber', 'id', 'subscriber_id');
     }
 
@@ -55,7 +56,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->belongsToMany('Phonex\Group', 'user_group', 'user_id', 'group_id');
     }
 
-    /* helper functions */
+    public function roles(){
+        return $this->belongsToMany('Phonex\Role', 'user_role', 'user_id', 'role_id');
+    }
+
+    /* Helper functions */
     public function addToContactList(User $user, $displayName = null){
         $subscriber1 = $this->subscriber;
         $subscriber2 = $user->subscriber;
@@ -88,7 +93,6 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     }
 
     public static function getSupportUser(){
-//        return User::where('username', "support")->first();
         return User::where('username', "phonex-support")->first();
     }
 
@@ -108,8 +112,42 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
             $subscriber->delete();
         }
 
-
         $this->groups()->detach();
         $this->delete();
+    }
+
+
+    /* ACL */
+    /**
+     * The type of caller
+     *
+     * @return string
+     */
+    public function getCallerType()
+    {
+        // the same as in lock.php configuration
+        return 'users';
+    }
+
+    /**
+     * The unique ID to identify the caller with
+     *
+     * @return int
+     */
+    public function getCallerId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * The caller's roles
+     *
+     * @return array
+     */
+    public function getCallerRoles()
+    {
+        $dbRoles = $this->roles->fetch('name')->toArray();
+        $defaultRoles = ['user'];
+        return array_merge($defaultRoles, $dbRoles);
     }
 }

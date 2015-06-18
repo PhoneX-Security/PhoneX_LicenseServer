@@ -31,7 +31,7 @@ class QaController extends Controller {
         }
 
 //        $name  = "test318";
-        $name  = "cooldogpedro21";
+        $name  = "jhuska4";
 //        dd($dt);
         $subscriber = Subscriber::where('username', $name)->first();
 

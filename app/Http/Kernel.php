@@ -15,6 +15,7 @@ class Kernel extends HttpKernel {
 		'Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse',
 		'Illuminate\Session\Middleware\StartSession',
 		'Illuminate\View\Middleware\ShareErrorsFromSession',
+        'BeatSwitch\Lock\Integrations\Laravel\Middleware\LockPermissions'
 //		 TODO allow this
 //		'Phonex\Http\Middleware\CustomVerifyCsrfToken',
 	];
@@ -28,6 +29,7 @@ class Kernel extends HttpKernel {
 		'auth' => 'Phonex\Http\Middleware\Authenticate',
 		'auth.basic' => 'Illuminate\Auth\Middleware\AuthenticateWithBasicAuth',
 		'guest' => 'Phonex\Http\Middleware\RedirectIfAuthenticated',
+        'acl' => 'Phonex\Http\Middleware\AclRoute',
 	];
 
 }

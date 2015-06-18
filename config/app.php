@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'version_name' => '0.2.5',
-    'version_code' => 3,
+    'version_name' => '0.3',
+    'version_code' => 4,
 
 	/*
 	|--------------------------------------------------------------------------
@@ -152,6 +152,9 @@ return [
 
         // Rabbit MQ
         'FintechFab\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider',
+
+        // Acl
+        'BeatSwitch\Lock\Integrations\Laravel\LockServiceProvider',
 	],
 
 	/*
@@ -205,7 +208,10 @@ return [
 		'Debugbar' => 'Barryvdh\Debugbar\Facade', // for logging
 
 		'InputGet' => 'Phonex\Utils\InputGet',
-		'InputPost' => 'Phonex\Utils\InputPost'
+		'InputPost' => 'Phonex\Utils\InputPost',
+
+        'Lock' => 'BeatSwitch\Lock\Integrations\Laravel\Facades\Lock',
+        'LockManager' => 'BeatSwitch\Lock\Integrations\Laravel\Facades\LockManager',
 	],
 
 ];

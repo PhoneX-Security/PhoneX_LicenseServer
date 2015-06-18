@@ -14,12 +14,22 @@
         "fintech-fab/laravel-queue-rabbitmq": "5.0",
 		"rap2hpoutre/laravel-log-viewer": "0.1.*",
 		"mockery/mockery": "0.9.*",
-        "miroc/laravel-adminer": "dev-master"
+        "miroc/laravel-adminer": "dev-master",
+		"guzzlehttp/guzzle": "^6.0",
+      "beatswitch/lock-laravel": "dev-patch-1"
+
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.0",
 		"phpspec/phpspec": "~2.1"
 	},
+
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "/home/vagrant/Code/laravel_ext/lock-laravel"
+    }
+  ],
 	"autoload": {
 		"classmap": [
 			"database"
