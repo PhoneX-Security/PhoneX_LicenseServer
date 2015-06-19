@@ -99,6 +99,8 @@ class Subscriber extends Model{
 
         // LS-5 Initialize TURN password for new users.
         $subscriber->turnPasswd = getRandomString(24);
+        // Pre-computed ha1 password for turn server
+        $subscriber->turn_passwd_ha1b = getHA1_B($sip, $subscriber->turnPasswd);
 
         return $subscriber;
     }

@@ -11,7 +11,6 @@
 |
 */
 
-use Phonex\BusinessCode;
 use Phonex\Commands\IssueLicense;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
@@ -35,11 +34,12 @@ Route::resource('products', 'Api\ProductController', ['only' => ['show', 'index'
 Route::controller('qa', 'QaController'); // qa tools
 
 // Authenticated pages
-Route::group(['middleware' => 'auth'], function() {
+Route::group(['middleware' => ['auth', 'acl']], function() {
 	Route::resource('users', 'UserController');
-    Route::resource('groups', 'GroupController');
     Route::patch('users/{users}/change-sip-pass', ['as' => 'users.change_sip_pass', 'uses' => 'UserController@patchChangeSipPassword']);
     Route::patch('users/{users}/add-user-to-cl', ['as' => 'users.add_user_to_cl', 'uses' => 'UserController@patchAddUserToCl']);
+
+    Route::resource('groups', 'GroupController');
 
     // contact lists
     Route::delete('users/{user}/cl/{contactUser}', ['uses' => 'UserController@deleteContact']);
@@ -48,19 +48,32 @@ Route::group(['middleware' => 'auth'], function() {
 
     Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 
-    // dev tools
-    Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index'); // logs viewer
     Route::controller('bcodes', 'BusinessCodeController');
+
+
+
+
+    /* Admin only pages */
+    Route::get('logs', ['acl-resource' => 'logs',
+        'uses' => '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index'
+    ]);
+    Route::any('adminer', ['acl-resource' => 'adminer',
+        'uses' => '\Miroc\LaravelAdminer\AdminerController@index']);
 });
 
 Route::get('x', function(){
+//    $u =  User::findByUsername('test318');
+//    dd($u->getCallerRoles());
+
+
+//        dd($u->getCallerRoles());
 });
 
+
 Route::get('test_i', function(){
-//    $u =  User::getByUsername('bberry2');
+//    $u =  User::getByUsername('zas03');
 //    $licFuncType = LicenseFuncType::getFull();
-//    $licType = LicenseType::findByName('half_year');
-//
+//    $licType = LicenseType::findByName('year');
 //    $c = new IssueLicense($u, $licType, $licFuncType);
 
 });

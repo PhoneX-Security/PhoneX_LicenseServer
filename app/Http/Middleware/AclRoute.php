@@ -21,7 +21,7 @@ class AclRoute{
         $lockResources = $this->getAclResources($request);
 
         $u = \Auth::getUser();
-        if (!$u->can('route', $lockResources)){
+        if ($lockResources && !$u->can('route', $lockResources)){
             // TODO log it here
             return response('Unauthorized. Your actions are audited.', 401);
         }

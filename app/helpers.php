@@ -68,6 +68,19 @@ if (!function_exists('getHA1_1')) {
     }
 }
 
+if (!function_exists('getHA1_B')) {
+    function getHA1_B($sip, $password)
+    {
+        // split sip by @
+        $arr = explode("@", $sip, 2);
+        if ($arr == null || count($arr) != 2) {
+            var_dump($arr);
+            throw new Exception("Invalid SIP format");
+        }
+        return getHA1_2($sip, $arr[1], $password);
+    }
+}
+
 if (!function_exists('getHA1_2')) {
     function getHA1_2($username, $domain, $password)
     {
