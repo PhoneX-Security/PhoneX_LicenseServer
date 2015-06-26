@@ -1,6 +1,7 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +18,7 @@ use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Role;
 use Phonex\Subscriber;
 use Phonex\User;
 use Phonex\Utils\InputGet;
@@ -26,18 +28,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller {
 
-
 	public function __construct()
 	{
-		// Automatically added in routes.php
-//		$this->middleware('auth');
 	}
-
 
 	public function index(){
         $limit = InputGet::getInteger('limit', 15);
 
-        $query = User::sortable()->with('subscriber', 'groups');
+        $query = User::sortable()->with('subscriber', 'groups', 'roles');
         $filteredGroups = [];
         // Filter groups
         if (\Request::has('user_group')){
@@ -73,46 +71,68 @@ class UserController extends Controller {
 	{
 		$licenseTypes = LicenseType::all()->sortBy('order');
         $licenseFuncTypes = LicenseFuncType::all()->sortBy('order');
-		return view('user.create', compact('licenseTypes', 'licenseFuncTypes'));
+        $groups = Group::all();
+        $roles = Role::all();
+		return view('user.create', compact('licenseTypes', 'licenseFuncTypes', 'groups', 'roles'));
 	}
 
 
-	public function store(CreateUserRequest $request)	{
-		// all data should be valid at the moment (see @CreateUserRequest#rules)
-        $userRequest = new CreateUser($request->get('username'));
-        if ($request->has('has_access')){
-            $userRequest->addAccess($request->get('password'));
+	public function store(CreateUserRequest $request)
+    {
+        dd('check if roles+groups are valid and retrieve them');
+
+        $groupIds = [];
+        $roleIds = [];
+
+        $defaultPassword = $request->get('password');
+        $userRequest = new CreateUser($request->get('username'), $groupIds);
+        $userRequest->addAccess($defaultPassword);
+        if ($roleIds){
+            $userRequest->addRoles($roleIds);
         }
+
         $user = $this->dispatch($userRequest);
 
-        if (InputPost::has('issue_license')){
-            $licenseType = LicenseType::find($request->get('license_type_id'));
-            $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
-            $defaultSipPass = $request->get('sip_default_password');
+        $licenseType = LicenseType::find($request->get('license_type_id'));
+        $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
 
-            $licRequest = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $defaultSipPass);
-            $this->dispatch($licRequest);
+        $licRequest = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $defaultPassword);
+        $this->dispatch($licRequest);
 
-            // add support to contact list
-            $supportAdded = ContactList::addSupportToContactListMutually($user);
-            return Redirect::route('users.index')
-                ->with('success', 'The new user ' . $user->username . ' + license has been created.' . ($supportAdded ? "Support account has been mutually added to contact list" : ""));
-        }
-
-		return Redirect::route('users.index')
-			->with('success', 'The new user ' . $user->username . ' has been created.');
+        // add support to contact list
+        $supportAdded = ContactList::addSupportToContactListMutually($user);
+        return Redirect::route('users.index')
+            ->with('success', 'The new user ' . $user->username . ' + license has been created.' . ($supportAdded ? "Support account has been mutually added to contact list" : ""));
 	}
 
 	public function show($id)
     {
-		$user = User::with([
+		$user = User::find($id);
+		if ($user == null){
+			throw new NotFoundHttpException;
+		}
+		return view('user.show', compact('user'));
+	}
+    public function edit($id)
+    {
+        $user = User::with('licenses.licenseType')->find($id);
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
+
+        return view('user.edit', compact('user'));
+    }
+
+    public function showLicenses($id)
+    {
+        $user = User::with([
             'licenses.licenseType',
             'issuedLicenses.licenseType',
             'subscriber.subscribersInContactList.user'])->find($id);
 
-		if ($user == null){
-			throw new NotFoundHttpException;
-		}
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
 
         foreach($user->licenses as $license){
             if (!$license->expires_at || Carbon::now()->gt(Carbon::parse($license->expires_at))) {
@@ -122,18 +142,21 @@ class UserController extends Controller {
             }
         }
 
-		return view('user.show', compact('user'));
-	}
+        return view('user.show-lic', compact('user'));
+    }
 
-	public function edit($id)
-    {
-        $user = User::with('licenses.licenseType')->find($id);
+    public function showCl($id){
+        $user = User::with([
+            'subscriber.subscribersInContactList.user'])->find($id);
+
         if ($user == null){
             throw new NotFoundHttpException;
         }
+        return view('user.show-cl', compact('user'));
+    }
 
-        return view('user.edit', compact('user'));
-	}
+
+
 
 	public function update($id, UpdateUserRequest $request)
     {

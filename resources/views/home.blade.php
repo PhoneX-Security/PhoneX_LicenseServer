@@ -1,17 +1,12 @@
-@extends('app')
+@extends('content-with-header')
+
+@section('title', 'Homepage')
+{{--@section('subtitle', 'Index')--}}
 
 @section('content')
-{{--<div class="container">--}}
-	{{--<div class="row">--}}
-		{{--<div class="col-md-10 col-md-offset-1">--}}
-			<div class="panel panel-default">
-				<div class="panel-heading">Home</div>
+    @parent
 
-				<div class="panel-body">
-					You are logged in PhoneX License Server
-				</div>
-			</div>
-		{{--</div>--}}
-	{{--</div>--}}
-{{--</div>--}}
+    <section class="content">
+        <p>Welcome to PhoneX License Server.</p>
+    </section><!-- /.content -->
 @endsection

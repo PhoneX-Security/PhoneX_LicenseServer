@@ -1,122 +1,140 @@
-@extends('main')
+@extends('content-with-header')
+
+@section('title', 'Users')
+@section('subtitle', 'Manage')
 
 @section('content')
+    @parent
 
-{{--<- class="container">--}}
-	<section class="content-header">
-		<div class="row">
-			<div class="col-sm-12">
-				<h1>
-					Users
-					<small>Manage</small>
-				</h1>
-                @include('navigation.breadcrumb')
-			</div>
-		</div>
-	</section>
+    <section class="content">
 
-	<section class="content">
+        @include('errors.notifications')
 
-    @include('errors.notifications')
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Users</h3>
+            </div><!-- /.box-header -->
+            <div class="box-body">
 
-	<div class="row">
-		<div class="col-sm-12">
-            <div style="margin-bottom: 10px" class="phonex-table-div clearfix">
-                <div class="left-cell">
-                    <form class="form-horizontal" style="width: 25%" action="{{ \URL::route('users.index') }}" method="get">
+                <div class="row form-inline" style="margin-bottom: 5px">
+                    <div class="col-sm-6">
 
-                        <div class="input-group">
-                            <input type="search" class="form-control input-sm" name="username" value="{{ Input::get('username') }}" placeholder="Searchsssss">
-                        <span class="input-group-btn">
-                            <button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
-                        </span>
-                        </div>
-                    </form>
+                        <form class="form-horizontal" action="{{ \URL::route('users.index') }}" method="get">
+
+                            <div class="input-group">
+                                <input type="search" class="form-control input-sm" name="username"
+                                       value="{{ Input::get('username') }}" placeholder="Search">
+                                <span class="input-group-btn">
+                                    <button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
+                                </span>
+                            </div>
+                        </form>
+
+                        {{--<div class="left-cell">--}}
+                        {{--<form class="form-horizontal" style="width: 25%" action="{{ \URL::route('users.index') }}" method="get">--}}
+
+                        {{--<div class="input-group">--}}
+                        {{--<input type="search" class="form-control input-sm" name="username" value="{{ Input::get('username') }}" placeholder="Searchsssss">--}}
+                        {{--<span class="input-group-btn">--}}
+                        {{--<button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>--}}
+                        {{--</span>--}}
+                        {{--</div>--}}
+                        {{--</form>--}}
+                        {{--</div>--}}
+
+                        {{--<div class="form-group">--}}
+                            {{--<label>Show <select--}}
+                                        {{--name="example1_length" aria-controls="example1"--}}
+                                        {{--class="form-control input-sm">--}}
+                                    {{--<option value="10">10</option>--}}
+                                    {{--<option value="25">25</option>--}}
+                                    {{--<option value="50">50</option>--}}
+                                    {{--<option value="100">100</option>--}}
+                                {{--</select> entries</label>--}}
+                        {{--</div>--}}
+                    </div>
+                    <div class="col-sm-6 text-right">
+
+                        <a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
+                            <i class="fa fa-plus-circle"></i> New User
+                        </a>
+
+                    </div>
                 </div>
-                <div class="right-cell">
-                    <a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
-                        <i class="fa fa-plus-circle"></i> New User
-                    </a>
-                </div>
-            </div>
 
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="row">
-                        <div class="col-xs-8 pull-left">
-                            {{--Filters--}}
-                            <form class="form-inline" action="{{ \URL::route('users.index') }}" method="get">
-                                <div class="form-group">
-                                    <label for="group_input">Group</label>
-                                    <select id="group_input" name="user_group[]" class="multiselect-basic"  multiple="multiple">
-                                        @foreach($groups as $group)
-                                        <option value="{{ $group->id }}" @if($group->selected) selected="selected" @endif>{{ $group->name }}</option>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="example1" class="table table-bordered table-striped">
+
+                            <thead>
+                            <tr>
+                                <th>{!! link_to_sort('id', 'ID') !!}</th>
+                                <th>{!! link_to_sort('username', 'Username') !!}</th>
+                                <th>{!! link_to_sort('email', 'E-mail') !!}</th>
+                                <th width="15%">Groups</th>
+                                <th>SIP - Last activity</th>
+                                <th>Roles</th>
+                                <th class="text-center">Options</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach($users as $user)
+                                <tr>
+
+                                    <td>{{ $user->id }}</td>
+                                    <td>
+                                        <a href="{{ \URL::route('users.show', [ $user->id ]) }}">{{ $user->username }}</a>
+                                    </td>
+                                    <td>{{ $user->email or '' }}</td>
+                                    <td>
+                                        @foreach($user->groups as $k => $group)
+                                            @if($k > 0), @endif
+                                            {{ $group->name }}
                                         @endforeach
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-default">Filter</button>
-                            </form>
+                                    </td>
 
-                        </div>
-						<div class="text-right pull-right col-xs-2">Total: {{ $users->total() }}</div>
-					</div>
-				</div>
-				<table class="table table-condensed phonex-table-sortable">
-					<tr>
-						<th>{!! link_to_sort('id', 'ID') !!}</th>
-						<th>{!! link_to_sort('username', 'Username') !!}</th>
-						<th>{!! link_to_sort('email', 'E-mail') !!}</th>
-						<th>{!! link_to_sort('has_access', 'Has access') !!}</th>
-                        <th width="15%">Groups</th>
-                        <th>SIP - Last activity</th>
-						<th>Roles</th>
-						<th class="text-center">Options</th>
-					</tr>
-					@foreach($users as $user)
-						<tr>
+                                    <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
 
-							<td>{{ $user->id }}</td>
-							<td>
-                                <a href="{{ \URL::route('users.show', [ $user->id ]) }}">{{ $user->username }}</a>
-                            </td>
-							<td>{{ $user->email or '' }}</td>
-							<td>@if($user->has_access) Yes @else No @endif</td>
-                            <td>
-                                @foreach($user->groups as $k => $group)
-                                    @if($k > 0), @endif
-                                    {{ $group->name }}
-                                @endforeach
-                            </td>
+                                    <td>
+                                        {{ $user->roles_list }}
 
-                            <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
+                                    </td>
 
-							<td>
-								@if($user->has_access) <i class="fa fa-check-square fa-fw"></i> Admin @endif
+                                    <td class="text-center">
+                                        <div class="btn-group  btn-group-xs">
+                                            <a class="btn btn-info view-btn-edit" href="{{ \URL::route('users.show', $user->id) }}" title="Details"><i class="fa fa-pencil-square-o"></i> Details</a>
+                                        </div>
 
-								{{--<i class="fa fa-check-square fa-fw"></i> Superuser--}}
-							</td>
+                                        <div class="btn-group  btn-group-xs">
+                                            <a class="btn btn-info view-btn-edit" href="{{ \URL::route('users.licenses', $user->id) }}" title="Details"><i class="fa fa-pencil-square-o"></i> Licenses</a>
+                                        </div>
 
-							<td class="text-center">
-								<div class="btn-group  btn-group-xs">
-									<a type="button" class="btn btn-info view-btn-edit" href="{{ \URL::route('users.edit', $user->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>
-									{{--<a type="button" class="btn btn-danger action_confirm   view-btn-delete" data-method="delete" href="#" title="Delete user"><i class="fa fa-times-circle-o"></i></a>--}}
-								</div>
-							</td>
-						</tr>
-					@endforeach
-				</table>
-			</div>
+                                        <div class="btn-group  btn-group-xs">
+                                            <a class="btn btn-info view-btn-edit" href="{{ \URL::route('users.cl', $user->id) }}" title="Details"><i class="fa fa-pencil-square-o"></i> Contact List</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
 
-			<div class="text-center">
-				{!! $users->appends(Request::except('page'))->render(); !!}
-			</div>
-		</div>
-	</div>
+            <div class="box-footer clearfix">
+                <div class="pull-left">
+                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
+                        {{--Showing 1 to 10 of --}}
+                        Total {{ $users->total() }} entries</div>
+                </div>
 
 
-	</section>
+                <div class="pull-right">
+                    {!! $users->appends(Request::except('page'))->render(); !!}
+                </div>
 
-{{--</div>--}}
-
-
+            </div>
+        </div><!-- /.box -->
+    </section>
 @endsection

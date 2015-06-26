@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'version_name' => '0.3',
+    'version_name' => '0.30',
     'version_code' => 4,
 
 	/*
@@ -155,6 +155,8 @@ return [
 
         // Acl
         'BeatSwitch\Lock\Integrations\Laravel\LockServiceProvider',
+        // Breadcrumbs
+        'DaveJamesMiller\Breadcrumbs\ServiceProvider',
 	],
 
 	/*
@@ -212,6 +214,8 @@ return [
 
         'Lock' => 'BeatSwitch\Lock\Integrations\Laravel\Facades\Lock',
         'LockManager' => 'BeatSwitch\Lock\Integrations\Laravel\Facades\LockManager',
+
+        'Breadcrumbs' => 'DaveJamesMiller\Breadcrumbs\Facade',
 	],
 
 ];

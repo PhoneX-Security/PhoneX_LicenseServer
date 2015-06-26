@@ -2,14 +2,16 @@
 Parameters: $user
 --}}
 
+<h4>User details</h4>
+
 <div class="row">
-    <div class="col-md-6 ">
+    <div class="col-md-4 ">
         <dl>
             <dt>Username</dt>
             <dd>{{ $user->username }}</dd>
         </dl>
     </div>
-    <div class="col-md-6 ">
+    <div class="col-md-4 ">
         <dl>
             <dt>Email Address</dt>
             <dd>{{ $user->email or '-'}}</dd>
@@ -18,7 +20,7 @@ Parameters: $user
 </div>
 
 <div class="row">
-    <div class="col-md-6 ">
+    <div class="col-md-4 ">
         <dl>
             <dt>Has access</dt>
             <dd>@if ($user->has_access) Yes @else No @endif</dd>
@@ -27,13 +29,13 @@ Parameters: $user
 </div>
 
 <div class="row">
-    <div class="col-md-6 ">
+    <div class="col-md-4 ">
         </dl>
         <dt>Date created</dt>
         <dd>{{ date_simple($user->created_at) }}</dd>
         </dl>
     </div>
-    <div class="col-md-6 ">
+    <div class="col-md-4 ">
         <dl>
             <dt>Date updated</dt>
             <dd>{{ date_simple($user->updated_at) }}</dd>

@@ -35,12 +35,18 @@ class CreateUser extends Command implements SelfHandling {
 
     private $subscriberId;
 
+    private $roleIds;
+
 
     public function __construct($username, $groupsId = array(), $isQaTrial = false, $trialNumber = null){
         $this->username = $username;
         $this->groupsId = $groupsId;
         $this->isQaTrial = $isQaTrial;
         $this->trialNumber = $trialNumber;
+    }
+
+    public function addRoles($roleIds){
+        $this->roleIds = $roleIds;
     }
 
     public function addAccess($password){
@@ -83,6 +89,11 @@ class CreateUser extends Command implements SelfHandling {
         // assign groups
         if (!empty($this->groupsId)){
             $user->groups()->attach($this->groupsId);
+        }
+
+        // assign roles
+        if (!empty($this->roleIds)){
+            $user->roles()->attach($this->roleIds);
         }
 
         return $user;

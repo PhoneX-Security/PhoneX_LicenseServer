@@ -23,15 +23,15 @@ class CreateUserRequest extends Request {
 	{
 		return [
 			'username' => 'required|max:255|unique:users',
-//			'email' => 'required|email|max:255|unique:users',
-			// giving access
-			'password' => 'confirmed|min:8|max:255|required_with:has_access',
-			// giving license
-			'starts_at' => 'date_format:"d-m-Y"|required_with:issue_license',
-			'sip_default_password' => 'min:8|max:255|required_with:issue_license',
-			'license_type_id' => 'exists:license_types,id|required_with:issue_license',
-			'license_func_type_id' => 'exists:license_func_types,id|required_with:issue_license',
-            'issuer_username' => 'exists:users,username|required_with:issue_license',
+			'password' => 'required|min:8|max:255',
+
+            'groups' => '',
+//            'roles' => '',
+
+			'starts_at' => 'required|date_format:"d-m-Y"',
+			'license_type_id' => 'required|exists:license_types,id',
+			'license_func_type_id' => 'required|exists:license_func_types,id',
+
 		];
 	}
 

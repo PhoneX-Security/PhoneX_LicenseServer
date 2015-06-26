@@ -45,27 +45,9 @@
 {{--|               | sidebar-mini                            |--}}
 {{--|---------------------------------------------------------|--}}
 
-<body class="skin-yellow-light sidebar-mini">
-<div class="wrapper">
+<body class="login-page">
 
-    @include('header')
-
-    @include('sidebar-main')
-
-
-    <div class="content-wrapper">
-        @yield('content')
-        {{----}}
-
-    </div><!-- /.content-wrapper -->
-
-    @include('footer')
-
-    {{--@include('sidebar-control')--}}
-
-</div><!-- ./wrapper -->
-
-<!-- REQUIRED JS SCRIPTS -->
+@yield('content')
 
 <!-- jQuery 2.1.4 -->
 <script src="/plugins/jQuery/jQuery-2.1.4.min.js"></script>

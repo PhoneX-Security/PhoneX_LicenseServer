@@ -12,5 +12,12 @@ var elixir = require('laravel-elixir');
  */
 
 elixir(function(mix) {
-    mix.less('app.less');
+
+
+    mix.less([
+        // a directory in resources/less/assets/
+        'less/AdminLTE.less',
+        "less/skins/skin-blue.less",
+        "less/skins/skin-yellow-light.less"
+    ]);
 });

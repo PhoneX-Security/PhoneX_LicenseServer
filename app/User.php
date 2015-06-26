@@ -60,6 +60,12 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->belongsToMany('Phonex\Role', 'user_role', 'user_id', 'role_id');
     }
 
+    /* Accessors */
+    // roles_list
+    public function getRolesListAttribute(){
+        return implode(", ", $this->roles->fetch('display_name')->toArray());
+    }
+
     /* Helper functions */
     public function addToContactList(User $user, $displayName = null){
         $subscriber1 = $this->subscriber;
@@ -115,6 +121,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         $this->groups()->detach();
         $this->delete();
     }
+
 
 
     /* ACL */
