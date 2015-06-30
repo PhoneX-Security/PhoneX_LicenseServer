@@ -29,8 +29,7 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     Route::delete('users/{user}/cl/{contactUser}', ['uses' => 'UserController@deleteContact']);
     Route::get('users/{user}/cl/delete/{contactUser}', ['uses' => 'UserController@deleteContact']);
 
-
-    Route::patch('users/{users}/change-sip-pass', ['as' => 'users.change_sip_pass', 'uses' => 'UserController@patchChangeSipPassword']);
+    Route::patch('users/{users}/change-password', ['as' => 'users.change_password', 'uses' => 'UserController@patchChangePassword']);
     Route::patch('users/{users}/add-user-to-cl', ['as' => 'users.add_user_to_cl', 'uses' => 'UserController@patchAddUserToCl']);
 
     Route::resource('groups', 'GroupController');

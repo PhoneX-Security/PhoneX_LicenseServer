@@ -106,10 +106,11 @@ class QaController extends Controller {
     public function getMigrateTurn(Request $request){
         die('turned off');
 
-//        $subs = Subscriber::whereNotNull('turnPasswd')->get();
-        $subs = Subscriber::all();
+        $subs = Subscriber::whereNull('turn_passwd_ha1b')->get();
+//        dd($subs);
+//        $subs = Subscriber::all();
         foreach($subs as $subscriber){
-            $subscriber->turnPasswd = getRandomString(24);
+//            $subscriber->turnPasswd = getRandomString(24);
 //            $subscriber->turn_passwd_ha1 = getHA1_1($subscriber->username . '@' . $subscriber->domain, $subscriber->turnPasswd);
             $subscriber->turn_passwd_ha1b = getHA1_B($subscriber->username . '@' . $subscriber->domain, $subscriber->turnPasswd);
             $subscriber->save();

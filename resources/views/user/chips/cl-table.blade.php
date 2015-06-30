@@ -35,21 +35,22 @@ Parameters: $user
 
 @include('dialogs.confirm_delete')
 
+
 <hr />
 
-<h4>Add contact</h4>
+{{--<h4>Add contact</h4>--}}
 
 {{--<form class="form-inline">--}}
-{!! \Form::open(['method' => 'patch', 'route' => ['users.add_user_to_cl', $user->id], 'class'=>'form-inline']) !!}
-    <div class="form-group">
-        <label class="inline-form-right-margin" for="exampleInputName1">Username</label>
-        <input type="text" class="form-control inline-form-side-margin" id="exampleInputName1" name="username">
-        <label class="inline-form-side-margin" for="exampleInputName2">Alias</label>
-        <input type="text" class="form-control inline-form-side-margin" id="exampleInputName2" name="alias">
+{{--{!! \Form::open(['method' => 'patch', 'route' => ['users.add_user_to_cl', $user->id], 'class'=>'form-inline']) !!}--}}
+    {{--<div class="form-group">--}}
+        {{--<label class="inline-form-right-margin" for="exampleInputName1">Username</label>--}}
+        {{--<input type="text" class="form-control inline-form-side-margin" id="exampleInputName1" name="username">--}}
+        {{--<label class="inline-form-side-margin" for="exampleInputName2">Alias</label>--}}
+        {{--<input type="text" class="form-control inline-form-side-margin" id="exampleInputName2" name="alias">--}}
         {{--<label>--}}
             {{--<input type="checkbox" name="mutually"> Mutually--}}
         {{--</label>--}}
-    </div>
-    <button type="submit" class="btn btn-primary">Add</button>
+    {{--</div>--}}
+    {{--<button type="submit" class="btn btn-primary">Add</button>--}}
 {{--</form>--}}
-{!! \Form::close() !!}
+{{--{!! \Form::close() !!}--}}

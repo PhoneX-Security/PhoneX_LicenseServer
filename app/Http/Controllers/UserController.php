@@ -197,15 +197,14 @@ class UserController extends Controller {
 		//
 	}
 
-    public function patchChangeSipPassword($id)
+    public function patchChangePassword($id, Request $request)
     {
-        $newPass = InputPost::get('sip_default_password');
-
-        $data = ['sip_default_password' => $newPass, 'id' => $id];
+        $newPassword = $request->get('password');
+        $data = ['password' => $newPassword, 'id' => $id];
 
         $v = Validator::make($data, [
             'id' => 'required|exists:users,id',
-            'sip_default_password' => 'required|min:8',
+            'password' => 'required|min:8',
         ]);
 
         if ($v->fails()){
@@ -222,14 +221,14 @@ class UserController extends Controller {
         }
 
         $sipUser = Subscriber::find($user->subscriber_id);
-        $sipUser->setPasswordFields($newPass);
+        $sipUser->setPasswordFields($newPassword);
         $sipUser->forcePasswordChange = 1;
         $sipUser->save();
 
         // audit this
         event(AuditEvent::update('subscriber', $user->subscriber_id, 'password'));
 
-        return Redirect::route('users.show', [$user->id])
+        return Redirect::route('users.edit', [$user->id])
             ->with('success', 'User SIP password has been reset.');
     }
 
