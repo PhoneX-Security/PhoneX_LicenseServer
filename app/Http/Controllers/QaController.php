@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Phonex\Commands\CreateSubscriberWithLicense;
 use Phonex\Commands\CreateUser;
+use Phonex\Commands\RefreshSubscribers;
 use Phonex\ContactList;
 use Phonex\Http\Requests;
 use Phonex\LicenseFuncType;
@@ -16,6 +17,12 @@ use Queue;
 class QaController extends Controller {
 	public function QaController(){
 	}
+
+    public function getCheckLic(){
+        $c = new RefreshSubscribers();
+        Bus::dispatch($c);
+    }
+
 
 	public function getChangeExpiration(Request $request){
         $dt = Carbon::now();
@@ -89,6 +96,7 @@ class QaController extends Controller {
     }
 
     public function getAddContact(Request $request){
+        die('turned off');
         $username = $request->get('username');
 
         $master =  User::findByUsername('qa_dusan_master');

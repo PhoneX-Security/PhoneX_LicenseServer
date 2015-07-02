@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel {
         // Refresh subscriber table every day
         $schedule->call(function(){
             Bus::dispatch(new RefreshSubscribers());
-        })->dailyAt('23:59');
+        })->dailyAt('03:30');
 
 	}
 

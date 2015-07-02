@@ -25,7 +25,7 @@ class RefreshSubscriberTest extends TestCase {
         $c = new IssueLicense($user, $licType, $licFuncType, "pass");
         $l1 = Bus::dispatch($c);
 
-        $recentLic = RefreshSubscribers::getRecentLicense($user);
+        $recentLic = RefreshSubscribers::getActiveLicense($user);
         $this->assertEquals($l1->id, $recentLic->id);
     }
 
@@ -49,7 +49,7 @@ class RefreshSubscriberTest extends TestCase {
         $c3->startingAt(Carbon::createFromDate(2020));
         $l3 = Bus::dispatch($c3);
 
-        $recentLic = RefreshSubscribers::getRecentLicense($user);
+        $recentLic = RefreshSubscribers::getActiveLicense($user);
         $this->assertEquals($l3->id, $recentLic->id);
 	}
 }

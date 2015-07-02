@@ -2,6 +2,7 @@
 
 use BeatSwitch\Lock\Callers\Caller;
 use BeatSwitch\Lock\LockAware;
+use Carbon\Carbon;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -93,6 +94,37 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
             Log::error('cannot push ContactListUpdated message', [$e]);
         }
     }
+
+    public function getActiveLicenseWithLatestExpiration()
+    {
+        if ($this->licenses->isEmpty()){
+            return null;
+        }
+        $activeLicenses = $this->licenses->filter(function ($lic) {
+            $now = Carbon::now();
+            if ($lic->starts_at->lte($now) && $lic->expires_at->gte($now)) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        if ($activeLicenses->isEmpty()){
+            return null;
+        }
+
+        $activeLic = $activeLicenses->first();
+        foreach($activeLicenses as $lic){
+            $activeLic = $this->endingLater($activeLic, $lic);
+        }
+
+        return $activeLic;
+    }
+
+    private function endingLater(License $lic1, License $lic2){
+        return $lic2->expires_at->gte($lic1->expires_at) ? $lic2 : $lic1;
+    }
+
 
     public static function findByUsername($username){
         return User::where('username', $username)->first();
