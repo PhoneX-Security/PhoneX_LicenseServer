@@ -157,6 +157,7 @@ return [
         'BeatSwitch\Lock\Integrations\Laravel\LockServiceProvider',
         // Breadcrumbs
         'DaveJamesMiller\Breadcrumbs\ServiceProvider',
+        'Torann\GeoIP\GeoIPServiceProvider',
 	],
 
 	/*
@@ -216,6 +217,7 @@ return [
         'LockManager' => 'BeatSwitch\Lock\Integrations\Laravel\Facades\LockManager',
 
         'Breadcrumbs' => 'DaveJamesMiller\Breadcrumbs\Facade',
+        'GeoIP' => 'Torann\GeoIP\GeoIPFacade',
 	],
 
 ];

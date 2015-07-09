@@ -3,6 +3,8 @@ use Phonex\Model\AppVersion;
 use Illuminate\Database\Eloquent\Model;
 use Phonex\Exceptions\InvalidStateException;
 use Phonex\Exceptions\SubscriberAlreadyInCLException;
+use GeoIP;
+
 
 /**
  * @property  username
@@ -58,6 +60,34 @@ class Subscriber extends Model{
             return new AppVersion($this->app_version);
         } else {
             return null;
+        }
+    }
+
+    public function getLocationAttribute()
+    {
+        if($this->last_action_ip){
+            return GeoIP::getLocation($this->last_action_ip);
+        } else {
+            return null;
+        }
+    }
+
+    public function getFormattedLocationAttribute()
+    {
+        if ($this->location){
+            $s = "IP: " . $this->location['ip'] . "<br />" .
+//                "ISO Code: " . $this->location['isoCode'] . "<br />" .
+                "Country: " . $this->location['country'] . "<br />" .
+                "City: " . $this->location['city'] . "<br />" .
+                "State: " .$this->location['state'] . "<br />" .
+//                "Postal code: " . $this->location['postal_code'] . "<br />" .
+                "Latitude: " . $this->location['lat'] . "<br />" .
+                "Longitude: " . $this->location['lon'] . "<br />" .
+                "Timezone: " . $this->location['timezone'] . "<br />";
+//                "Continent: " . $this->location['continent'] . "<br />";
+            return $s;
+        } else {
+            return '';
         }
     }
 

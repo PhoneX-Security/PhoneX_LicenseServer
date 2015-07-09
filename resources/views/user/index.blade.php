@@ -74,6 +74,7 @@
                                 <th width="15%">Groups</th>
                                 <th>SIP - Last activity</th>
                                 <th>Phone / Version</th>
+                                <th>Location</th>
                                 <th>Roles</th>
                                 <th class="text-center">Options</th>
                             </tr>
@@ -97,8 +98,16 @@
 
                                     <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
                                     <td>
-                                        @if($user->subscriber->app_version)
+                                        @if($user->subscriber && $user->subscriber->app_version)
                                             {{$user->subscriber->app_version_obj->platformDesc() . " / " . $user->subscriber->app_version_obj->versionDesc()}}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($user->subscriber && $user->subscriber->location)
+                                            {{$user->subscriber->location['country']}}
+                                            @if($user->subscriber->location['city'])
+                                                {{ ", " . $user->subscriber->location['city'] }}
+                                            @endif
                                         @endif
                                     </td>
 

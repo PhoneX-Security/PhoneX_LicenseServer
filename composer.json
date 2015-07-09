@@ -16,7 +16,9 @@
 		"mockery/mockery": "0.9.*",
         "miroc/laravel-adminer": "dev-master",
 		"guzzlehttp/guzzle": "^6.0",
-      "beatswitch/lock-laravel": "dev-patch-1"
+        "beatswitch/lock-laravel": "dev-patch-1",
+        "torann/geoip": "0.2.*@dev",
+		"davejamesmiller/laravel-breadcrumbs": "^3.0"
 
 	},
 	"require-dev": {

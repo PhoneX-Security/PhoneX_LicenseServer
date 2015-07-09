@@ -43,10 +43,19 @@ Parameters: $user
     </div>
 </div>
 
-@if($user->subscriber->app_version)
-<h4>App details</h4>
+<h4>Login details</h4>
+
 
 <div class="row">
+    @if($user->subscriber->location)
+        <div class="col-md-4 ">
+            </dl>
+            <dt>Location</dt>
+            <dd>{!! $user->subscriber->formatted_location !!}</dd>
+            </dl>
+        </div>
+    @endif
+    @if($user->subscriber->app_version)
     <div class="col-md-4 ">
         </dl>
         <dt>Phone</dt>
@@ -59,10 +68,10 @@ Parameters: $user
             <dd>{{ $user->subscriber->app_version_obj->versionDesc() }}</dd>
         </dl>
     </div>
-</div>
-@endif
+    @endif
 
-<h4>SIP details</h4>
+</div>
+
 @if($user->subscriber)
     <div class="row">
         <div class="col-md-4 ">
