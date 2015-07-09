@@ -40,5 +40,10 @@ class LicenseFuncType extends Model{
         return LicenseFuncType::where('name', $funcType)->first();
     }
 
+    /* Accessors */
+    public function getUcNameAttribute()
+    {
+        return ucfirst($this->name);
+    }
 
 }

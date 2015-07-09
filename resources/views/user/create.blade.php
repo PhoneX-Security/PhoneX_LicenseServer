@@ -36,7 +36,7 @@
                     <form  role="form" method="POST" action="/users">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-                        <h4>Details</h4>
+                        <h4>User details</h4>
 
                         <div class="row">
                             <div class="col-md-4 ">
@@ -56,7 +56,7 @@
 
                         <div class="row">
                             <div class="col-md-4 ">
-                                <div class="form-group"><label class="control-label">Groups</label>
+                                <div class="form-group"><label class="control-label">Groups (TODO)</label>
                                     <select multiple name="groups" class="form-control">
                                         @foreach($groups as $group)
                                             <option value="{{$group->id}}">{{ $group->name }}</option>
@@ -66,7 +66,7 @@
                             </div>
 
                             <div class="col-md-4 ">
-                                <div class="form-group"><label class="control-label">Roles</label>
+                                <div class="form-group"><label class="control-label">Roles (TODO)</label>
                                     <select multiple name="roles" class="form-control">
                                         @foreach($roles as $role)
                                             <option value="{{$role->id}}">{{ $role->display_name }}</option>
@@ -85,60 +85,12 @@
                             </div>
                         </div>
 
-                        <h4>License</h4>
+                        <h4>License details</h4>
                         <div class="panel panel-default">
-                            <div class="panel-body issue_license_panel">
+                            <div class="panel-body">
 
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-md-2">
-                                            <div class="form-group">
-                                                <label for="starts_at" class="control-label">Start date*</label>
-                                                <div class="input-group date">
-                                                    <input value="{{ old('starts_at') }}" type="text" name="starts_at" class="form-control" />
-                                                    <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                @include('user.chips.form-new-license')
 
-
-                                        <script type="text/javascript">
-                                            $(function () {
-                                                $('#starts_at').daterangepicker();
-                                            });
-                                        </script>
-
-
-                                        <div class="col-md-2">
-                                            <label for="password" class="control-label">Expiration*</label>
-                                            <select name="license_type_id" class="form-control">
-                                                @foreach($licenseTypes as $type)
-                                                    <option value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label for="password" class="control-label">Type*</label>
-                                            <select name="license_func_type_id" class="form-control">
-                                                @foreach($licenseFuncTypes as $type)
-                                                    <option value="{{ $type->id }}">{{ ucfirst($type->name) }} </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-
-                                <div class="row">
-                                    <div class="col-md-4 ">
-                                        <div class="form-group">
-                                            <label for="password" class="control-label">License notes</label>
-                                            <textarea name="comment" class="form-control" rows="3"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 

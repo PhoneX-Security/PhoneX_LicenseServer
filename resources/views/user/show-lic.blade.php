@@ -10,23 +10,22 @@
 	<div class="row">
 		<div class="col-sm-12">
 
-            @include('user.chips.top-nav')
-
             @include('errors.notifications')
+
+            @include('user.chips.top-nav')
 
             <div class="box box-default">
                 <div class="box-header with-border">
 
                     <div class="row form-inline" style="margin-bottom: 5px">
                         <div class="col-sm-6">
-                            <a class="btn btn-primary">Issue license</a>
+                            <a href="{{route('users.new-license', [$user->id]) }}" class="btn btn-primary">New license</a>
                         </div>
 
                         <div class="col-sm-6 text-right">
                         </div>
                     </div>
                 </div>
-
 
                 <div class="box-body">
                     <h4>Licenses</h4>

@@ -58,6 +58,8 @@ class IssueLicense extends Command implements SelfHandling {
             $license->comment = $this->comment;
         }
 
+        $license->issuer_id = \Auth::user()->id;
+
         $license->save();
 
         // update subscriber

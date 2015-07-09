@@ -20,4 +20,12 @@ class LicenseType extends Model{
     public static function findByName($name){
         return LicenseType::where('name', $name)->first();
     }
+
+    /* Accessors */
+    public function getUcNameWithDaysAttribute()
+    {
+        return ucfirst($this->name) . " (" . $this->days . " days)";
+    }
+
+
 }

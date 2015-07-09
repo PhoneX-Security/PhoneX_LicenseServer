@@ -19,21 +19,21 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     Route::get('/', 'HomeController@index');
 
 	Route::resource('users', 'UserController');
-
     // CL
     Route::get('users/{user}/licenses', ['as' => 'users.licenses', 'uses' => 'UserController@showLicenses']);
     Route::get('users/{user}/cl', ['as' => 'users.cl', 'uses' => 'UserController@showCl']);
 
-    // contact lists + alternative via get
+    // Contact lists + alternative via get
     Route::delete('users/{user}/cl', ['uses' => 'UserController@deleteContact']);
     Route::delete('users/{user}/cl/{contactUser}', ['uses' => 'UserController@deleteContact']);
     Route::get('users/{user}/cl/delete/{contactUser}', ['uses' => 'UserController@deleteContact']);
 
-    Route::patch('users/{users}/change-password', ['as' => 'users.change_password', 'uses' => 'UserController@patchChangePassword']);
-    Route::patch('users/{users}/add-user-to-cl', ['as' => 'users.add_user_to_cl', 'uses' => 'UserController@patchAddUserToCl']);
+    Route::get('users/{users}/new-license', ['as' => 'users.new-license', 'uses' => 'UserController@getNewLicense']);
+    Route::post('users/{users}/new-license', ['as' => 'users.new-license', 'uses' => 'UserController@postNewLicense']);
+    Route::patch('users/{users}/change-password', ['as' => 'users.change_password', 'uses' => 'UserController@changePassword']);
+    Route::patch('users/{users}/add-user-to-cl', ['as' => 'users.add_user_to_cl', 'uses' => 'UserController@addUserToCl']);
 
     Route::resource('groups', 'GroupController');
-
 
     Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 

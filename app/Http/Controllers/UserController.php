@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Phonex\Commands\CreateSubscriberWithLicense;
 use Phonex\Commands\CreateUser;
+use Phonex\Commands\IssueLicense;
 use Phonex\ContactList;
 use Phonex\Events\AuditEvent;
 use Phonex\Group;
@@ -14,6 +15,7 @@ use Phonex\Http\Requests;
 use Phonex\Http\Requests\AddUserToClRequest;
 use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\DeleteContactRequest;
+use Phonex\Http\Requests\NewLicenseRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\License;
 use Phonex\LicenseFuncType;
@@ -79,8 +81,9 @@ class UserController extends Controller {
 
 	public function store(CreateUserRequest $request)
     {
-        dd('check if roles+groups are valid and retrieve them');
+//        dd('check if roles+groups are valid and retrieve them');
 
+        // TODO retrieve role + group IDs
         $groupIds = [];
         $roleIds = [];
 
@@ -97,6 +100,8 @@ class UserController extends Controller {
         $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
 
         $licRequest = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $defaultPassword);
+        $startsAt = Carbon::createFromFormat("d-m-Y", $request->get('starts_at'));
+        $licRequest->startingAt($startsAt);
         $this->dispatch($licRequest);
 
         // add support to contact list
@@ -107,19 +112,13 @@ class UserController extends Controller {
 
 	public function show($id)
     {
-		$user = User::find($id);
-		if ($user == null){
-			throw new NotFoundHttpException;
-		}
+		$user = $user = $this->getUserOr404($id);
 		return view('user.show', compact('user'));
 	}
+
     public function edit($id)
     {
-        $user = User::with('licenses.licenseType')->find($id);
-        if ($user == null){
-            throw new NotFoundHttpException;
-        }
-
+        $user = $this->getUserOr404($id);
         return view('user.edit', compact('user'));
     }
 
@@ -145,6 +144,33 @@ class UserController extends Controller {
         return view('user.show-lic', compact('user'));
     }
 
+    public function getNewLicense($id)
+    {
+        $user = $this->getUserOr404($id);
+        $licenseTypes = LicenseType::all()->sortBy('order');
+        $licenseFuncTypes = LicenseFuncType::all()->sortBy('order');
+        return view('user.new-license', compact('user', 'licenseTypes', 'licenseFuncTypes'));
+    }
+
+    public function postNewLicense($id, NewLicenseRequest $request)
+    {
+        $user = $this->getUserOr404($id);
+        $licenseType = LicenseType::find($request->get('license_type_id'));
+        $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
+
+        $licRequest = new IssueLicense($user, $licenseType, $licenseFuncType);
+        if ($request->has('comment')){
+            $licRequest->setComment($request->get('comment'));
+        }
+
+        $startsAt = Carbon::createFromFormat("d-m-Y", $request->get('starts_at'));
+        $licRequest->startingAt($startsAt);
+        $this->dispatch($licRequest);
+
+        return Redirect::route('users.licenses', [$id])
+            ->with('success', 'New license to user ' . $user->username . ' has been issued.');
+    }
+
     public function showCl($id){
         $user = User::with([
             'subscriber.subscribersInContactList.user'])->find($id);
@@ -154,9 +180,6 @@ class UserController extends Controller {
         }
         return view('user.show-cl', compact('user'));
     }
-
-
-
 
 	public function update($id, UpdateUserRequest $request)
     {
@@ -197,7 +220,7 @@ class UserController extends Controller {
 		//
 	}
 
-    public function patchChangePassword($id, Request $request)
+    public function changePassword($id, Request $request)
     {
         $newPassword = $request->get('password');
         $data = ['password' => $newPassword, 'id' => $id];
@@ -232,7 +255,7 @@ class UserController extends Controller {
             ->with('success', 'User SIP password has been reset.');
     }
 
-    public function patchAddUserToCl($user_id, AddUserToClRequest $request)
+    public function addUserToCl($user_id, AddUserToClRequest $request)
     {
         $user = User::find($user_id);
         $userToAdd = User::findByUsername($request->get('username'));
@@ -275,5 +298,13 @@ class UserController extends Controller {
         }
         return Redirect::route('users.show', [$user->id])
             ->with('success', 'User has been removed from contact list');
+    }
+
+    private function getUserOr404($id){
+        $user = User::find($id);
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
+        return $user;
     }
 }

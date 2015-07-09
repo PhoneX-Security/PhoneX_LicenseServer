@@ -11,11 +11,11 @@
 	<div class="row">
 		<div class="col-sm-12">
 
+            @include('errors.notifications')
+
             @include('user.chips.top-nav')
 
             @include('dialogs.contact-add')
-
-            @include('errors.notifications')
 
             <div class="box box-default">
                 <div class="box-header with-border">

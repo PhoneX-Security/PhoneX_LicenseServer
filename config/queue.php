@@ -16,7 +16,7 @@ return [
 	|
 	*/
 
-	'default' => env('QUEUE_DRIVER', 'sync'),
+	'default' => env('QUEUE_DRIVER', "null"),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -62,6 +62,10 @@ return [
 		'sync' => [
 			'driver' => 'sync',
 		],
+
+        'null' => [
+            'driver' => 'null',
+        ],
 
 		'database' => [
 			'driver' => 'database',

@@ -4,7 +4,7 @@
 
     <div class="login-box">
         <div class="login-logo">
-            <a href="/">PhoneX <b>Admin</b></a>
+            <a href="/"><b>License</b> server</a>
         </div><!-- /.login-logo -->
         <div class="login-box-body">
 
