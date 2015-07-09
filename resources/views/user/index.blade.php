@@ -73,6 +73,7 @@
                                 <th>{!! link_to_sort('email', 'E-mail') !!}</th>
                                 <th width="15%">Groups</th>
                                 <th>SIP - Last activity</th>
+                                <th>Phone / Version</th>
                                 <th>Roles</th>
                                 <th class="text-center">Options</th>
                             </tr>
@@ -95,6 +96,11 @@
                                     </td>
 
                                     <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
+                                    <td>
+                                        @if($user->subscriber->app_version)
+                                            {{$user->subscriber->app_version_obj->platformDesc() . " / " . $user->subscriber->app_version_obj->versionDesc()}}
+                                        @endif
+                                    </td>
 
                                     <td>
                                         {{ $user->roles_list }}

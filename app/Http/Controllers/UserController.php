@@ -82,7 +82,6 @@ class UserController extends Controller {
 	public function store(CreateUserRequest $request)
     {
 //        dd('check if roles+groups are valid and retrieve them');
-
         // TODO retrieve role + group IDs
         $groupIds = [];
         $roleIds = [];
@@ -132,6 +131,8 @@ class UserController extends Controller {
         if ($user == null){
             throw new NotFoundHttpException;
         }
+
+        dd($user->subscriber->app_version_object);
 
         foreach($user->licenses as $license){
             if (!$license->expires_at || Carbon::now()->gt(Carbon::parse($license->expires_at))) {

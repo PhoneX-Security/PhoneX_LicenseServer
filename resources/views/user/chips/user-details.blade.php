@@ -43,6 +43,25 @@ Parameters: $user
     </div>
 </div>
 
+@if($user->subscriber->app_version)
+<h4>App details</h4>
+
+<div class="row">
+    <div class="col-md-4 ">
+        </dl>
+        <dt>Phone</dt>
+        <dd>{{ $user->subscriber->app_version_obj->platformDesc() }}</dd>
+        </dl>
+    </div>
+    <div class="col-md-4 ">
+        <dl>
+            <dt>Application</dt>
+            <dd>{{ $user->subscriber->app_version_obj->versionDesc() }}</dd>
+        </dl>
+    </div>
+</div>
+@endif
+
 <h4>SIP details</h4>
 @if($user->subscriber)
     <div class="row">

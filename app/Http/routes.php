@@ -1,5 +1,26 @@
 <?php
 
+/*
+|--------------------------------------------------------------------------
+| Application Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register all of the routes for an application.
+| It's a breeze. Simply tell Laravel the URIs it should respond to
+| and give it the controller to call when that URI is requested.
+|
+*/
+
+use Phonex\BusinessCode;
+use Phonex\Commands\IssueLicense;
+use Phonex\Group;
+use Phonex\LicenseFuncType;
+use Phonex\LicenseType;
+use Phonex\User;
+
+Route::get('home', 'HomeController@index');
+Route::get('/', 'HomeController@index');
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

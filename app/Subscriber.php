@@ -1,4 +1,5 @@
 <?php namespace Phonex;
+use Phonex\Model\AppVersion;
 use Illuminate\Database\Eloquent\Model;
 use Phonex\Exceptions\InvalidStateException;
 use Phonex\Exceptions\SubscriberAlreadyInCLException;
@@ -50,6 +51,17 @@ class Subscriber extends Model{
         return $this->hasOne('Phonex\User'); // looks for subscriber_id in User table
     }
 
+    /* Accessors */
+    public function getAppVersionObjAttribute()
+    {
+        if ($this->app_version){
+            return new AppVersion($this->app_version);
+        } else {
+            return null;
+        }
+    }
+
+    /* Helpers */
     public function addToContactList(Subscriber $subscriber, $displayName){
         $count = ContactList::whereRaw('subscriber_id=? and int_usr_id=?', [$this->id, $subscriber->id])->count();
         if ($count > 0){
