@@ -13,6 +13,7 @@
 
                 <div class="box box-default">
                     <div class="box-header with-border">
+                        @yield('form-nav')
                     </div>
 
                     <div class="box-body">
