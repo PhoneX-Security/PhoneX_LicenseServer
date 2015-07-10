@@ -1,46 +1,29 @@
-@extends('app')
+@extends('content-with-header')
+
+@section('title', 'Business codes')
+@section('subtitle', 'Manage')
 
 @section('content')
-    <section class="content-header">
-        <div class="row">
-            <div class="col-sm-12">
-                <h1>
-                    Product codes
-                    <small>Manage</small>
-                </h1>
-                @include('navigation.breadcrumb')
-            </div>
-        </div>
-    </section>
+    @parent
 
     <section class="content">
         @include('errors.notifications')
 
-        <div class="row">
-            <div class="col-sm-12">
-                <div style="margin-bottom: 10px" class="phonex-table-div clearfix">
-                    <div class="left-cell">
-                    </div>
-                    <div class="right-cell">
-                        {{--<a class="btn btn-sm btn-primary view-btn-create" href="/users/create">--}}
-                           {{--Export MP codes--}}
-                        {{--</a>--}}
-                        <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-single-codes/">
-                            <i class="fa fa-plus-circle"></i> New single codes
-                        </a>
-                        <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-code-pairs/">
-                            <i class="fa fa-plus-circle"></i> New code pairs
-                        </a>
-                    </div>
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Business codes</h3>
+                <div class="box-tools">
+                    {{--<a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-single-codes/">--}}
+                        {{--<i class="fa fa-plus-circle"></i> New single codes--}}
+                    {{--</a>--}}
+                    <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-code-pairs/">
+                        <i class="fa fa-plus-circle"></i> New code pairs
+                    </a>
                 </div>
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="text-right pull-right col-xs-2">Total: {{ $bcodes->total() }}</div>
-                        </div>
-                    </div>
-                    <table class="table table-condensed phonex-table-sortable">
+            </div>
+            <div class="box-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
                         <tr>
                             <th>ID</th>
                             <th>Code</th>
@@ -51,28 +34,36 @@
                             <th>Licenses acquired</th>
                             <th class="text-center">Options</th>
                         </tr>
-                        @foreach($bcodes as $bcode)
-                            <tr>
-                                <td>{{ $bcode->id }}</td>
-                                <td>{{ $bcode->code }}</td>
-                                <td>{{ $bcode->group->name or ''}}</td>
-                                <td>{{ $bcode->parent->username or ''}}</td>
-                                <td>@if($bcode->exported) Yes @else No @endif</td>
+                    </thead>
+                    <tbody>
+                    @foreach($bcodes as $bcode)
+                        <tr>
+                            <td>{{ $bcode->id }}</td>
+                            <td>{{ $bcode->code }}</td>
+                            <td>{{ $bcode->group->name or ''}}</td>
+                            <td>{{ $bcode->parent->username or ''}}</td>
+                            <td>@if($bcode->exported) Yes @else No @endif</td>
 
-                                <td>{{ $bcode->licenses_limit  }}</td>
-                                <td>...</td>
-                                <td class="text-center">
-                                    <div class="btn-group  btn-group-xs">
-                                        {{--<a type="button" class="btn btn-info view-btn-edit" href="{{ \URL::route('users.edit', $user->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>--}}
-                                        {{--<a type="button" class="btn btn-danger action_confirm   view-btn-delete" data-method="delete" href="#" title="Delete user"><i class="fa fa-times-circle-o"></i></a>--}}
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </table>
+                            <td>{{ $bcode->licenses_limit  }}</td>
+                            <td>...</td>
+                            <td class="text-center">
+                                <div class="btn-group  btn-group-xs">
+                                    {{--<a type="button" class="btn btn-info view-btn-edit" href="{{ \URL::route('users.edit', $user->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>--}}
+                                    {{--<a type="button" class="btn btn-danger action_confirm   view-btn-delete" data-method="delete" href="#" title="Delete user"><i class="fa fa-times-circle-o"></i></a>--}}
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="box-footer clearfix">
+                <div class="pull-left">
+                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
+                        Total {{ $bcodes->total() }} entries</div>
                 </div>
 
-                <div class="text-center">
+                <div class="pull-right">
                     {!! $bcodes->appends(Request::except('page'))->render(); !!}
                 </div>
             </div>

@@ -7,7 +7,7 @@
     <li class="header">MENU</li>
 
     <li><a href="/users"><i class="fa fa-user"></i> <span>Users</span></a></li>
-    {{--<li><a href="/licenses"><i class="fa fa-book"></i> <span>Licenses</span></a></li>--}}
+    <li><a href="/licenses"><i class="fa fa-book"></i> <span>Licenses</span></a></li>
     <li><a href="/groups"><i class="fa fa-users"></i> <span>Groups</span></a></li>
     <li><a href="/bcodes"><i class="fa fa-credit-card"></i> <span>Product codes</span></a></li>
 

@@ -68,15 +68,6 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
         'uses' => '\Miroc\LaravelAdminer\AdminerController@index']);
 });
 
-//Route::get('test_i', function(){
-////    $u =  User::getByUsername('zas03');
-////    $licFuncType = LicenseFuncType::getFull();
-////    $licType = LicenseType::findByName('year');
-////    $c = new IssueLicense($u, $licType, $licFuncType);
-//
-//});
-
-
 //Route::get('test_connect', function(){
 ////    $prefix = "miro";
 ////    $masterNum = 5;
