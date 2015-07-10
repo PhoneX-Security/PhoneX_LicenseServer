@@ -6,12 +6,12 @@
 	"type": "project",
 
 	"require": {
-		"laravel/framework": "5.0.*",
+		"laravel/framework": "5.1.*",
 	  	"illuminate/html": "~5.0",
 		"barryvdh/laravel-ide-helper": "~2.0",
 		"barryvdh/laravel-debugbar": "~2.0",
         "dapphp/securimage": "~3.5",
-        "fintech-fab/laravel-queue-rabbitmq": "5.0",
+        "fintech-fab/laravel-queue-rabbitmq": "5.1",
 		"rap2hpoutre/laravel-log-viewer": "0.1.*",
 		"mockery/mockery": "0.9.*",
         "miroc/laravel-adminer": "dev-master",

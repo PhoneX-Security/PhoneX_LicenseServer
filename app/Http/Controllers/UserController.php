@@ -5,9 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Phonex\Commands\CreateSubscriberWithLicense;
-use Phonex\Commands\CreateUser;
-use Phonex\Commands\IssueLicense;
+use Phonex\Jobs\CreateSubscriberWithLicense;
+use Phonex\Jobs\CreateUser;
+use Phonex\Jobs\IssueLicense;
 use Phonex\ContactList;
 use Phonex\Events\AuditEvent;
 use Phonex\Group;
@@ -131,8 +131,6 @@ class UserController extends Controller {
         if ($user == null){
             throw new NotFoundHttpException;
         }
-
-        dd($user->subscriber->app_version_object);
 
         foreach($user->licenses as $license){
             if (!$license->expires_at || Carbon::now()->gt(Carbon::parse($license->expires_at))) {

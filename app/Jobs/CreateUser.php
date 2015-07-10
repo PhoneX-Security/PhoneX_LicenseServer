@@ -1,4 +1,4 @@
-<?php namespace Phonex\Commands;
+<?php namespace Phonex\Jobs;
 
 use Carbon\Carbon;
 use Log;

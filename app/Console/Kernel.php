@@ -3,7 +3,7 @@
 use Bus;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Phonex\Commands\RefreshSubscribers;
+use Phonex\Jobs\RefreshSubscribers;
 
 class Kernel extends ConsoleKernel {
 

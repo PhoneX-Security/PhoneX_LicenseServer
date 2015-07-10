@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Log;
 use Phonex\BusinessCode;
-use Phonex\Commands\CreateSubscriberWithLicense;
-use Phonex\Commands\CreateUser;
+use Phonex\Jobs\CreateSubscriberWithLicense;
+use Phonex\Jobs\CreateUser;
 use Phonex\ContactList;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;

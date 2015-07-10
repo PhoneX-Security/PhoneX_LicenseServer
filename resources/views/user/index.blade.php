@@ -19,7 +19,7 @@
                 <div class="row form-inline" style="margin-bottom: 5px">
                     <div class="col-sm-6">
 
-                        <form class="form-horizontal" action="{{ \URL::route('users.index') }}" method="get">
+                        <form class="form-horizontal" action="{{ route('users.index') }}" method="get">
 
                             <div class="input-group">
                                 <input type="search" class="form-control input-sm" name="username"

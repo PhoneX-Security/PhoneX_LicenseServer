@@ -16,7 +16,7 @@ class BusServiceProvider extends ServiceProvider {
 		$dispatcher->mapUsing(function($command)
 		{
 			return Dispatcher::simpleMapping(
-				$command, 'Phonex\Commands', 'Phonex\Handlers\Commands'
+				$command, 'Phonex\Jobs', 'Phonex\Handlers\Commands'
 			);
 		});
 	}

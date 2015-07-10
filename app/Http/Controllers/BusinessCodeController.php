@@ -4,7 +4,7 @@ use Mail;
 use Phonex\BusinessCode;
 use Phonex\BusinessCodeExport;
 use Phonex\BusinessCodesExport;
-use Phonex\Commands\CreateBusinessCodePair;
+use Phonex\Jobs\CreateBusinessCodePair;
 use Phonex\Group;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\GenerateCodePairsRequest;

@@ -1,4 +1,4 @@
-<?php namespace Phonex\Commands;
+<?php namespace Phonex\Jobs;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
@@ -10,7 +10,7 @@ use Queue;
 /**
  * Refresh subscriber table from existing licenses (start time, expiration time, license type)
  * Class RefreshSubscribers
- * @package Phonex\Commands
+ * @package Phonex\Jobs
  */
 class RefreshSubscribers extends Command implements SelfHandling {
 

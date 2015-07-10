@@ -1,4 +1,4 @@
-<?php namespace Phonex\Commands;
+<?php namespace Phonex\Jobs;
 
 use Illuminate\Contracts\Bus\SelfHandling;
 use Phonex\BusinessCode;
@@ -12,7 +12,7 @@ use Phonex\User;
 
 /**
  * Class CreateBusinessCodePair
- * @package Phonex\Commands
+ * @package Phonex\Jobs
  */
 class CreateBusinessCodePair extends Command implements SelfHandling {
     private $creator;

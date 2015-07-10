@@ -83,7 +83,7 @@ class Subscriber extends Model{
 //                "Postal code: " . $this->location['postal_code'] . "<br />" .
                 "Latitude: " . $this->location['lat'] . "<br />" .
                 "Longitude: " . $this->location['lon'] . "<br />" .
-                "Timezone: " . $this->location['timezone'] . "<br />";
+                "Timezone: " . $this->location['timezone'];
 //                "Continent: " . $this->location['continent'] . "<br />";
             return $s;
         } else {

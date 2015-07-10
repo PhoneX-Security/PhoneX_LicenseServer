@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Phonex\Commands\CreateUser;
+use Phonex\Jobs\CreateUser;
 use Phonex\LicenseType;
 
 class UsersSeeder extends Seeder {

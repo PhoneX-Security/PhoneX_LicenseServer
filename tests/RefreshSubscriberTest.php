@@ -1,9 +1,9 @@
 <?php
 
 use Carbon\Carbon;
-use Phonex\Commands\CreateSubscriberWithLicense;
-use Phonex\Commands\IssueLicense;
-use Phonex\Commands\RefreshSubscribers;
+use Phonex\Jobs\CreateSubscriberWithLicense;
+use Phonex\Jobs\IssueLicense;
+use Phonex\Jobs\RefreshSubscribers;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 

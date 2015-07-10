@@ -1,8 +1,8 @@
 <?php
 
-use Phonex\Commands\CreateBusinessCodePair;
-use Phonex\Commands\CreateSubscriberWithLicense;
-use Phonex\Commands\CreateUser;
+use Phonex\Jobs\CreateBusinessCodePair;
+use Phonex\Jobs\CreateSubscriberWithLicense;
+use Phonex\Jobs\CreateUser;
 use Phonex\Group;
 use Phonex\Http\Controllers\AccountController;
 use Phonex\License;

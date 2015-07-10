@@ -1,7 +1,7 @@
 <?php namespace Phonex\Utils;
 
 use Bus;
-use Phonex\Commands\CreateUser;
+use Phonex\Jobs\CreateUser;
 use Phonex\User;
 use Queue;
 

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>PhoneX Backend | @yield('title', 'Homepage')</title>
+    <title>License Server | @yield('title', 'Homepage')</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- Bootstrap 3.3.4 -->
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />

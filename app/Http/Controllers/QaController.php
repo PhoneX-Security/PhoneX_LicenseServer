@@ -3,9 +3,9 @@
 use Bus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Phonex\Commands\CreateSubscriberWithLicense;
-use Phonex\Commands\CreateUser;
-use Phonex\Commands\RefreshSubscribers;
+use Phonex\Jobs\CreateSubscriberWithLicense;
+use Phonex\Jobs\CreateUser;
+use Phonex\Jobs\RefreshSubscribers;
 use Phonex\ContactList;
 use Phonex\Http\Requests;
 use Phonex\LicenseFuncType;

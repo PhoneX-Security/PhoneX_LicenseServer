@@ -1,6 +1,5 @@
 <?php namespace Phonex\Handlers\Events;
 
-use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Support\Facades\Auth;
 use Log;
 use Phonex\AuditTrail;

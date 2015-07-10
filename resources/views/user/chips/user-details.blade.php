@@ -49,7 +49,7 @@ Parameters: $user
 <div class="row">
     @if($user->subscriber->location)
         <div class="col-md-4 ">
-            </dl>
+            <dl>
             <dt>Location</dt>
             <dd>{!! $user->subscriber->formatted_location !!}</dd>
             </dl>

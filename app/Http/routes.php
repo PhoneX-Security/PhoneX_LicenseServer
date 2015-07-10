@@ -12,7 +12,7 @@
 */
 
 use Phonex\BusinessCode;
-use Phonex\Commands\IssueLicense;
+use Phonex\Jobs\IssueLicense;
 use Phonex\Group;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;

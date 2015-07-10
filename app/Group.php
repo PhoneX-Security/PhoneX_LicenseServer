@@ -8,4 +8,9 @@ class Group extends Model{
     public function users(){
         return $this->belongsToMany('Phonex\User', 'user_group', 'group_id', 'user_id');
     }
+
+    public function owner()
+    {
+        return $this->belongsTo('Phonex\User', 'owner_id');
+    }
 }

@@ -5,6 +5,8 @@ use Phonex\Utils\TestUtils;
 class TestCase extends Illuminate\Foundation\Testing\TestCase {
     use TestUtils;
 
+    protected $baseUrl = 'http://localhost';
+
 	/**
 	 * Creates the application.
 	 *
