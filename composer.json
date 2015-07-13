@@ -16,22 +16,15 @@
 		"mockery/mockery": "0.9.*",
         "miroc/laravel-adminer": "dev-master",
 		"guzzlehttp/guzzle": "^6.0",
-        "beatswitch/lock-laravel": "dev-patch-1",
         "torann/geoip": "0.2.*@dev",
-		"davejamesmiller/laravel-breadcrumbs": "^3.0"
+		"davejamesmiller/laravel-breadcrumbs": "^3.0",
+		"beatswitch/lock": "^0.1.0"
 
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.0",
 		"phpspec/phpspec": "~2.1"
 	},
-
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "/home/vagrant/Code/laravel_ext/lock-laravel"
-    }
-  ],
 	"autoload": {
 		"classmap": [
 			"database"
@@ -40,7 +33,8 @@
 		  "app/helpers.php"
 		],
 		"psr-4": {
-			"Phonex\\": "app/"
+			"Phonex\\": "app/",
+            "BeatSwitch\\Lock\\Integrations\\Laravel\\": "modules/lock-laravel/src/"
 		}
 	},
 	"autoload-dev": {
