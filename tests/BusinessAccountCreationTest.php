@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Phonex\Jobs\CreateBusinessCodePair;
 use Phonex\Jobs\CreateSubscriberWithLicense;
 use Phonex\Jobs\CreateUser;
@@ -12,6 +13,8 @@ use Phonex\Subscriber;
 use Phonex\User;
 
 class BusinessAccountCreationTest extends TestCase {
+    use DatabaseTransactions;
+
     const URL = '/account/business-account';
     const TEST_USERNAME = "kexo_test123_business";
 
@@ -19,14 +22,10 @@ class BusinessAccountCreationTest extends TestCase {
         // has to do this here before the framework is started because phpunit prints something before headers are sent
         @session_start();
         parent::setUp();
-//        DB::beginTransaction();
-//        echo "begin_transaction\n";
-    }
 
-    public function tearDown(){
-        parent::tearDown();
-//        DB::rollBack();
-//        echo "rollback\n";
+        // login as random user
+        $user = User::find(1);
+        $this->be($user);
     }
 
 	/**
@@ -68,7 +67,7 @@ class BusinessAccountCreationTest extends TestCase {
     }
 
     public function testBadBusinessCode(){
-        $nonExistingUsername = "kajsmentke";
+        $nonExistingUsername = "kajsmentkeueue";
 
         // first delete user if exists
         $oldUser = User::where('username', $nonExistingUsername)->first();
@@ -92,12 +91,12 @@ class BusinessAccountCreationTest extends TestCase {
         // Mock Queue push because it might trigger Stack Overflow
         $this->mockQueuePush();
 
-        $username1 = "kajsmentke12";
-        $username2 = "kozmeker13";
-        $username3 = "fajnsmeker2";
+        $username1 = "kajsmentke132";
+        $username2 = "kozmeker132";
+        $username3 = "fajnsmeker22";
 
         // first delete users if exist
-        $this->deleteUsers([$username1, $username2, $username3]);
+//        $this->deleteUsers([$username1, $username2, $username3]);
 
         // now create user1 and generate code pair
         $trialLic = LicenseType::find(1);
@@ -169,11 +168,11 @@ class BusinessAccountCreationTest extends TestCase {
         // Mock Queue push because it might trigger Stack Overflow
         $this->mockQueuePush();
 
-        $username1 = "kajsmentke1233";
-        $username2 = "kozmeker1333";
-        $username3 = "fajnsmeker1443";
+        $username1 = "kajsmentke1s233";
+        $username2 = "kozmeker13s33";
+        $username3 = "fajnsmeker14s43";
 
-        $this->deleteUsers([$username1, $username2, $username3]);
+//        $this->deleteUsers([$username1, $username2, $username3]);
 
         // now create user1 and generate code pair
         $licType = LicenseType::find(1);

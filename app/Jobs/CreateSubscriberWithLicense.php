@@ -49,7 +49,9 @@ class CreateSubscriberWithLicense extends Command implements SelfHandling {
         $license->license_func_type_id = $this->licenseFuncType->id;
         $license->starts_at = $startsAt;
         $license->expires_at = $expiresAt;
-        $license->issuer_id = \Auth::user()->id;
+        if (\Auth::user()){
+            $license->issuer_id = \Auth::user()->id;
+        }
         
         if ($this->comment){
             $license->comment=$this->comment;

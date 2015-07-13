@@ -11,6 +11,13 @@ class ContactListUpdateTest extends TestCase {
     const TEST_USER1 = "smajda";
     const TEST_USER2 = "smajdova_mamka";
 
+    public function setUp()
+    {
+        parent::setUp();
+        $user = User::find(1);
+        $this->be($user);
+    }
+
     public function testContactListUpdate(){
 
         $oldUser = User::where('username', self::TEST_USER1)->first();

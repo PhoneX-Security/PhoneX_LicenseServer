@@ -92,6 +92,17 @@ class Subscriber extends Model{
     }
 
     /* Helpers */
+    public function deleteWithContactListRecords(){
+        ContactList::where('subscriber_id', $this->id)
+            ->orWhere('int_usr_id', $this->id)
+            ->delete();
+
+        $item = SupportContact::where('owner_sip', $this->email_address)->first();
+        $item->delete();
+
+        $this->delete();
+    }
+
     public function addToContactList(Subscriber $subscriber, $displayName){
         $count = ContactList::whereRaw('subscriber_id=? and int_usr_id=?', [$this->id, $subscriber->id])->count();
         if ($count > 0){
