@@ -22,6 +22,18 @@ class BusinessCodeController extends Controller {
         return view('bcode.index', compact('bcodes'));
 	}
 
+    public function getCodeExports()
+    {
+        $items = BusinessCodesExport::with(['creator', 'codes'])->get();
+        return view('bcode.exports', compact('items'));
+    }
+
+    public function getExport($id)
+    {
+        $export = BusinessCodesExport::with(['creator','codes'])->findOrFail($id);
+        dd($export);
+    }
+
     public function getGenerateSingleCodes(){
         die('TODO');
     }

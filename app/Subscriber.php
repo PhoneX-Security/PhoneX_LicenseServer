@@ -5,7 +5,6 @@ use Phonex\Exceptions\InvalidStateException;
 use Phonex\Exceptions\SubscriberAlreadyInCLException;
 use GeoIP;
 
-
 /**
  * @property  username
  * @property mixed id
