@@ -31,7 +31,22 @@ class BusinessCodeController extends Controller {
     public function getExport($id)
     {
         $export = BusinessCodesExport::with(['creator','codes'])->findOrFail($id);
-        dd($export);
+
+        // Only code pairs are supported at the moment
+        $codePairs = [];
+
+        // Match pairs
+        foreach($export->codes as $code){
+            $firstCode = $code->code;
+            $secondCode = $code->clMappings->first()->code;
+
+            if (in_array($firstCode, $codePairs)){
+                // we found all pairs, breaking
+                continue;
+            }
+            $codePairs[$firstCode] = $secondCode;
+        }
+        return view('bcode.export-details', compact('codePairs', 'export'));
     }
 
     public function getGenerateSingleCodes(){

@@ -23,6 +23,7 @@
                             <th>Creator</th>
                             <th>Created at</th>
                             <th>Exported to email</th>
+                            <th>Codes count</th>
                             <th class="text-center">Options</th>
                         </tr>
                     </thead>
@@ -33,6 +34,7 @@
                             <td><a href="{{ route('users.show', $item->creator->id) }}">{{ $item->creator->username }}</a></td>
                             <td>{{ $item->created_at }}</td>
                             <td>{{ $item->email }}</td>
+                            <td>{{ $item->codes->count() }}</td>
                             <td class="text-center">
                                 <div class="btn-group  btn-group-xs">
                                     <a type="button" class="btn btn-info view-btn-edit" href="{{ "/bcodes/export/" . $item->id }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Details</a>
