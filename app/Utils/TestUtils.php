@@ -45,4 +45,14 @@ trait TestUtils{
             }
         }
     }
+
+    public function deleteSubscribers(array $usernames)
+    {
+        foreach($usernames as $username){
+            $user = User::findByUsername($username);
+            if ($user && $user->subscriber){
+                $user->subscriber->deleteWithContactListRecords();
+            }
+        }
+    }
 }

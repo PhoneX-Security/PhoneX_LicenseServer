@@ -97,9 +97,7 @@ class Subscriber extends Model{
             ->orWhere('int_usr_id', $this->id)
             ->delete();
 
-        $item = SupportContact::where('owner_sip', $this->email_address)->first();
-        $item->delete();
-
+        SupportContact::where('owner_sip', $this->email_address)->delete();
         $this->delete();
     }
 

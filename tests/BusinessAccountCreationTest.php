@@ -16,7 +16,10 @@ class BusinessAccountCreationTest extends TestCase {
     use DatabaseTransactions;
 
     const URL = '/account/business-account';
-    const TEST_USERNAME = "kexo_test123_business";
+    const TEST_USERNAME = "kajsmentke_sk";
+    const TEST_USERNAME2 = "kozmeker_sk";
+    const TEST_USERNAME3 = "fajnsmeker_sk";
+
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -67,13 +70,7 @@ class BusinessAccountCreationTest extends TestCase {
     }
 
     public function testBadBusinessCode(){
-        $nonExistingUsername = "kajsmentkeueue";
-
-        // first delete user if exists
-        $oldUser = User::where('username', $nonExistingUsername)->first();
-        if ($oldUser != null){
-            $oldUser->deleteWithLicenses();
-        }
+        $nonExistingUsername = "kajsmentkeunique";
 
         $this->callAndCheckResponse(self::URL, [
             'version' => AccountController::VERSION,
@@ -91,125 +88,130 @@ class BusinessAccountCreationTest extends TestCase {
         // Mock Queue push because it might trigger Stack Overflow
         $this->mockQueuePush();
 
-        $username1 = "kajsmentke132";
-        $username2 = "kozmeker132";
-        $username3 = "fajnsmeker22";
+        try {
+            $username1 = self::TEST_USERNAME;
+            $username2 = self::TEST_USERNAME2;
+            $username3 = self::TEST_USERNAME3;
 
-        // first delete users if exist
-//        $this->deleteUsers([$username1, $username2, $username3]);
+            // now create user1 and generate code pair
+            $trialLic = LicenseType::find(1);
+            $trialLicFunc = \Phonex\LicenseFuncType::getTrial();
+            $command = new CreateUser($username1);
+            $user1 = Bus::dispatch($command);
+            $commandSub = new CreateSubscriberWithLicense($user1, $trialLic, $trialLicFunc, 'fasirka_heslo');
+            Bus::dispatch($commandSub);
 
-        // now create user1 and generate code pair
-        $trialLic = LicenseType::find(1);
-        $trialLicFunc = \Phonex\LicenseFuncType::getTrial();
-        $command = new CreateUser($username1);
-        $user1 = Bus::dispatch($command);
-        $commandSub = new CreateSubscriberWithLicense($user1, $trialLic, $trialLicFunc, 'fasirka_heslo');
-        Bus::dispatch($commandSub);
+            // predefined group + license type
+            $mpGroup = Group::where('name', 'Mobil Pohotovost')->first();
+            $mpLicenseType = LicenseType::where('name', 'half_year')->first();
+            $mpLicenseFuncType = LicenseFuncType::getFull();
 
-        // predefined group + license type
-        $mpGroup = Group::where('name', 'Mobil Pohotovost')->first();
-        $mpLicenseType = LicenseType::where('name', 'half_year')->first();
-        $mpLicenseFuncType = LicenseFuncType::getFull();
+            $command = new CreateBusinessCodePair($user1, $mpLicenseType, $mpLicenseFuncType);
+            $command->addGroup($mpGroup);
+            $codePair = Bus::dispatch($command);
 
-        $command = new CreateBusinessCodePair($user1, $mpLicenseType, $mpLicenseFuncType);
-        $command->addGroup($mpGroup);
-        $codePair = Bus::dispatch($command);
+            // remember counts
+            $userCount = User::all()->count();
+            $licenseCount = License::all()->count();
+            $subscriberCount = Subscriber::all()->count();
 
-        // remember counts
-        $userCount = User::all()->count();
-        $licenseCount = License::all()->count();
-        $subscriberCount = Subscriber::all()->count();
+            // now use first code to get a license
+            $json = $this->callAndCheckResponse(self::URL,[
+                'version' => AccountController::VERSION,
+                'imei' => 'a',
+                'captcha' =>'captcha',
+                'username' => $username2,
+                'bcode' => $codePair[0]->code
+            ], AccountController::RESP_OK);
+            $this->assertEquals($username2, $json->username);
 
-        // now use first code to get a license
-        $json = $this->callAndCheckResponse(self::URL,[
-            'version' => AccountController::VERSION,
-            'imei' => 'a',
-            'captcha' =>'captcha',
-            'username' => $username2,
-            'bcode' => $codePair[0]->code
-        ], AccountController::RESP_OK);
-        $this->assertEquals($username2, $json->username);
+            // assert all records created
+            $this->assertEquals($userCount + 1, User::all()->count());
+            $this->assertEquals($licenseCount + 1, License::all()->count());
+            $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
 
-        // assert all records created
-        $this->assertEquals($userCount + 1, User::all()->count());
-        $this->assertEquals($licenseCount + 1, License::all()->count());
-        $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
+            // check we cannot create another license on the same business code
+            $json = $this->callAndCheckResponse(self::URL, [
+                'version' => AccountController::VERSION,
+                'imei' => 'a',
+                'captcha' =>'captcha',
+                'username' => $username3,
+                'bcode' => $codePair[0]->code
+            ], AccountController::RESP_ERR_ALREADY_USED_BUSINESS_CODE);
 
-        // check we cannot create another license on the same business code
-        $json = $this->callAndCheckResponse(self::URL, [
-            'version' => AccountController::VERSION,
-            'imei' => 'a',
-            'captcha' =>'captcha',
-            'username' => $username3,
-            'bcode' => $codePair[0]->code
-        ], AccountController::RESP_ERR_ALREADY_USED_BUSINESS_CODE);
+            // now use the second code to get a license
+            $json = $this->callAndCheckResponse(self::URL, [
+                'version' => AccountController::VERSION,
+                'imei' => 'a',
+                'captcha' =>'captcha',
+                'username' => $username3,
+                'bcode' => $codePair[1]->code
+            ], AccountController::RESP_OK);
+            $this->assertEquals($username3, $json->username);
 
-        // now use the second code to get a license
-        $json = $this->callAndCheckResponse(self::URL, [
-            'version' => AccountController::VERSION,
-            'imei' => 'a',
-            'captcha' =>'captcha',
-            'username' => $username3,
-            'bcode' => $codePair[1]->code
-        ], AccountController::RESP_OK);
-        $this->assertEquals($username3, $json->username);
-
-        // expect two users in contact list (support and another business user)
-        $user3 = User::where('username', $username3)->first();
-        $this->assertEquals(2, count($user3->subscriber->subscribersInContactList));
+            // expect two users in contact list (support and another business user)
+            $user3 = User::where('username', $username3)->first();
+            $this->assertEquals(2, count($user3->subscriber->subscribersInContactList));
 
 //        // assert all records created
-        $this->assertEquals($userCount + 2, User::all()->count());
-        $this->assertEquals($licenseCount + 2, License::all()->count());
-        $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
+            $this->assertEquals($userCount + 2, User::all()->count());
+            $this->assertEquals($licenseCount + 2, License::all()->count());
+            $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
+
+        } finally {
+            // Subscribers table do not support transactions, delete manually
+            $this->deleteSubscribers([$username1, $username2, $username3]);
+        }
     }
 
     public function testAccountCreationWithParent(){
         // Mock Queue push because it might trigger Stack Overflow
         $this->mockQueuePush();
 
-        $username1 = "kajsmentke1s233";
-        $username2 = "kozmeker13s33";
-        $username3 = "fajnsmeker14s43";
+        try {
+            $username1 = self::TEST_USERNAME;
+            $username2 = self::TEST_USERNAME2;
+            $username3 = self::TEST_USERNAME3;
 
-//        $this->deleteUsers([$username1, $username2, $username3]);
+            // now create user1 and generate code pair
+            $licType = LicenseType::find(1);
+            $licFuncType = \Phonex\LicenseFuncType::getTrial();
+            $command = new CreateUser($username1);
+            $user1 = Bus::dispatch($command);
+            $commandSub = new CreateSubscriberWithLicense($user1, $licType, $licFuncType, 'fasirka_heslo');
+            Bus::dispatch($commandSub);
 
-        // now create user1 and generate code pair
-        $licType = LicenseType::find(1);
-        $licFuncType = \Phonex\LicenseFuncType::getTrial();
-        $command = new CreateUser($username1);
-        $user1 = Bus::dispatch($command);
-        $commandSub = new CreateSubscriberWithLicense($user1, $licType, $licFuncType, 'fasirka_heslo');
-        Bus::dispatch($commandSub);
+            $command = new CreateBusinessCodePair($user1, $licType, $licFuncType);
+            // add parent - will be added as support account
+            $command->addParent($user1);
+            $codePair = Bus::dispatch($command);
 
-        $command = new CreateBusinessCodePair($user1, $licType, $licFuncType);
-        // add parent - will be added as support account
-        $command->addParent($user1);
-        $codePair = Bus::dispatch($command);
+            // use 1. code
+            $this->callAndCheckResponse(
+                self::URL,
+                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username2,'bcode' => $codePair[0]->code],
+                AccountController::RESP_OK
+            );
 
-        // use 1. code
-        $this->callAndCheckResponse(
-            self::URL,
-            ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username2,'bcode' => $codePair[0]->code],
-            AccountController::RESP_OK
-        );
+            // use 2. code
+            $this->callAndCheckResponse(
+                self::URL,
+                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username3,'bcode' => $codePair[1]->code],
+                AccountController::RESP_OK
+            );
 
-        // use 2. code
-        $this->callAndCheckResponse(
-            self::URL,
-            ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username3,'bcode' => $codePair[1]->code],
-            AccountController::RESP_OK
-        );
+            // check both have themselves and support account in cl
+            $user1 = User::findByUsername($username1);
+            $user2 = User::findByUsername($username2);
+            $user3 = User::findByUsername($username3);
 
-        // check both have themselves and support account in cl
-        $user1 = User::findByUsername($username1);
-        $user2 = User::findByUsername($username2);
-        $user3 = User::findByUsername($username3);
+            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user1->subscriber));
+            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user3->subscriber));
 
-        $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user1->subscriber));
-        $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user3->subscriber));
-
-        $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user1->subscriber));
-        $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user2->subscriber));
+            $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user1->subscriber));
+            $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user2->subscriber));
+        } finally {
+            $this->deleteSubscribers([$username1, $username2, $username3]);
+        }
     }
 }
