@@ -35,7 +35,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
 	protected $hidden = ['password', 'remember_token'];
 
-    /* relations */
+    /* Relations */
 	public function licenses(){
 		return $this->hasMany('Phonex\License', 'user_id');
 	}
@@ -60,6 +60,17 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     public function roles(){
         return $this->belongsToMany('Phonex\Role', 'user_role', 'user_id', 'role_id');
     }
+
+    /* Scopes */
+
+    /* Some magic here, for more info, see Laravel Eloquent Scopes */
+//    public function scopeOfGroups($query, array $groupIds)
+//    {
+//        return $query->select('users.*')
+//            ->join('user_group', 'users.id', '=', 'user_group.user_id')
+//            ->groupBy('users.id')
+//            ->whereIn('group_id', $groupIds);
+//    }
 
     /* Accessors */
     // roles_list
