@@ -115,3 +115,9 @@ if (!function_exists('getRandomString')) {
         return $cons;
     }
 }
+
+if (!function_exists('bcodeDashes')) {
+    function bcodeDashes($code){
+        return substr($code, 0, 3) . "-" . substr($code, 3, 3) . "-" . substr($code, 6);
+    }
+}

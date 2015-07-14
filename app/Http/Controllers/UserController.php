@@ -113,7 +113,7 @@ class UserController extends Controller {
 
 	public function show($id)
     {
-		$user = $user = $this->getUserOr404($id);
+		$user = $this->getUserOr404($id);
 		return view('user.show', compact('user'));
 	}
 

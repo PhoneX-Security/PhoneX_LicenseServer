@@ -1,6 +1,6 @@
 <?php namespace Phonex\Http\Requests;
 
-class CreateGroupRequest extends Request {
+class UpdateGroupRequest extends Request {
 
 	/**
 	 * Determine if the user is authorized to make this request.
@@ -20,7 +20,8 @@ class CreateGroupRequest extends Request {
 	public function rules()
 	{
 		return [
-            'name' => 'required|min:5|max:255|unique:groups',
+			/* Name uniqueness hase be checked with the exception of current Group name, hard to do it here, do it in the controller */
+//            'name' => 'required|min:5|max:255',
             'owner_username' => 'exists:users,username',
 		];
 	}

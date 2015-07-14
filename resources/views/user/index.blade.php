@@ -113,20 +113,13 @@
 
                                     <td>
                                         {{ $user->roles_list }}
-
                                     </td>
 
                                     <td class="text-center">
                                         <div class="btn-group  btn-group-xs">
-                                            <a class="btn btn-info view-btn-edit" href="{{ \URL::route('users.show', $user->id) }}" title="Details"><i class="fa fa-pencil-square-o"></i> Details</a>
-                                        </div>
-
-                                        <div class="btn-group  btn-group-xs">
-                                            <a class="btn btn-info view-btn-edit" href="{{ \URL::route('users.licenses', $user->id) }}" title="Details"><i class="fa fa-pencil-square-o"></i> Licenses</a>
-                                        </div>
-
-                                        <div class="btn-group  btn-group-xs">
-                                            <a class="btn btn-info view-btn-edit" href="{{ \URL::route('users.cl', $user->id) }}" title="Details"><i class="fa fa-pencil-square-o"></i> Contact List</a>
+                                            <a class="btn btn-info view-btn-edit" href="{{ route('users.show', $user->id) }}" title="Details"><i class="fa fa-pencil-square-o"></i> Details</a>
+                                            <a class="btn btn-info view-btn-edit" href="{{ route('users.licenses', $user->id) }}" title="Licenses"><i class="fa fa-book"></i> Licenses</a>
+                                            <a class="btn btn-info view-btn-edit" href="{{ route('users.cl', $user->id) }}" title="Contact List"><i class="fa fa-list-alt"></i> Contact List</a>
                                         </div>
                                     </td>
                                 </tr>

@@ -98,16 +98,16 @@
 
             </div>
 
-            {{--<div class="box-footer clearfix">--}}
-                {{--<div class="pull-left">--}}
-                    {{--<div class="dataTables_info" id="example2_info" role="status" aria-live="polite">--}}
-                        {{--Total {{ $licenses->total() }} entries</div>--}}
-                {{--</div>--}}
+            <div class="box-footer clearfix">
+                <div class="pull-left">
+                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
+                        Total {{ $licenses->total() }} entries</div>
+                </div>
 
-                {{--<div class="pull-right">--}}
-                    {{--{!! $licenses->appends(Request::except('page'))->render(); !!}--}}
-                {{--</div>--}}
-            {{--</div>--}}
+                <div class="pull-right">
+                    {!! $licenses->appends(Request::except('page'))->render() !!}
+                </div>
+            </div>
         </div>
 
 

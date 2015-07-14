@@ -1,5 +1,6 @@
 @extends('form.form-create')
-@section('title', 'Licenses')
+@section('title', 'License #' . $license->id)
+@section('subtitle', 'Edit')
 
 @section('form-nav')
     <div class="row form-inline" style="margin-bottom: 5px">

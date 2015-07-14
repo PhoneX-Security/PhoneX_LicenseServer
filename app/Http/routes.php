@@ -39,6 +39,7 @@ Route::controller('qa', 'QaController'); // qa tools
 Route::group(['middleware' => ['auth', 'acl']], function() {
     Route::get('/', 'HomeController@index');
 
+    /* Users + details */
 	Route::resource('users', 'UserController');
     // CL
     Route::get('users/{user}/licenses', ['as' => 'users.licenses', 'uses' => 'UserController@showLicenses']);
@@ -54,10 +55,14 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     Route::patch('users/{users}/change-password', ['as' => 'users.change_password', 'uses' => 'UserController@changePassword']);
     Route::patch('users/{users}/add-user-to-cl', ['as' => 'users.add_user_to_cl', 'uses' => 'UserController@addUserToCl']);
 
+    /* Group */
     Route::resource('groups', 'GroupController');
+    Route::get('groups/{user}/users', ['as' => 'groups.users', 'uses' => 'GroupController@showUsers']);
 
+    /* Licenses */
     Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
 
+    /* Business Codes */
     Route::controller('bcodes', 'BusinessCodeController');
 
     /* Admin only pages */

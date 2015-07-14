@@ -22,7 +22,25 @@
 
     <link href="/css/custom.css" rel="stylesheet" type="text/css" />
 
+    <!-- REQUIRED JS SCRIPTS -->
+    {{-- Has to be loaded first- some scripts are inlined into the page (e.g. "delete contact" form, libraries have to be loaded before them) --}}
+    <!-- jQuery 2.1.4 -->
     <script src="/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <!-- Bootstrap 3.3.2 JS -->
+    <script src="/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <!-- AdminLTE App -->
+    <script src="/dist/js/app.min.js" type="text/javascript"></script>
+
+    <script src="/plugins/datepicker/bootstrap-datepicker.js"></script>
+
+    <script src="/js/custom.js"></script>
+
+
+    <!-- Optionally, you can add Slimscroll and FastClick plugins.
+          Both of these plugins are recommended to enhance the
+          user experience. Slimscroll is required when using the
+          fixed layout. -->
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -70,23 +88,6 @@
 
 </div><!-- ./wrapper -->
 
-<!-- REQUIRED JS SCRIPTS -->
 
-<!-- jQuery 2.1.4 -->
-{{--<script src="/plugins/jQuery/jQuery-2.1.4.min.js"></script>--}}
-<!-- Bootstrap 3.3.2 JS -->
-<script src="/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-<!-- AdminLTE App -->
-<script src="/dist/js/app.min.js" type="text/javascript"></script>
-
-<script src="/plugins/datepicker/bootstrap-datepicker.js"></script>
-
-<script src="/js/custom.js"></script>
-
-
-<!-- Optionally, you can add Slimscroll and FastClick plugins.
-      Both of these plugins are recommended to enhance the
-      user experience. Slimscroll is required when using the
-      fixed layout. -->
 </body>
 </html>

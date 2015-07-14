@@ -35,7 +35,8 @@
                     @foreach($groups as $group)
                         <tr>
                             <td>{{ $group->id }}</td>
-                            <td><a href="{{ \URL::route('users.index', [ 'user_group[]' => $group->id ]) }}">{{ $group->name or '' }}</a></td>
+                            {{--<td><a href="{{ \URL::route('users.index', [ 'user_group[]' => $group->id ]) }}">{{ $group->name or '' }}</a></td>--}}
+                            <td><a href="{{ route('groups.show', $group->id) }}">{{ $group->name }}</a></td>
                             <td>
                                 @if($group->owner)
                                     <a href="{{ route('users.show', [ $group->owner->id ]) }}">{{ $group->owner->username }}</a>
@@ -44,6 +45,10 @@
                             <td>{{ $group->comment }}</td>
                             <td>{{ $group->users()->count()  }}</td>
                             <td class="text-center">
+                                <div class="btn-group  btn-group-xs">
+                                    <a class="btn btn-info view-btn-edit" href="{{ route('groups.show', $group->id) }}" title="Details"><i class="fa fa-pencil-square-o"></i> Details</a>
+                                    <a class="btn btn-info view-btn-edit" href="{{ route('groups.users', $group->id) }}" title="Users"><i class="fa fa-users"></i> Users</a>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -58,7 +63,7 @@
                 </div>
 
                 <div class="pull-right">
-                    {!! $groups->appends(Request::except('page'))->render(); !!}
+                    {!! $groups->appends(Request::except('page'))->render() !!}
                 </div>
             </div>
         </div>

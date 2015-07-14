@@ -48,7 +48,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-2">
+                            <div class="col-md-4">
                                 @include('bcode.chips.code-pairs-table', ['codePairs' => $codePairs])
                             </div>
                         </div>
