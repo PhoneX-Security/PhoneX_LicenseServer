@@ -48,8 +48,8 @@
 
                             <div class="col-md-4 ">
                                 <div class="form-group"><label for="password" class="control-label">Default password*</label>
-                                    <input class="form-control" value="{{ old('password','phonexxx') }}" id="password" type="text" name="password">
-                                    <span class="help-block">Password will be changed on first login.</span>
+                                    <input class="form-control" value="{{ old('password', $randomPassword) }}" id="password" type="text" name="password">
+                                    <span class="help-block">Randomly generated default password. User is forced to change it during the first login.</span>
                                 </div>
                             </div>
                         </div>

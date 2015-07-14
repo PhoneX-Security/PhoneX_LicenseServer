@@ -75,7 +75,9 @@ class UserController extends Controller {
         $licenseFuncTypes = LicenseFuncType::all()->sortBy('order');
         $groups = Group::all();
         $roles = Role::all();
-		return view('user.create', compact('licenseTypes', 'licenseFuncTypes', 'groups', 'roles'));
+
+        $randomPassword = getRandomString(8, 'abcdefghjkmnpqrstuvwxyz123456789');
+		return view('user.create', compact('licenseTypes', 'licenseFuncTypes', 'groups', 'roles', 'randomPassword'));
 	}
 
 
