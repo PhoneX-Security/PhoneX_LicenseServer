@@ -76,7 +76,7 @@ class UserController extends Controller {
         $groups = Group::all();
         $roles = Role::all();
 
-        $randomPassword = getRandomString(8, 'abcdefghjkmnpqrstuvwxyz123456789');
+        $randomPassword = getRandomString(8, 'abcdefghjkmnpqrstuvwxyz23456789');
 		return view('user.create', compact('licenseTypes', 'licenseFuncTypes', 'groups', 'roles', 'randomPassword'));
 	}
 
