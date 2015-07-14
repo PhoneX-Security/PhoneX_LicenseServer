@@ -69,7 +69,8 @@ class CreateUser extends Command implements SelfHandling {
         $user->has_access = 0;
 
         if ($this->password){
-            $user->has_access = 1;
+            // Do not issue has_access automatically
+//            $user->has_access = 0;
             $user->password = bcrypt($this->password);
         }
         if ($this->subscriberId){
