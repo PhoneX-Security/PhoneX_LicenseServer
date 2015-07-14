@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class BusinessCode extends Model{
 	protected $table = 'business_codes';
-    public static $chars = 'abcdefghjklmnpqrstuvwxyz23456789'; // i,1,0,o characters are skipped
-    const MODULO = 29; // 32 characters, therefore modulo 29
+    public static $chars = 'abcdefghjkmnpqrstuvwxyz23456789'; // i,1,0,o,l characters are skipped
+    const MODULO = 29;
     const BASE_LENGTH = 8; // base length + parity character makes business code
     const TOTAL_LENGTH = 9;
 
@@ -57,9 +57,6 @@ class BusinessCode extends Model{
     /**
      *
      * @param null $prefix, possible le = 'business_codes';
-    public static $chars = 'abcdefghjklmnpqrstuvwxyz23456789'; // i,1,0,o characters are skipped
-    const MODULO = 29; // 32 characters, therefore modulo 29
-    const BASE_LENGTH = 8; // base length +prefix, CANNOT contain '1','i','o' or '0' characters, max length 2 chars
      * @return string
      */
     public static function generateUniqueCode($prefix = null){
@@ -89,7 +86,7 @@ class BusinessCode extends Model{
     }
 
     public static function getCode($prefix = null){
-        // 36 characters, 8 characters length, 1 modulo parity character
+        // 31 characters, 8 characters length, 1 modulo parity character
         $code = getRandomString(self::BASE_LENGTH, self::$chars);
 
         if ($prefix != null){
@@ -109,7 +106,7 @@ class BusinessCode extends Model{
         if (!$code || strlen($code) != self::BASE_LENGTH){
             throw new \LengthException("To generate parity character, we require 7 characters long code.");
         }
-        // ISBN-10 like algorithm, using mod 31
+        // ISBN-10 like algorithm
         $x = $code . self::$chars[0]; // first add "zero" character to compute error
         $sum = 0;
         for ($i = 0; $i < strlen($x); $i++){
