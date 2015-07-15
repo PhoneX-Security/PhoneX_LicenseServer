@@ -39,9 +39,9 @@
                             <th>ID</th>
                             <th>Code</th>
                             <th>Group</th>
-                            <th>Parent</th>
-                            <th>Licenses limit</th>
-                            <th>Licenses acquired</th>
+                            <th>Parent user</th>
+                            <th>Users limit</th>
+                            <th>Users created</th>
                             <th class="text-center">Options</th>
                         </tr>
                     </thead>
@@ -52,8 +52,14 @@
                             <td>{{ $bcode->code }}</td>
                             <td>{{ $bcode->group->name or ''}}</td>
                             <td>{{ $bcode->parent->username or ''}}</td>
-                            <td>{{ $bcode->licenses_limit  }}</td>
-                            <td>...</td>
+                            <td>{{ $bcode->users_limit  }}</td>
+                            <td>@if($bcode->users)
+                                    @foreach($bcode->users as $k => $user)
+                                        <a href="{{route('users.show',$user->id)}}">{{ $user->username }}</a>
+                                        @if($k != 0), @endif
+                                    @endforeach
+                                @else -
+                                @endif </td>
                             <td class="text-center">
                                 <div class="btn-group  btn-group-xs">
                                     {{--<a type="button" class="btn btn-info view-btn-edit" href="{{ \URL::route('users.edit', $user->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>--}}
