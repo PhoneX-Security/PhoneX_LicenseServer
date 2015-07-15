@@ -38,6 +38,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Code</th>
+                            <th>Associated code(s)</th>
                             <th>Group</th>
                             <th>Parent user</th>
                             <th>Users limit</th>
@@ -50,9 +51,18 @@
                         <tr>
                             <td>{{ $bcode->id }}</td>
                             <td>{{ $bcode->code }}</td>
+                            <td>
+                                @if($bcode->clMappings)
+                                    @foreach($bcode->clMappings as $k => $assocCode)
+                                        {{ $assocCode->code }}
+                                        @if($k != 0), @endif
+                                    @endforeach
+                                @else -
+                                @endif </td>
+                            </td>
                             <td>{{ $bcode->group->name or ''}}</td>
                             <td>{{ $bcode->parent->username or ''}}</td>
-                            <td>{{ $bcode->users_limit  }}</td>
+                            <td>{{ $bcode->users->count() . '/' . $bcode->users_limit  }}</td>
                             <td>@if($bcode->users)
                                     @foreach($bcode->users as $k => $user)
                                         <a href="{{route('users.show',$user->id)}}">{{ $user->username }}</a>

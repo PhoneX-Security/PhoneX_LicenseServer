@@ -18,15 +18,15 @@ class BusinessCodeController extends Controller {
 	public function BusinessCodeController(){
 	}
 
-	public function getIndex(Request $request){
-        $bcodes = null;
+	public function getIndex(Request $request)
+    {
+        $query = BusinessCode::with(['clMappings', 'users', 'group', 'creator', 'parent']);
 
         if ($request->has('code')){
-            $bcodes = BusinessCode::where('code', 'LIKE', '%'. $request->get('code') .'%')->paginate(15);
-        } else {
-            $bcodes = BusinessCode::paginate(15);
+            $query = $query->where('code', 'LIKE', '%'. $request->get('code') .'%');
         }
 
+        $bcodes = $query->paginate(15);
         return view('bcode.index', compact('bcodes'));
 	}
 
