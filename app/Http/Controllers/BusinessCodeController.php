@@ -1,5 +1,6 @@
 <?php namespace Phonex\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Mail;
 use Phonex\BusinessCode;
 use Phonex\BusinessCodeExport;
@@ -17,8 +18,15 @@ class BusinessCodeController extends Controller {
 	public function BusinessCodeController(){
 	}
 
-	public function getIndex(){
-        $bcodes = BusinessCode::paginate(15);
+	public function getIndex(Request $request){
+        $bcodes = null;
+
+        if ($request->has('code')){
+            $bcodes = BusinessCode::where('code', 'LIKE', '%'. $request->get('code') .'%')->paginate(15);
+        } else {
+            $bcodes = BusinessCode::paginate(15);
+        }
+
         return view('bcode.index', compact('bcodes'));
 	}
 

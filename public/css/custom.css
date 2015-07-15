@@ -4,6 +4,10 @@
     border-bottom: 4px solid #000000;
 }
 
-th a{
+th a {
     color: #000;
+}
+
+.inline-block {
+    display:inline-block;
 }

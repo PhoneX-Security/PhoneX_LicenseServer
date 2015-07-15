@@ -16,6 +16,17 @@
                     {{--<a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-single-codes/">--}}
                         {{--<i class="fa fa-plus-circle"></i> New single codes--}}
                     {{--</a>--}}
+
+                    <form class="form-inline inline-block" action="/bcodes" method="get">
+
+                        <div class="input-group">
+                            <input type="text" name="code" value="{{Request::get('code')}}" class="form-control input-sm pull-right" style="width: 150px;" placeholder="Search by code">
+                            <div class="input-group-btn">
+                                <button class="btn btn-sm btn-default"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </form>
+
                     <a class="btn btn-sm btn-primary view-btn-create" href="/bcodes/generate-code-pairs/">
                         <i class="fa fa-plus-circle"></i> New code pairs
                     </a>
@@ -29,7 +40,6 @@
                             <th>Code</th>
                             <th>Group</th>
                             <th>Parent</th>
-                            <th>Exported</th>
                             <th>Licenses limit</th>
                             <th>Licenses acquired</th>
                             <th class="text-center">Options</th>
@@ -42,8 +52,6 @@
                             <td>{{ $bcode->code }}</td>
                             <td>{{ $bcode->group->name or ''}}</td>
                             <td>{{ $bcode->parent->username or ''}}</td>
-                            <td>@if($bcode->exported) Yes @else No @endif</td>
-
                             <td>{{ $bcode->licenses_limit  }}</td>
                             <td>...</td>
                             <td class="text-center">
@@ -64,7 +72,7 @@
                 </div>
 
                 <div class="pull-right">
-                    {!! $bcodes->appends(Request::except('page'))->render(); !!}
+                    {!! $bcodes->appends(Request::except('page'))->render() !!}
                 </div>
             </div>
         </div>
