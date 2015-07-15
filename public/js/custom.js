@@ -26,6 +26,10 @@ $initDatePicker = function(){
     });
 };
 
+$initBootstrapTooltip = function () {
+    $('[data-toggle="tooltip"]').tooltip()
+};
+
 //$initDatePickerLangs = function(){
 //    //https://eternicode.github.io/bootstrap-datepicker/
 //    $.fn.datepicker.dates['en-GB'] = {
@@ -66,4 +70,5 @@ $(document).ready(function(){
     $initDatePicker();
     $initMultiSelect();
     $readyFn();
+    $initBootstrapTooltip();
 });

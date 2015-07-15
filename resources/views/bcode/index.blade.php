@@ -38,7 +38,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Code</th>
-                            <th>Associated code(s)</th>
+                            <th><abbr data-toggle="tooltip" data-placement="top" title="Users who are created with associated business codes are automatically paired as contacts in their contact lists. They are also known as 'code pairs'.">Associated code(s)</abbr></th>
                             <th>Group</th>
                             <th>Parent user</th>
                             <th>Users limit</th>
