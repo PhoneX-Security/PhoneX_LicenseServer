@@ -45,7 +45,7 @@ Parameters: $user
 
 <h4>Login details</h4>
 
-
+@if($user->subscriber)
 <div class="row">
     @if($user->subscriber->location)
         <div class="col-md-4 ">
@@ -72,7 +72,7 @@ Parameters: $user
 
 </div>
 
-@if($user->subscriber)
+
     <div class="row">
         <div class="col-md-4 ">
             <dl>
