@@ -39,6 +39,7 @@
                             <th>ID</th>
                             <th>Code</th>
                             <th><abbr data-toggle="tooltip" data-placement="top" title="Users who are created with associated business codes are automatically paired as contacts in their contact lists. They are also known as 'code pairs'.">Associated code(s)</abbr></th>
+                            <th>Expires at</th>
                             <th>Group</th>
                             <th>Parent user</th>
                             <th>Users limit</th>
@@ -60,6 +61,7 @@
                                 @else -
                                 @endif </td>
                             </td>
+                            <td>{{ $bcode->expires_at }}</td>
                             <td>{{ $bcode->group->name or ''}}</td>
                             <td>{{ $bcode->parent->username or ''}}</td>
                             <td>{{ $bcode->users->count() . '/' . $bcode->users_limit  }}</td>

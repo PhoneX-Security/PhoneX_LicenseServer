@@ -1,5 +1,6 @@
 <?php namespace Phonex\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Log;
 use Phonex\BusinessCode;
@@ -26,6 +27,7 @@ class AccountController extends Controller {
     const RESP_ERR_BAD_BUSINESS_CODE = 406;
     const RESP_ERR_ALREADY_USED_BUSINESS_CODE = 407;
     const RESP_ERR_UNSUPPORTED_VERSION = 408;
+    const RESP_ERR_EXPIRED_BUSINESS_CODE = 409;
 
     const USERNAME_REGEX = "/^[A-Za-z0-9_-]{3,18}$/";
 
@@ -251,10 +253,14 @@ class AccountController extends Controller {
             throw new \Exception("", self::RESP_ERR_BAD_BUSINESS_CODE);
         }
 
+        // Check expiration
+        $now = Carbon::now();
+        if ($code->expires_at && $code->expires_at->lte($now)){
+            throw new \Exception("", self::RESP_ERR_EXPIRED_BUSINESS_CODE);
+        }
+
+        // Check user limit
         $numberOfUsers = count($code->users);
-
-//        var_dump($numberOfUsers);
-
         if ($numberOfUsers >= $code->users_limit){
 //            Log::error("Requested business code is already used by #" . $numberOfUsers . " users", [$request->all()]);
             throw new \Exception("", self::RESP_ERR_ALREADY_USED_BUSINESS_CODE);

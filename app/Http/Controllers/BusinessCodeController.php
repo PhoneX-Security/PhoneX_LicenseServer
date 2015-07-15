@@ -96,6 +96,10 @@ class BusinessCodeController extends Controller {
                 $command->addGroup($group);
             }
 
+            if ($request->has('expires_at')){
+                $command->addExpiration(carbonFromInput($request->get('expires_at')));
+            }
+
             if ($parent){
                 $command->addParent($parent);
             }

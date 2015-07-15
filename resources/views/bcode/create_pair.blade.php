@@ -1,18 +1,34 @@
 @extends('form.form-create')
-@section('title', "New business code pairs")
+@section('title', "New code pairs")
 @section('form')
     <form  role="form" method="POST" action="/bcodes/generate-code-pairs">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-        {{--<h4>Details</h4>--}}
+        <h4>Code pair</h4>
+        <p>Specify number of pairs you want to generate and license details. After both codes are used, newly created users are automatically connected via their contact lists.</p>
 
         <div class="row">
             <div class="col-md-2 ">
                 <div class="form-group"><label for="number_of_pairs" class="control-label">Number of pairs*</label>
                     <input class="form-control" required value="{{ old('number_of_pairs') }}" placeholder="" id="number_of_pairs" type="number" name="number_of_pairs">
-                    <span class="help-block">Specify number of pairs you want to generate. After both codes are used, their users are automatically connected in contact list.</span>
+                    {{--<span class="help-block"></span>--}}
                 </div>
             </div>
+
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="expires_at" class="control-label">Expiration date (optional)</label>
+                    <div class="input-group date">
+                        <input value="{{ old('expires_at') }}" type="text" name="expires_at" class="form-control" />
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                $(function () {
+                    $('#expires_at').daterangepicker();
+                });
+            </script>
 
             <div class="col-md-2 ">
                 <div class="form-group">
@@ -23,51 +39,56 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="password" class="control-label">Expiration type</label>
-                    <select name="license_type_id" class="form-control" >
-                        @foreach($licenseTypes as $type)
-                            <option @if($type->default) selected="selected" @endif
-                            value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
-                        @endforeach
-                    </select>
+        <h4>License</h4>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="password" class="control-label">Expiration type</label>
+                            <select name="license_type_id" class="form-control" >
+                                @foreach($licenseTypes as $type)
+                                    <option @if($type->default) selected="selected" @endif
+                                    value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="" class="control-label">Type</label>
+                            <input class="form-control" disabled value="Full" type="text" >
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 ">
+                        <div class="form-group">
+                            <label for="parent_username" class="control-label">Parent (username)</label>
+                            <input class="form-control" value="{{ old('parent_username') }}"
+                                   placeholder="Parent username" id="parent_username" type="text" name="parent_username">
+                            <span class="help-block">Parent user will be added as a support account. If empty, <b>phonex-support</b> is added as support account</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="group_id" class="control-label">Group</label>
+                            <select name="group_id" class="form-control">
+                                <option selected disabled>-Select group-</option>
+                                @foreach($groups as $group)
+                                    <option value="{{ $group->id }}">{{ $group->name }} </option>
+                                @endforeach
+                            </select>
+                            <span class="help-block">User will be added to this group.</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="" class="control-label">Type</label>
-                    <input class="form-control" disabled value="Full" type="text" >
-                </div>
+
             </div>
 
-            <div class="col-md-2 ">
-                <div class="form-group">
-                    <label for="parent_username" class="control-label">Parent (username)</label>
-                    <input class="form-control" value="{{ old('parent_username') }}"
-                           placeholder="Parent username" id="parent_username" type="text" name="parent_username">
-                    <span class="help-block">Parent user will be added as a support account. If empty, <b>phonex-support</b> is added as support account</span>
-                </div>
-            </div>
-
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="group_id" class="control-label">Group</label>
-                    <select name="group_id" class="form-control">
-                        <option selected disabled>-Select group-</option>
-                        @foreach($groups as $group)
-                            <option value="{{ $group->id }}">{{ $group->name }} </option>
-                        @endforeach
-                    </select>
-                    <span class="help-block">User will be added to this group.</span>
-                </div>
-            </div>
         </div>
 
-        <div class="row">
-
-        </div>
 
         <p>* Required fields</p>
 

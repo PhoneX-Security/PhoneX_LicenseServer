@@ -1,5 +1,6 @@
 <?php namespace Phonex\Jobs;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Phonex\BusinessCode;
 use Phonex\BusinessCodeClMapping;
@@ -21,6 +22,7 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
     private $group;
     private $export;
     private $prefix;
+    private $expiresAt;
 
     private $parent;
 
@@ -48,6 +50,11 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
         $this->group = $group;
     }
 
+    public function addExpiration(Carbon $expiresAt)
+    {
+        $this->expiresAt = $expiresAt;
+    }
+
 	public function handle(){
         $codes = [];
         // first code
@@ -69,6 +76,10 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
         $bc1->is_active = 1;
         if ($this->export){
             $bc1->export_id = $this->export->id;
+        }
+
+        if ($this->expiresAt){
+            $bc1->expires_at = $this->expiresAt;
         }
 
         // second code

@@ -11,11 +11,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property int users_limit
  */
 class BusinessCode extends Model{
-	protected $table = 'business_codes';
     public static $chars = 'abcdefghjkmnpqrstuvwxyz23456789'; // i,1,0,o,l characters are skipped
     const MODULO = 29;
     const BASE_LENGTH = 8; // base length + parity character makes business code
     const TOTAL_LENGTH = 9;
+
+    protected $table = 'business_codes';
+    protected $dates = ['expires_at'];
 
     public function group(){
         return $this->belongsTo('Phonex\Group', 'group_id');

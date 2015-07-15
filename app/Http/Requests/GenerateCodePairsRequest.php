@@ -25,6 +25,7 @@ class GenerateCodePairsRequest extends Request {
 			'number_of_pairs' => 'required|integer|between:1,100',
             'email' => 'required|email',
             'parent_username' => 'exists:users,username',
+			'expires_at' => 'sometimes|date_format:"d-m-Y"',
 		];
 	}
 

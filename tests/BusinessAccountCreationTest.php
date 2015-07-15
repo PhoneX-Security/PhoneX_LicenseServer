@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Phonex\Jobs\CreateBusinessCodePair;
 use Phonex\Jobs\CreateSubscriberWithLicense;
@@ -19,6 +20,7 @@ class BusinessAccountCreationTest extends TestCase {
     const TEST_USERNAME = "kajsmentke_sk";
     const TEST_USERNAME2 = "kozmeker_sk";
     const TEST_USERNAME3 = "fajnsmeker_sk";
+    const TEST_USERNAME_NON_EXISTING = "kajsmeker";
 
 
     public function setUp(){
@@ -79,6 +81,26 @@ class BusinessAccountCreationTest extends TestCase {
             'username' => $nonExistingUsername,
             'bcode' => "too_short"
         ], AccountController::RESP_ERR_BAD_BUSINESS_CODE);
+    }
+
+    public function testExpiredBusinessCode(){
+        $someUser = User::find(1);
+
+        $licenseType = LicenseType::where('name', 'half_year')->first();
+        $licenseFuncType = LicenseFuncType::getFull();
+
+        $c1 = new CreateBusinessCodePair($someUser, $licenseType, $licenseFuncType);
+        // code from past - this should fail
+        $c1->addExpiration(Carbon::createFromDate(1999));
+        $expiredCodePair = Bus::dispatch($c1);
+
+        $this->callAndCheckResponse(self::URL, [
+            'version' => AccountController::VERSION,
+            'imei' => 'a',
+            'captcha' =>'captcha',
+            'username' => self::TEST_USERNAME_NON_EXISTING,
+            'bcode' => $expiredCodePair[0]->code
+        ], AccountController::RESP_ERR_EXPIRED_BUSINESS_CODE);
     }
 
     /**
@@ -182,6 +204,8 @@ class BusinessAccountCreationTest extends TestCase {
             Bus::dispatch($commandSub);
 
             $command = new CreateBusinessCodePair($user1, $licType, $licFuncType);
+            // some future expiration
+            $command->addExpiration(Carbon::now()->addYears(2));
             // add parent - will be added as support account
             $command->addParent($user1);
             $codePair = Bus::dispatch($command);

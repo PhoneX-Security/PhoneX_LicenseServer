@@ -101,7 +101,7 @@ class UserController extends Controller {
         $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
 
         $licRequest = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $defaultPassword);
-        $startsAt = Carbon::createFromFormat("d-m-Y", $request->get('starts_at'));
+        $startsAt = carbonFromInput($request->get('starts_at'));//Carbon::createFromFormat("d-m-Y", $request->get('starts_at'));
         $licRequest->startingAt($startsAt);
         $this->dispatch($licRequest);
 

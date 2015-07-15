@@ -121,3 +121,10 @@ if (!function_exists('bcodeDashes')) {
         return substr($code, 0, 3) . "-" . substr($code, 3, 3) . "-" . substr($code, 6);
     }
 }
+
+/* Most commonly used function for getting Carbon object from input */
+if (!function_exists('carbonFromInput')){
+    function carbonFromInput($input){
+        return Carbon::createFromFormat("d-m-Y", $input);
+    }
+}

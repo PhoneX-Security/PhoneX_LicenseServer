@@ -13,8 +13,9 @@
     <li class="treeview">
         <a href="#"><i class='fa fa-credit-card'></i> <span>Business codes</span> <i class="fa fa-angle-left pull-right"></i></a>
         <ul class="treeview-menu">
-            <li><a href="/bcodes">Index</a></li>
-            <li><a href="/bcodes/code-exports">List of exports</a></li>
+            <li><a href="/bcodes"><i class="fa fa-angle-double-right"></i> Index</a></li>
+            <li><a href="/bcodes/code-exports"><i class="fa fa-angle-double-right"></i> List of exports</a></li>
+            <li><a href="/bcodes/generate-code-pairs"><i class="fa fa-angle-double-right"></i> New code pairs</a></li>
         </ul>
     </li>
 </ul><!-- /.sidebar-menu -->
