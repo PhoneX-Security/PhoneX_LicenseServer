@@ -21,8 +21,10 @@ Parameters: $user
                 <td>{{ $subscriberContact->pivot->displayName }}</td>
                 <td>
                     <div class="btn-group  btn-group-xs">
+                        @if($subscriberContact->user)
                         <a type="button" class="btn btn-danger" href="#" title="Delete"
                            data-href="/users/{{$user->id}}/cl/delete/{{$subscriberContact->user->id}}" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i> Delete</a>
+                        @endif
                     </div>
                 </td>
             </tr>
