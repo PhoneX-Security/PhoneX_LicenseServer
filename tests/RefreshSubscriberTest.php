@@ -18,9 +18,8 @@ class RefreshSubscriberTest extends TestCase {
         $this->be($user);
     }
 
-
-    public function testRetrieveActiveLicense(){
-        $this->mockQueuePush(); //dirtyfix
+    public function testRetrieveActiveLicense()
+    {
 
         $user = $this->createUser(self::TEST_NAME_1);
 
@@ -34,9 +33,35 @@ class RefreshSubscriberTest extends TestCase {
         $c = new IssueLicense($user, $licType, $licFuncType, "pass");
         $l1 = Bus::dispatch($c);
 
-//        $recentLic = RefreshSubscribers::getActiveLicense($user);
-        $recentLic = $user->getActiveLicenseWithLatestExpiration();
+        $recentLic = RefreshSubscribers::getActiveLicenseWithLatestExpiration($user);
         $this->assertEquals($l1->id, $recentLic->id);
+    }
+
+    public function testChangeLicAndRunUpdate()
+    {
+        $user = $this->createUser(self::TEST_NAME_1);
+
+        $licWeekType = LicenseType::getWeek();
+        $licMonthType = LicenseType::getMonth();
+        $licFuncType = LicenseFuncType::getFull();
+
+        $c1 = new CreateSubscriberWithLicense($user, $licMonthType, $licFuncType, "pass");
+        $l1 = Bus::dispatch($c1);
+
+        $c2 = new IssueLicense($user, $licWeekType, $licFuncType, "pass");
+        $c2->startingAt(Carbon::now()->subDays(3));
+        $l2 = Bus::dispatch($c2);
+
+        // Refresh subscribers -- the first license should override expiration in subscriber
+        $refreshSubscribers = new RefreshSubscribers();
+        Bus::dispatch($refreshSubscribers);
+
+        // test if that happened
+        $user = User::find($user->id); // reload user
+        $this->assertTrue($user->current_license_starts_at->eq($l1->starts_at));
+        $this->assertTrue($user->current_license_expires_at->eq($l1->expires_at));
+        $this->assertTrue($user->subscriber->issued_on->eq($l1->starts_at));
+        $this->assertTrue($user->subscriber->expires_on->eq($l1->expires_at));
     }
 
 	public function testRetrieveFutureLicense(){

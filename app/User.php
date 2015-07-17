@@ -30,9 +30,9 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     protected $table = 'users';
 
+    protected $dates = ['current_license_starts_at', 'current_license_expires_at'];
 	protected $fillable = ['username', 'email', 'password', 'has_access'];
 	protected $sortable = ['username', 'email', 'has_access', 'id'];
-
 	protected $hidden = ['password', 'remember_token'];
 
     /* Relations */
@@ -106,37 +106,6 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         }
     }
 
-    public function getActiveLicenseWithLatestExpiration()
-    {
-        if ($this->licenses->isEmpty()){
-            return null;
-        }
-        $activeLicenses = $this->licenses->filter(function ($lic) {
-            $now = Carbon::now();
-            if ($lic->starts_at->lte($now) && $lic->expires_at->gte($now)) {
-                return true;
-            } else {
-                return false;
-            }
-        });
-
-        if ($activeLicenses->isEmpty()){
-            return null;
-        }
-
-        $activeLic = $activeLicenses->first();
-        foreach($activeLicenses as $lic){
-            $activeLic = $this->endingLater($activeLic, $lic);
-        }
-
-        return $activeLic;
-    }
-
-    private function endingLater(License $lic1, License $lic2){
-        return $lic2->expires_at->gte($lic1->expires_at) ? $lic2 : $lic1;
-    }
-
-
     public static function findByUsername($username){
         return User::where('username', $username)->first();
     }
@@ -164,8 +133,6 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         $this->groups()->detach();
         $this->delete();
     }
-
-
 
     /* ACL */
     /**

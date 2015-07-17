@@ -19,16 +19,39 @@
                 <div class="row form-inline" style="margin-bottom: 5px">
                     <div class="col-sm-6">
 
-                        <form class="form-horizontal" action="{{ route('users.index') }}" method="get">
+                        {{--<form class="form-horizontal" action="{{ route('users.index') }}" method="get">--}}
+
+                            {{--<div class="input-group">--}}
+                                {{--<input type="search" class="form-control input-sm" name="username"--}}
+                                       {{--value="{{ Input::get('username') }}" placeholder="Search">--}}
+                                {{--<span class="input-group-btn">--}}
+                                    {{--<button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>--}}
+                                {{--</span>--}}
+                            {{--</div>--}}
+                        {{--</form>--}}
+
+                        <form class="form-inline inline-block" action="{{ route('users.index') }}" method="get">
 
                             <div class="input-group">
-                                <input type="search" class="form-control input-sm" name="username"
-                                       value="{{ Input::get('username') }}" placeholder="Search">
-                                <span class="input-group-btn">
-                                    <button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
-                                </span>
+                                <input type="text" name="username" value="{{Request::get('username')}}" class="form-control input-sm pull-right" style="width: 150px;" placeholder="Search by username">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
+                                </div>
                             </div>
                         </form>
+
+                        <form class="form-inline inline-block"  action="{{ \URL::route('users.index') }}" method="get">
+                            <div class="form-group">
+                                <label for="group_input">Group</label>
+                                <select id="group_input" name="user_group[]" class="multiselect-basic"  multiple="multiple">
+                                    @foreach($groups as $group)
+                                        <option value="{{ $group->id }}" @if($group->selected) selected="selected" @endif>{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-default">Filter</button>
+                        </form>
+
 
                         {{--<div class="left-cell">--}}
                         {{--<form class="form-horizontal" style="width: 25%" action="{{ \URL::route('users.index') }}" method="get">--}}
@@ -72,7 +95,8 @@
                                 <th>{!! link_to_sort('username', 'Username') !!}</th>
                                 <th>{!! link_to_sort('email', 'E-mail') !!}</th>
                                 <th width="15%">Groups</th>
-                                <th>SIP - Last activity</th>
+                                <th>Last activity</th>
+                                <th>Current lic. expiration</th>
                                 <th>Phone / Version</th>
                                 <th>Location</th>
                                 <th>Roles</th>
@@ -97,6 +121,7 @@
                                     </td>
 
                                     <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
+                                    <td>@if($user->subscriber) {{ $user->subscriber->expires_on }} @endif</td>
                                     <td>
                                         @if($user->subscriber && $user->subscriber->app_version)
                                             {{$user->subscriber->app_version_obj->platformDesc() . " / " . $user->subscriber->app_version_obj->versionDesc()}}

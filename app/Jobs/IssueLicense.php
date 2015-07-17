@@ -72,6 +72,11 @@ class IssueLicense extends Command implements SelfHandling {
 
         $subscriber->save();
 
+        // update User's auxiliary columns
+        $this->user->current_license_starts_at = $license->starts_at;
+        $this->user->current_license_expires_at = $license->expires_at;
+        $this->user->save();
+
         Queue::push('licenseUpdated', ['username'=>$this->user->email], 'users');
         return $license;
 	}

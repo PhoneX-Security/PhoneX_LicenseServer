@@ -10,10 +10,10 @@ Parameters: $users
             <th>ID</th>
             <th>Username</th>
             <th>E-mail</th>
-            <th>SIP - Last activity</th>
+            <th>Last activity</th>
+            <th>Current lic. expiration</th>
             <th>Phone / Version</th>
             <th>Location</th>
-            <th>Roles</th>
             <th class="text-center">Options</th>
         </tr>
         </thead>
@@ -27,14 +27,9 @@ Parameters: $users
                     <a href="{{ \URL::route('users.show', [ $user->id ]) }}">{{ $user->username }}</a>
                 </td>
                 <td>{{ $user->email or '' }}</td>
-                <td>
-                    @foreach($user->groups as $k => $group)
-                        @if($k > 0), @endif
-                        {{ $group->name }}
-                    @endforeach
-                </td>
 
                 <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
+                <td>@if($user->subscriber) {{ $user->subscriber->expires_on }} @endif</td>
                 <td>
                     @if($user->subscriber && $user->subscriber->app_version)
                         {{$user->subscriber->app_version_obj->platformDesc() . " / " . $user->subscriber->app_version_obj->versionDesc()}}
@@ -60,7 +55,7 @@ Parameters: $users
         @endforeach
         </tbody>
     </table>
-    <p>Total: {{ $user->count() }}</p>
+    <p>Total: {{ $users->count() }}</p>
 @else
     No users
 @endif

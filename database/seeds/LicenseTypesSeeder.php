@@ -12,7 +12,7 @@ class LicenseTypesSeeder extends Seeder {
 	 */
 	public function run()
 	{
-        LicenseType::create(['name' => 'trial', 'days' => 7, 'is_trial' => 1, 'order' => 2]);
+        LicenseType::create(['name' => 'week', 'days' => 7, 'is_trial' => 1, 'order' => 2]);
         LicenseType::create(['name' => 'year', 'days' => 365, 'is_trial' => 0, 'order' => 6]);
         LicenseType::create(['name' => 'month', 'days' => 31, 'is_trial' => 0, 'order' => 3]);
         LicenseType::create(['name' => 'infinite', 'days' => 4000, 'is_trial' => 0, 'order' => 7]);

@@ -65,6 +65,9 @@ class CreateSubscriberWithLicense extends Command implements SelfHandling {
         $subscriber->save();
 
         $this->user->subscriber_id = $subscriber->id;
+        // update User's auxiliary columns
+        $this->user->current_license_starts_at = $license->starts_at;
+        $this->user->current_license_expires_at = $license->expires_at;
         $this->user->save();
 
         return $license;

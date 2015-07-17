@@ -45,4 +45,11 @@ class License extends Model{
             return true;
         }
     }
+
+    public static function endingLater(License $lic1, License $lic2){
+        return $lic2->expires_at->gte($lic1->expires_at) ? $lic2 : $lic1;
+    }
+    public static function startingEarlier(License $lic1, License $lic2){
+        return $lic2->starts_at->lte($lic1->starts_at) ? $lic2 : $lic1;
+    }
 }

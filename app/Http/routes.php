@@ -14,6 +14,7 @@
 use Phonex\BusinessCode;
 use Phonex\Jobs\IssueLicense;
 use Phonex\Group;
+use Phonex\Jobs\RefreshSubscribers;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\User;
