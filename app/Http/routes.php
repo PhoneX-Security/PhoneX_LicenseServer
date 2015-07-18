@@ -66,6 +66,9 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     /* Business Codes */
     Route::controller('bcodes', 'BusinessCodeController');
 
+    /* Statistics */
+    Route::controller('stats', 'StatsController');
+
     /* Admin only pages */
     Route::get('logs', ['acl-resource' => 'logs',
         'uses' => '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index'

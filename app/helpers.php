@@ -47,7 +47,7 @@ if (!function_exists('date_simple')){
         if (!$datetime){
             return '';
         } else {
-            return Carbon::parse($datetime)->format('d.m.Y');
+            return Carbon::parse($datetime)->format('Y-m-d.');
         }
     }
 }
@@ -124,7 +124,7 @@ if (!function_exists('bcodeDashes')) {
 
 /* Most commonly used function for getting Carbon object from input */
 if (!function_exists('carbonFromInput')){
-    function carbonFromInput($input){
-        return Carbon::createFromFormat("d-m-Y", $input);
+    function carbonFromInput($input, $format = "d-m-Y"){
+        return Carbon::createFromFormat($format, $input);
     }
 }

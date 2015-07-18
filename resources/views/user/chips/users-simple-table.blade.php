@@ -9,9 +9,11 @@ Parameters: $users
         <tr>
             <th>ID</th>
             <th>Username</th>
-            <th>E-mail</th>
+            <th>Created at</th>
             <th>Last activity</th>
-            <th>Current lic. expiration</th>
+            <th>Cur. lic. type</th>
+            {{--<th>Cur. lic. starts</th>--}}
+            <th>Cur. lic. expires</th>
             <th>Phone / Version</th>
             <th>Location</th>
             <th class="text-center">Options</th>
@@ -26,9 +28,11 @@ Parameters: $users
                 <td>
                     <a href="{{ \URL::route('users.show', [ $user->id ]) }}">{{ $user->username }}</a>
                 </td>
-                <td>{{ $user->email or '' }}</td>
+                <td>{{ $user->dateCreated }}</td>
 
                 <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
+                <td>@if($user->subscriber) {{ $user->subscriber->license_type }} @endif</td>
+{{--                <td>@if($user->subscriber) {{ $user->subscriber->issued_on }} @endif</td>--}}
                 <td>@if($user->subscriber) {{ $user->subscriber->expires_on }} @endif</td>
                 <td>
                     @if($user->subscriber && $user->subscriber->app_version)

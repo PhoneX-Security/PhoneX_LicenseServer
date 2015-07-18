@@ -1,17 +1,19 @@
 <?php namespace Phonex\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Phonex\Utils\DateRangeValidator;
+use Validator;
 
 class AppServiceProvider extends ServiceProvider {
 
 	/**
 	 * Bootstrap any application services.
 	 *
-	 * @return void
 	 */
 	public function boot()
 	{
-		//
+		// provide a new custom validator
+		Validator::extend('date_range',  DateRangeValidator::class . '@validate');
 	}
 
 	/**

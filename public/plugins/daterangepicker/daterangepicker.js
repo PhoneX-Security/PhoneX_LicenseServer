@@ -140,8 +140,10 @@
             this.applyClass = 'btn-success';
             this.cancelClass = 'btn-default';
 
-            this.format = 'MM/DD/YYYY';
-            this.separator = ' - ';
+            //this.format = 'MM/DD/YYYY';
+            // This would be default format
+            this.format = 'YYYY-MM-DD';
+            this.separator = ' : ';
 
             this.locale = {
                 applyLabel: 'Apply',

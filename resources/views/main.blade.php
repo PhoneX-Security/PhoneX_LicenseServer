@@ -19,6 +19,9 @@
     <link href="/dist/css/skins/skin-blue-light.min.css" rel="stylesheet" type="text/css" />
 
     <link href="/plugins/datepicker/datepicker3.css" rel="stylesheet" type="text/css" />
+    <link href="/plugins/daterangepicker/daterangepicker-bs3.css" rel="stylesheet" type="text/css" />
+
+    <link href="/plugins/multiselect/bootstrap-multiselect.css" rel="stylesheet" type="text/css" />
 
     <link href="/css/custom.css" rel="stylesheet" type="text/css" />
 
@@ -31,7 +34,13 @@
     <!-- AdminLTE App -->
     <script src="/dist/js/app.min.js" type="text/javascript"></script>
 
+    <!-- Date & date range picker -->
     <script src="/plugins/datepicker/bootstrap-datepicker.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js" type="text/javascript"></script>
+    <script src="/plugins/daterangepicker/daterangepicker.js" type="text/javascript"></script>
+
+    {{--Multiselect--}}
+    <script src="/plugins/multiselect/bootstrap-multiselect.js" type="text/javascript"></script>
 
     <script src="/js/custom.js"></script>
 
