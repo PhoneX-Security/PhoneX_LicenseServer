@@ -32,7 +32,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     protected $dates = ['current_license_starts_at', 'current_license_expires_at'];
 	protected $fillable = ['username', 'email', 'password', 'has_access'];
-	protected $sortable = ['username', 'email', 'has_access', 'id'];
+	protected $sortable = ['username', 'email', 'has_access', 'id', 'current_license_expires_at'];
 	protected $hidden = ['password', 'remember_token'];
 
     /* Relations */
