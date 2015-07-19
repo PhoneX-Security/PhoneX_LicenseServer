@@ -17,7 +17,7 @@ class BusinessAccountCreationTest extends TestCase {
     use DatabaseTransactions;
 
     const URL = '/account/business-account';
-    const TEST_USERNAME = "kajsmentke_sk";
+    const TEST_USERNAME = "kajsmentke_sk1";
     const TEST_USERNAME2 = "kozmeker_sk";
     const TEST_USERNAME3 = "fajnsmeker_sk";
     const TEST_USERNAME_NON_EXISTING = "kajsmeker";

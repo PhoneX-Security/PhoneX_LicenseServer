@@ -96,7 +96,7 @@
                                 <th>{!! link_to_sort('email', 'E-mail') !!}</th>
                                 <th width="15%">Groups</th>
                                 <th>Last activity</th>
-                                <th>{!! link_to_sort('current_license_expires_at', 'Current lic. expiration') !!}</th>
+                                <th>Active lic. expiration</th>
                                 <th>Phone / Version</th>
                                 <th>Location</th>
                                 <th>Roles</th>
@@ -122,7 +122,7 @@
 
                                     <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
 {{--                                    <td>@if($user->subscriber) {{ $user->subscriber->expires_on }} @endif</td>--}}
-                                    <td>{{ $user->current_license_expires_at }}</td>
+                                    <td>{{ $user->activeLicense->expires_at or '' }}</td>
                                     <td>
                                         @if($user->subscriber && $user->subscriber->app_version)
                                             {{$user->subscriber->app_version_obj->platformDesc() . " / " . $user->subscriber->app_version_obj->versionDesc()}}

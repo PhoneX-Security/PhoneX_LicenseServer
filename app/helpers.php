@@ -47,7 +47,7 @@ if (!function_exists('date_simple')){
         if (!$datetime){
             return '';
         } else {
-            return Carbon::parse($datetime)->format('Y-m-d.');
+            return Carbon::parse($datetime)->format('Y-m-d');
         }
     }
 }

@@ -49,9 +49,8 @@ class RefreshSubscribers extends Command implements SelfHandling {
 
                 if ($license != null){
                     // If auxiliary user columns are empty, fill them out
-                    if (!$user->current_license_starts_at || !$user->current_license_expires_at){
-                        $user->current_license_starts_at = $license->starts_at;
-                        $user->current_license_expires_at = $license->expires_at;
+                    if (!$user->activeLicense){
+                        $user->active_license_id = $license->id;
                         $user->save();
                     }
 
@@ -70,9 +69,8 @@ class RefreshSubscribers extends Command implements SelfHandling {
                         $subscriber->license_type = $license->licenseFuncType->name;
                         $subscriber->save();
 //
-//                        // also update user's auxiliary columns
-                        $user->current_license_starts_at = $license->starts_at;
-                        $user->current_license_expires_at = $license->expires_at;
+//                        // also update user's auxiliary column
+                        $user->active_license_id = $license->id;
                         $user->save();
 
                         // TODO enable this when we have confidence this function works well

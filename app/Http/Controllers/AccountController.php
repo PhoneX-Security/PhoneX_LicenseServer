@@ -91,18 +91,13 @@ class AccountController extends Controller {
     public function postTrial(Request $request){
         $username = null;
         try {
-            $this->checkCompulsoryFields($request, ['version', 'captcha', 'imei']);
+            $this->checkCompulsoryFields($request, ['version', 'captcha', 'imei', 'username']);
             $this->checkValidRequestVersion($request);
             $this->checkCorrectCaptcha($request);
-
-            if ($request->has('username')){
-                // username has to be lowercase
-                $username = strtolower($request->get('username'));
-                // check username validity
-                $this->checkUsernameValid($username);
-            }
+            $username = $request->get('username');
+            $this->checkUsernameValid($username);
         } catch (\Exception $e){
-//            Log::error("postTrial; verification checked failed", [$e]);
+            Log::error("postTrial; verification checked failed", [$e]);
             return $this->responseError($e->getCode());
         }
 
@@ -112,9 +107,8 @@ class AccountController extends Controller {
         $trialRequest->fill($request->all());
         $trialRequest->ip = $request->getClientIp();
         $trialRequest->isApproved = $isValid;
-        if ($username){
-            $trialRequest->username = $username;
-        }
+        $trialRequest->username = $username;
+
         $trialRequest->save();
 
         if ($isValid) {
@@ -203,20 +197,19 @@ class AccountController extends Controller {
 
     private function issueTrialAccount(TrialRequest $trialRequest){
         $isQaTrial = $this->isPhonexIp(\Input::getClientIp());
-        $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
+//        $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
+        $username = $trialRequest->username;
 
-        $username = ($trialRequest->username) ? $trialRequest->username : 'trial' . $trialNumber;
-
-        if ($isQaTrial){
-            $username = 'qa_trial' . $trialNumber;
-        }
+//        if ($isQaTrial){
+//            $username = 'qa_trial' . $trialNumber;
+//        }
 
         $licenseType = LicenseType::find(1); // MAGIC ID - week is #1
         $licenseFuncType = LicenseFuncType::getTrial();
         $sipPassword = rand(100000, 999999);
 
         try {
-            $createUserCommand = new CreateUser($username, [], $isQaTrial, $trialNumber);
+            $createUserCommand = new CreateUser($username, [], $isQaTrial);
             $user = $this->dispatch($createUserCommand);
 
             $createLicCommand = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $sipPassword);

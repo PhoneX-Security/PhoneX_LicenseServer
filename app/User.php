@@ -30,9 +30,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     protected $table = 'users';
 
-    protected $dates = ['current_license_starts_at', 'current_license_expires_at'];
 	protected $fillable = ['username', 'email', 'password', 'has_access'];
-	protected $sortable = ['username', 'email', 'has_access', 'id', 'current_license_expires_at'];
+	protected $sortable = ['username', 'email', 'has_access', 'id'];
 	protected $hidden = ['password', 'remember_token'];
 
     /* Relations */
@@ -40,24 +39,38 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 		return $this->hasMany('Phonex\License', 'user_id');
 	}
 
-    public function issuedLicenses(){
+    /**
+     * Auxiliary column 'active_license_id' is computed periodically (see RefreshSubscriber) and points to current active license
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function activeLicense()
+    {
+        return $this->hasOne('Phonex\License', 'id', 'active_license_id');
+    }
+
+    public function issuedLicenses()
+    {
         return $this->hasMany('Phonex\License', 'issuer_id');
     }
 
-    public function createdBusinessCodes(){
+    public function createdBusinessCodes()
+    {
         return $this->hasMany('Phonex\BusinessCode', 'creator_id');
     }
 
-    public function subscriber(){
+    public function subscriber()
+    {
         // weird, parameters 2 + 3 are switched ()
         return $this->hasOne('Phonex\Subscriber', 'id', 'subscriber_id');
     }
 
-    public function groups(){
+    public function groups()
+    {
         return $this->belongsToMany('Phonex\Group', 'user_group', 'user_id', 'group_id');
     }
 
-    public function roles(){
+    public function roles()
+    {
         return $this->belongsToMany('Phonex\Role', 'user_role', 'user_id', 'role_id');
     }
 
@@ -115,6 +128,10 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     }
 
     public function deleteWithLicenses(){
+        // first invalid active license pointer
+        $this->active_license_id = null;
+        $this->save();
+
         $licenses = $this->licenses;
         foreach($licenses as $license){
             $license->delete();

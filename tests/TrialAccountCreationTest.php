@@ -7,12 +7,12 @@ use Phonex\Subscriber;
 use Phonex\TrialRequest;
 use Phonex\User;
 
-class TrialAccountCreationTest extends TestCase {
+class gTrialAccountCreationTest extends TestCase {
     // this wraps all tests in a transaction
     use DatabaseTransactions;
 
     const URL = '/account/trial';
-    const TEST_USERNAME = "qatrialacctest";
+    const TEST_USERNAME = "qatrialacctest2";
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -42,14 +42,14 @@ class TrialAccountCreationTest extends TestCase {
 
     public function testInvalidVersion(){
         $this->callAndCheckResponse(self::URL,
-            ['version' => AccountController::VERSION + 1, 'imei' => 'a', 'captcha' =>'captcha'],
+            ['version' => AccountController::VERSION + 1, 'imei' => 'a', 'captcha' =>'captcha', 'username' => 'someusername'],
             AccountController::RESP_ERR_UNSUPPORTED_VERSION
         );
     }
 
     public function testBadCaptcha(){
         $this->callAndCheckResponse(self::URL,
-            ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'bad_captcha'],
+            ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'bad_captcha', 'username' => 'someusername'],
             AccountController::RESP_ERR_BAD_CAPTCHA,
             AccountController::TEST_NON_QA_IP
         );
@@ -69,32 +69,32 @@ class TrialAccountCreationTest extends TestCase {
         );
     }
 
-    // continue with normal tests
-    public function testTrialCreation(){
-        try {
-            $userCount = User::all()->count();
-            $licenseCount = License::all()->count();
-            $subscriberCount = Subscriber::all()->count();
-            $trialReqCount = TrialRequest::all()->count();
-
-            $response = $this->call('POST', self::URL, ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'captcha']);
-            $json = json_decode($response->getContent());
-//            var_dump($response);
-            $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
-
-            // assert all records created
-            $this->assertEquals($userCount + 1, User::all()->count());
-            $this->assertEquals($licenseCount + 1, License::all()->count());
-            $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
-            $this->assertEquals($trialReqCount + 1, TrialRequest::all()->count());
-        } finally {
-            // Subscriber has to be deleted manually - tables use MyISAM engine and are on a different server, do not support transactions
-            $user = User::where('username', $json->username)->first();
-            if ($user){
-                $user->subscriber->deleteWithContactListRecords();
-            }
-        }
-    }
+//    // Disabled - automatic trial name assigning is disabled
+//    public function testTrialCreation(){
+//        try {
+//            $userCount = User::all()->count();
+//            $licenseCount = License::all()->count();
+//            $subscriberCount = Subscriber::all()->count();
+//            $trialReqCount = TrialRequest::all()->count();
+//
+//            $response = $this->call('POST', self::URL, ['version' => AccountController::VERSION, 'imei' => 'a', 'captcha' =>'captcha']);
+//            $json = json_decode($response->getContent());
+////            var_dump($response);
+//            $this->assertEquals(AccountController::RESP_OK, $json->responseCode);
+//
+//            // assert all records created
+//            $this->assertEquals($userCount + 1, User::all()->count());
+//            $this->assertEquals($licenseCount + 1, License::all()->count());
+//            $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
+//            $this->assertEquals($trialReqCount + 1, TrialRequest::all()->count());
+//        } finally {
+//            // Subscriber has to be deleted manually - tables use MyISAM engine and are on a different server, do not support transactions
+//            $user = User::where('username', $json->username)->first();
+//            if ($user){
+//                $user->subscriber->deleteWithContactListRecords();
+//            }
+//        }
+//    }
 
     public function testTrialCreationWithUsername(){
         try {

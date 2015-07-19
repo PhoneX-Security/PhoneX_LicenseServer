@@ -9,7 +9,7 @@ use Phonex\LicenseType;
 use Phonex\User;
 
 class RefreshSubscriberTest extends TestCase {
-    const TEST_NAME_1 = "jano";
+    const TEST_NAME_1 = "jano3";
 
     public function setUp()
     {
@@ -58,8 +58,7 @@ class RefreshSubscriberTest extends TestCase {
 
         // test if that happened
         $user = User::find($user->id); // reload user
-        $this->assertTrue($user->current_license_starts_at->eq($l1->starts_at));
-        $this->assertTrue($user->current_license_expires_at->eq($l1->expires_at));
+        $this->assertTrue($user->active_license_id === ($l1->id));
         $this->assertTrue($user->subscriber->issued_on->eq($l1->starts_at));
         $this->assertTrue($user->subscriber->expires_on->eq($l1->expires_at));
     }

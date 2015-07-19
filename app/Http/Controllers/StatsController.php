@@ -69,8 +69,13 @@ class StatsController extends Controller {
         }
         $daterange = $dateFrom->toDateString() . " : " . $dateTo->toDateString();
         return view('stats.new-users', compact('licFuncTypes', 'users','daterange'));
+    }
+
+    public function getNewUsersGraphs()
+    {
 
     }
+
 
     public function getLastActivity()
     {

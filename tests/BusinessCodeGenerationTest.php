@@ -13,7 +13,6 @@ class BusinessCodeGenerationTest extends TestCase {
 	{
 		$code = BusinessCode::getCode();
         $this->assertTrue(BusinessCode::parityCheck($code));
-        echo "$code \n";
 
         // now change first character to a bad one
         $badCode = $code;
@@ -22,13 +21,11 @@ class BusinessCodeGenerationTest extends TestCase {
         $position = array_search($badCode[$lastPos], str_split(BusinessCode::$chars));
         $position = ($position + 1) % strlen(BusinessCode::$chars);
         $badCode[$lastPos] = BusinessCode::$chars[$position];
-        echo "$badCode \n";
         $this->assertFalse(BusinessCode::parityCheck($badCode));
 
         // prefix code
         $codeMp = BusinessCode::getCode('mp');
         $this->assertTrue(BusinessCode::parityCheck($codeMp));
-        echo "$codeMp \n";
 	}
 
 }
