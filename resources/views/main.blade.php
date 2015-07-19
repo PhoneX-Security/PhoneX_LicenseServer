@@ -42,6 +42,8 @@
     {{--Multiselect--}}
     <script src="/plugins/multiselect/bootstrap-multiselect.js" type="text/javascript"></script>
 
+    @yield('js-scripts')
+
     <script src="/js/custom.js"></script>
 
 

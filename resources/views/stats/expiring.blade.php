@@ -1,6 +1,6 @@
 @extends('content-with-header')
 
-@section('title', 'New users')
+@section('title', 'Users with expiring licenses')
 
 @section('content')
     @parent
@@ -10,9 +10,9 @@
 
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">...</h3>
+                <h3 class="box-title">..</h3>
                 <div class="box-tools">
-                    <form class="form-inline inline-block"  action="/stats/new-users" method="get">
+                    <form class="form-inline inline-block"  action="/stats/expiring" method="get">
 
                         <div class="form-group">
                             <label for="lic_func_types" style="margin: 0 5px">License types</label>
@@ -24,7 +24,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="exampleInputEmail1" style="margin: 0 5px"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i> Range </label>
+                            <label for="exampleInputEmail1" style="margin: 0 5px"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i> License expiring in </label>
                             <input style="width: 170px" type="text" class="form-control" value="{{old('daterange', $daterange)}}" name="daterange">
                         </div>
 
@@ -40,12 +40,8 @@
                                         "firstDay": 1
                                     },
                                     ranges: {
-                                        'Today': [moment().subtract(1, 'days'), moment()],
-                                        'Yesterday': [moment().subtract(2, 'days'), moment().subtract(1, 'days')],
-                                        'Last 7 Days': [moment().subtract(7, 'days'), moment()],
-                                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                                        'This Month': [moment().startOf('month'), moment().endOf('month')],
-                                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                                        'Next 7 Days': [moment(), moment().add(6, 'days')],
+                                        'In two weeks': [moment().add(7, 'days'), moment().add(13, 'days')],
                                     }
                                 }, cb);
                             });

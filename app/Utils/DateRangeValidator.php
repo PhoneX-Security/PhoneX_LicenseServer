@@ -17,7 +17,7 @@ class DateRangeValidator
      * @param $parameters
      * @return bool
      */
-    public function validate($attribute, $value, $parameters)
+    public function validateDateRange($attribute, $value, $parameters)
     {
         $dateFormat = $parameters[0];
         $dates = explode(':', $value);
@@ -31,6 +31,19 @@ class DateRangeValidator
             }
         }
         return true;
+    }
+
+    /**
+     * Parse Carbon dates from dateRange value
+     * @param $value
+     * @param string $format
+     * @return array [$dateFrom, $dateTo]
+     */
+    public static function retrieveDates($value, $format = 'Y-m-d')
+    {
+        return array_map(function($item) use ($format){
+            return carbonFromInput(trim($item), $format);
+        }, explode(":", $value) );
     }
 
     private function validateDate($date, $format)

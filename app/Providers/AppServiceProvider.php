@@ -2,6 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 use Phonex\Utils\DateRangeValidator;
+use Phonex\Utils\Stats;
 use Validator;
 
 class AppServiceProvider extends ServiceProvider {
@@ -31,6 +32,10 @@ class AppServiceProvider extends ServiceProvider {
 			'Illuminate\Contracts\Auth\Registrar',
 			'Phonex\Services\Registrar'
 		);
+
+		$this->app->singleton(Stats::class, function(){
+			return new Stats();
+		});
 	}
 
 }
