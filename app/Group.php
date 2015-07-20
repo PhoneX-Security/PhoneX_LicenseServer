@@ -15,4 +15,9 @@ class Group extends Model{
     {
         return $this->belongsTo('Phonex\User', 'owner_id');
     }
+
+    public function bcodes()
+    {
+        return $this->hasMany('Phonex\BusinessCode', 'group_id');
+    }
 }

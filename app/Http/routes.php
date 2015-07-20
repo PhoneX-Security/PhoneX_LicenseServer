@@ -60,6 +60,7 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     /* Group */
     Route::resource('groups', 'GroupController');
     Route::get('groups/{user}/users', ['as' => 'groups.users', 'uses' => 'GroupController@showUsers']);
+    Route::get('groups/{user}/bcodes', ['as' => 'groups.bcodes', 'uses' => 'GroupController@showCodes']);
 
     /* Licenses */
     Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);

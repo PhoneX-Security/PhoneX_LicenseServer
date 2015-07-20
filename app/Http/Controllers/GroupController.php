@@ -51,6 +51,12 @@ class GroupController extends Controller {
         return view('group.show-users', compact('group'));
     }
 
+    public function showCodes($id)
+    {
+        $group = Group::with('bcodes')->findOrFail($id);
+        return view('group.show-bcodes', compact('group'));
+    }
+
     public function edit($id)
     {
         $group = Group::findOrFail($id);
