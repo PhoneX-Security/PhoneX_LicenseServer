@@ -170,8 +170,11 @@ class AccountController extends Controller {
             $user->save();
 
             // add support account
+            // Biggest priority has parent, then group owner, than phonex-support
             if ($businessCode->parent_id != null){
                 ContactList::addSupportToContactListMutually($user, $businessCode->parent);
+            } else if($businessCode->group && $businessCode->group->owner) {
+                ContactList::addSupportToContactListMutually($user, $businessCode->group->owner);
             } else {
                 // no parent id, add default support account
                 ContactList::addSupportToContactListMutually($user);

@@ -190,13 +190,16 @@ class UserController extends Controller {
         if ($user == null){
             throw new NotFoundHttpException;
         }
-        $data = $stats->userLastActivity($user, 90);
-        $labels = $stats->labelsPer(90, Stats::DAY);
+
+        $days = 90;
+
+        $data = $stats->userLastActivity($user, $days);
+        $labels = $stats->labelsPer($days, Stats::DAY);
         $labels = array_map(function($item){
             return '"' . $item . '"';
         }, $labels);
 
-        return view('user.show-stats', compact('user', 'labels', 'data'));
+        return view('user.show-stats', compact('user', 'labels', 'data', 'days'));
     }
 
 	public function update($id, UpdateUserRequest $request)

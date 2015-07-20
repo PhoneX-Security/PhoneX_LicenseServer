@@ -22,6 +22,9 @@ class BusinessAccountCreationTest extends TestCase {
     const TEST_USERNAME3 = "fajnsmeker_sk";
     const TEST_USERNAME_NON_EXISTING = "kajsmeker";
 
+    const GROUP_NAME = "slovenskooo";
+
+
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -124,12 +127,12 @@ class BusinessAccountCreationTest extends TestCase {
             Bus::dispatch($commandSub);
 
             // predefined group + license type
-            $mpGroup = Group::where('name', 'Mobil Pohotovost')->first();
-            $mpLicenseType = LicenseType::where('name', 'half_year')->first();
-            $mpLicenseFuncType = LicenseFuncType::getFull();
+            $group = Group::create(['name' => self::GROUP_NAME]);//Group::where('name', 'Mobil Pohotovost')->first();
+            $licenseType = LicenseType::getHalfYear();
+            $licenseFuncType = LicenseFuncType::getFull();
 
-            $command = new CreateBusinessCodePair($user1, $mpLicenseType, $mpLicenseFuncType);
-            $command->addGroup($mpGroup);
+            $command = new CreateBusinessCodePair($user1, $licenseType, $licenseFuncType);
+            $command->addGroup($group);
             $codePair = Bus::dispatch($command);
 
             // remember counts
@@ -197,7 +200,7 @@ class BusinessAccountCreationTest extends TestCase {
 
             // now create user1 and generate code pair
             $licType = LicenseType::find(1);
-            $licFuncType = \Phonex\LicenseFuncType::getTrial();
+            $licFuncType = LicenseFuncType::getTrial();
             $command = new CreateUser($username1);
             $user1 = Bus::dispatch($command);
             $commandSub = new CreateSubscriberWithLicense($user1, $licType, $licFuncType, 'fasirka_heslo');
@@ -236,6 +239,44 @@ class BusinessAccountCreationTest extends TestCase {
             $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user2->subscriber));
         } finally {
             $this->deleteSubscribers([$username1, $username2, $username3]);
+        }
+    }
+
+    public function testAccountCreationWithGroupOwner(){
+        // Mock Queue push because it might trigger Stack Overflow
+        $this->mockQueuePush();
+
+        try {
+            $username1 = self::TEST_USERNAME;
+            $username2 = self::TEST_USERNAME2;
+
+            $licType = LicenseType::getWeek();
+            $licFuncType = LicenseFuncType::getTrial();
+            $command = new CreateUser($username1);
+            $user1 = Bus::dispatch($command);
+            $commandSub = new CreateSubscriberWithLicense($user1, $licType, $licFuncType, 'fasirka_heslo');
+            Bus::dispatch($commandSub);
+
+            $group = Group::create(['name' => self::GROUP_NAME, 'owner_id' => $user1->id]);
+
+            $command = new CreateBusinessCodePair($user1, $licType, $licFuncType);
+            $command->addGroup($group);
+            $codePair = Bus::dispatch($command);
+
+            // use 1. code
+            $this->callAndCheckResponse(
+                self::URL,
+                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username2,'bcode' => $codePair[0]->code],
+                AccountController::RESP_OK
+            );
+
+            // check both have themselves and support account in cl
+            // check user2 has user1 as a support account (as a owner of a group)
+            $user2 = User::findByUsername($username2);
+
+            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user1->subscriber));
+        } finally {
+            $this->deleteSubscribers([$username1, $username2]);
         }
     }
 }

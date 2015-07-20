@@ -97,8 +97,10 @@
 
                     </div>
 
-                    <p><b>Axis X</b> represents sum of specific events per day (certificate download, login and certificate signing).  <br />
-                    </p><b>Axis Y</b> represents time for last 90 days.
+                    <br />
+
+                    <p><b>Axis X</b> - sum of specific events per day (certificate download, login and certificate signing).  <br />
+                    </p><b>Axis Y</b> - time for last {{$days}} days.
 
                 </div>
             </div>
