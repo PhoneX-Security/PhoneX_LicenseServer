@@ -46,7 +46,7 @@
                 <div class="row">
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="password" class="control-label">Expiration type</label>
+                            <label for="password" class="control-label">Expiration</label>
                             <select name="license_type_id" class="form-control" >
                                 @foreach($licenseTypes as $type)
                                     <option @if($type->default) selected="selected" @endif
@@ -55,11 +55,14 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="" class="control-label">Type</label>
-                            <input class="form-control" disabled value="Full" type="text" >
-                        </div>
+                        <label for="license_func_type_id" class="control-label">Type</label>
+                        <select id="license_func_type_id" name="license_func_type_id" class="form-control">
+                            @foreach($licenseFuncTypes as $type)
+                                <option value="{{ $type->id }}" @if($type->default) selected="selected" @endif>{{ ucfirst($type->name) }} </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="col-md-2">
@@ -71,7 +74,7 @@
                                     <option value="{{ $group->id }}">{{ $group->name }} </option>
                                 @endforeach
                             </select>
-                            <span class="help-block">User will be added to this group. Its owner will be added as support account.</span>
+                            <span class="help-block">User will be added to this group. Its owner will be added as a support account.</span>
                         </div>
                     </div>
 
@@ -83,11 +86,8 @@
                             <span class="help-block">Parent user will be added as a support account. (This has bigger priority than group's owner)</span>
                         </div>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
 

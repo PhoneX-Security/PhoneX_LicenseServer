@@ -67,18 +67,25 @@ class BusinessCodeController extends Controller {
         $groups = Group::all();
         $licenseTypes = LicenseType::all();
         foreach ($licenseTypes as $lt){
-            if ($lt->name == 'quarter'){
+            if ($lt->name === LicenseType::EXPIRATION_QUARTER){
                 $lt->default = true;
             }
         }
-        return view('bcode.create_pair', compact('groups', 'licenseTypes'));
+        $licenseFuncTypes = LicenseFuncType::all();
+        foreach ($licenseFuncTypes as $lft){
+            if ($lft->name === LicenseFuncType::TYPE_TRIAL){
+                $lt->default = true;
+            }
+        }
+
+        return view('bcode.create_pair', compact('groups', 'licenseTypes', 'licenseFuncTypes'));
     }
 
     public function postGenerateCodePairs(GenerateCodePairsRequest $request)
     {
         $group = Group::find($request->get('group_id'));
         $licenseType = LicenseType::find($request->get('license_type_id'));
-        $licenseFuncType = LicenseFuncType::getFull();
+        $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
 
         $numberOfPairs = $request->get('number_of_pairs');
         $email = $request->get('email');
