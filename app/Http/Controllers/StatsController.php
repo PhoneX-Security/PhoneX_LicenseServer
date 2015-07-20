@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Phonex\Http\Requests;
 use Phonex\LicenseFuncType;
+use Phonex\LicenseType;
 use Phonex\User;
 use Phonex\Utils\DateRangeValidator;
 use Phonex\Utils\Stats;
@@ -29,19 +30,33 @@ class StatsController extends Controller {
             list($dateFrom, $dateTo) = DateRangeValidator::retrieveDates($request->get('daterange'));
         }
 
-        // Load func types
+        // Load licenses types
+        $filteredLicTypeIds = $request->get('lic_type_ids', []);
+        $licTypes = $this->loadLicTypes($filteredLicTypeIds);
+
         $filteredLicFuncTypeIds = $request->get('lic_func_type_ids', []);
         $licFuncTypes = $this->loadLicFuncTypes($filteredLicFuncTypeIds);
 
-        $users = User::with('subscriber')
+         $query = User::select(['users.*', 'licenses.license_func_type_id', 'licenses.license_type_id'])
+            ->join('licenses','users.active_license_id', '=', 'licenses.id')
             ->where('dateCreated', '<=', $dateTo)
             ->where('dateCreated' , '>=', $dateFrom)
-            ->orderBy('dateCreated', 'DESC')
-            ->get();
-        $users = $this->filterUsersByLicFuncTypes($users, $filteredLicFuncTypeIds);
+            ->with(['subscriber', 'licenses'])
+            ->orderBy('dateCreated', 'DESC');
+
+        if ($filteredLicTypeIds){
+            $query = $query->whereIn('license_type_id', $filteredLicTypeIds);
+        }
+        if ($filteredLicFuncTypeIds){
+            $query = $query->whereIn('license_func_type_id', $filteredLicFuncTypeIds);
+        }
+
+        $users = $query->get();
+        $users = $this->filterUsersWithSubscriber($users, $filteredLicFuncTypeIds);
 
         $daterange = $dateFrom->toDateString() . " : " . $dateTo->toDateString();
-        return view('stats.new-users', compact('licFuncTypes', 'users','daterange'));
+
+        return view('stats.new-users', compact('licTypes', 'licFuncTypes', 'users','daterange'));
     }
 
     // options:
@@ -64,36 +79,46 @@ class StatsController extends Controller {
             list($dateFrom, $dateTo) = DateRangeValidator::retrieveDates($request->get('daterange'));
         }
 
-        // Load func types
+        // Load licenses types
+        $filteredLicTypeIds = $request->get('lic_type_ids', []);
+        $licTypes = $this->loadLicTypes($filteredLicTypeIds);
+
         $filteredLicFuncTypeIds = $request->get('lic_func_type_ids', []);
         $licFuncTypes = $this->loadLicFuncTypes($filteredLicFuncTypeIds);
 
         // join here is only for ability of directly filtering expiration dates of active licenses
-        $users = User::select(['users.*', 'licenses.expires_at'])
+        $query = User::select(['users.*', 'licenses.license_func_type_id', 'licenses.license_type_id'])
             ->join('licenses','users.active_license_id', '=', 'licenses.id')
             ->where('licenses.expires_at', '<=', $dateTo)
             ->where('licenses.expires_at' , '>=', $dateFrom)
             ->with('licenses')
-            ->orderBy('licenses.expires_at', 'ASC')
-            ->get();
-        $users = $this->filterUsersByLicFuncTypes($users, $filteredLicFuncTypeIds);
+            ->orderBy('licenses.expires_at', 'ASC');
+
+        if ($filteredLicTypeIds){
+            $query = $query->whereIn('license_type_id', $filteredLicTypeIds);
+        }
+        if ($filteredLicFuncTypeIds){
+            $query = $query->whereIn('license_func_type_id', $filteredLicFuncTypeIds);
+        }
+
+        $users = $query->get();
+        $users = $this->filterUsersWithSubscriber($users, $filteredLicFuncTypeIds);
 
         $daterange = $dateFrom->toDateString() . " : " . $dateTo->toDateString();
-        return view('stats.expiring', compact('licFuncTypes', 'users','daterange'));
+        return view('stats.expiring', compact('licTypes', 'licFuncTypes', 'users','daterange'));
     }
 
-    private function filterUsersByLicFuncTypes(Collection $users, array $filteredLicFuncTypeIds)
+    private function filterUsersWithSubscriber(Collection $users, array $filteredLicFuncTypeIds)
     {
         return $users->filter(function($user) use ($filteredLicFuncTypeIds){
             if (!$user->subscriber){
                 // we want only users with subscribers
                 return false;
             }
-
-            if ($filteredLicFuncTypeIds && !in_array($user->activeLicense->license_func_type_id, $filteredLicFuncTypeIds)){
-                // filter out unwanted licenses
-                return false;
-            }
+//            if ($filteredLicFuncTypeIds && !in_array($user->activeLicense->license_func_type_id, $filteredLicFuncTypeIds)){
+//                // filter out unwanted licenses
+//                return false;
+//            }
             return true;
         });
     }
@@ -107,10 +132,19 @@ class StatsController extends Controller {
         return $licFuncTypes;
     }
 
+    private function loadLicTypes(array $filteredTypeIds)
+    {
+        $licTypes = LicenseType::all();
+        foreach($licTypes as $funcType){
+            $funcType->selected = in_array($funcType->id, $filteredTypeIds);
+        }
+        return $licTypes;
+    }
+
     public function getUsersStatistics(Stats $stats)
     {
-        $counts = $stats->newUsersPer(15, Stats::WEEK);
-        $labels = $stats->labelsPer(15, Stats::WEEK);
+        $counts = $stats->newUsersPer(16, Stats::WEEK);
+        $labels = $stats->labelsPer(16, Stats::WEEK);
 
         // Prepare for JS print
         $labels = array_map(function($item){

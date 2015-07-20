@@ -53,6 +53,7 @@ class LicenseType extends Model{
     }
 
     /* Accessors */
+    //uc_name_with_days
     public function getUcNameWithDaysAttribute()
     {
         return ucfirst($this->name) . " (" . $this->days . " days)";

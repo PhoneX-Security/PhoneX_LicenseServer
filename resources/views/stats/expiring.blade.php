@@ -15,6 +15,15 @@
                     <form class="form-inline inline-block"  action="/stats/expiring" method="get">
 
                         <div class="form-group">
+                            <label for="lic_types" style="margin: 0 5px">Expiration types</label>
+                            <select id="lic_types" name="lic_type_ids[]" class="multiselect-basic"  multiple="multiple">
+                                @foreach($licTypes as $licType)
+                                    <option value="{{ $licType->id }}" @if($licType->selected) selected="selected" @endif>{{ $licType->uc_name_with_days }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="lic_func_types" style="margin: 0 5px">License types</label>
                             <select id="lic_func_types" name="lic_func_type_ids[]" class="multiselect-basic"  multiple="multiple">
                                 @foreach($licFuncTypes as $licFuncType)
@@ -25,7 +34,7 @@
 
                         <div class="form-group">
                             <label for="exampleInputEmail1" style="margin: 0 5px"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i> License expiring in </label>
-                            <input style="width: 170px" type="text" class="form-control" value="{{old('daterange', $daterange)}}" name="daterange">
+                            <input type="text" class="form-control" value="{{old('daterange', $daterange)}}" name="daterange">
                         </div>
 
                         <script type="text/javascript">

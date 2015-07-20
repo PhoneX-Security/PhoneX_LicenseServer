@@ -31,7 +31,7 @@ Parameters: $users
                 <td>{{ $user->dateCreated }}</td>
 
                 <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
-                <td>@if($user->subscriber) {{ $user->subscriber->license_type }} @endif</td>
+                <td>@if($user->activeLicense) {{ $user->activeLicense->readable_type }} @endif</td>
 {{--                <td>@if($user->subscriber) {{ $user->subscriber->issued_on }} @endif</td>--}}
                 <td>@if($user->subscriber) {{ $user->subscriber->expires_on }} @endif</td>
                 <td>
