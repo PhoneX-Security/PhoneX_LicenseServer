@@ -41,7 +41,7 @@ class StatsController extends Controller {
             ->join('licenses','users.active_license_id', '=', 'licenses.id')
             ->where('dateCreated', '<=', $dateTo)
             ->where('dateCreated' , '>=', $dateFrom)
-            ->with(['subscriber', 'licenses'])
+            ->with(['subscriber','licenses', 'licenses.licenseType', 'licenses.licenseFuncType'])
             ->orderBy('dateCreated', 'DESC');
 
         if ($filteredLicTypeIds){
@@ -91,7 +91,7 @@ class StatsController extends Controller {
             ->join('licenses','users.active_license_id', '=', 'licenses.id')
             ->where('licenses.expires_at', '<=', $dateTo)
             ->where('licenses.expires_at' , '>=', $dateFrom)
-            ->with('licenses')
+            ->with(['subscriber','licenses', 'licenses.licenseType', 'licenses.licenseFuncType'])
             ->orderBy('licenses.expires_at', 'ASC');
 
         if ($filteredLicTypeIds){
