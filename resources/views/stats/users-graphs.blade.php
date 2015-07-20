@@ -3,7 +3,6 @@
 @section('title', 'Users statistics')
 
 @section('js-scripts')
-    <!-- ChartJS 1.0.1 -->
     <script src="/plugins/chartjs/Chart.min.js" type="text/javascript"></script>
 @endsection
 

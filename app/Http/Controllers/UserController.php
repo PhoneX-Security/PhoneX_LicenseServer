@@ -25,6 +25,7 @@ use Phonex\Subscriber;
 use Phonex\User;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
+use Phonex\Utils\Stats;
 use Redirect;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -172,7 +173,8 @@ class UserController extends Controller {
             ->with('success', 'New license to user ' . $user->username . ' has been issued.');
     }
 
-    public function showCl($id){
+    public function showCl($id)
+    {
         $user = User::with([
             'subscriber.subscribersInContactList.user'])->find($id);
 
@@ -180,6 +182,21 @@ class UserController extends Controller {
             throw new NotFoundHttpException;
         }
         return view('user.show-cl', compact('user'));
+    }
+
+    public function showStats($id, Stats $stats)
+    {
+        $user = User::find($id);
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
+        $data = $stats->userLastActivity($user, 90);
+        $labels = $stats->labelsPer(90, Stats::DAY);
+        $labels = array_map(function($item){
+            return '"' . $item . '"';
+        }, $labels);
+
+        return view('user.show-stats', compact('user', 'labels', 'data'));
     }
 
 	public function update($id, UpdateUserRequest $request)

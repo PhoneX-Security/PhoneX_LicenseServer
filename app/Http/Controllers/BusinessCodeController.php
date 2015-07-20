@@ -57,11 +57,13 @@ class BusinessCodeController extends Controller {
         return view('bcode.export-details', compact('codePairs', 'export'));
     }
 
-    public function getGenerateSingleCodes(){
+    public function getGenerateSingleCodes()
+    {
         die('TODO');
     }
 
-    public function getGenerateCodePairs(){
+    public function getGenerateCodePairs()
+    {
         $groups = Group::all();
         $licenseTypes = LicenseType::all();
         foreach ($licenseTypes as $lt){
@@ -72,7 +74,8 @@ class BusinessCodeController extends Controller {
         return view('bcode.create_pair', compact('groups', 'licenseTypes'));
     }
 
-    public function postGenerateCodePairs(GenerateCodePairsRequest $request){
+    public function postGenerateCodePairs(GenerateCodePairsRequest $request)
+    {
         $group = Group::find($request->get('group_id'));
         $licenseType = LicenseType::find($request->get('license_type_id'));
         $licenseFuncType = LicenseFuncType::getFull();

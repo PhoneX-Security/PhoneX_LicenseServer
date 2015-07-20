@@ -40,6 +40,7 @@
                                         "firstDay": 1
                                     },
                                     ranges: {
+                                        'Last 7 Days': [moment().subtract(7, 'days'), moment()],
                                         'Next 7 Days': [moment(), moment().add(6, 'days')],
                                         'In two weeks': [moment().add(7, 'days'), moment().add(13, 'days')],
                                     }

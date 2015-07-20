@@ -45,6 +45,7 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     // CL
     Route::get('users/{user}/licenses', ['as' => 'users.licenses', 'uses' => 'UserController@showLicenses']);
     Route::get('users/{user}/cl', ['as' => 'users.cl', 'uses' => 'UserController@showCl']);
+    Route::get('users/{user}/stats', ['as' => 'users.stats', 'uses' => 'UserController@showStats']);
 
     // Contact lists + alternative via get
     Route::delete('users/{user}/cl', ['uses' => 'UserController@deleteContact']);

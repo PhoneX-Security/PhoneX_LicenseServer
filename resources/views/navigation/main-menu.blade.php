@@ -20,13 +20,13 @@
     </li>
 
     <li class="treeview">
-        <a href="#"><i class='fa fa-bar-chart'></i> <span>Statistics</span> <i class="fa fa-angle-left pull-right"></i></a>
+        <a href="#"><i class='fa fa-bar-chart'></i> <span>Statistics & info</span> <i class="fa fa-angle-left pull-right"></i></a>
         <ul class="treeview-menu">
             <li><a href="/stats/new-users"><i class="fa fa-angle-double-right"></i> New users</a></li>
             <li><a href="/stats/users-statistics"><i class="fa fa-angle-double-right"></i> User statistics</a></li>
             <li><a href="/stats/expiring"><i class="fa fa-angle-double-right"></i> Expiring users</a></li>
-            <li><a href="/stats/last-activity"><i class="fa fa-angle-double-right"></i> Last activity</a></li>
-            <li><a href="/stats/devices"><i class="fa fa-angle-double-right"></i> Devices</a></li>
+            {{--<li><a href="/stats/last-activity"><i class="fa fa-angle-double-right"></i> Last activity</a></li>--}}
+            {{--<li><a href="/stats/devices"><i class="fa fa-angle-double-right"></i> Devices</a></li>--}}
         </ul>
     </li>
 </ul><!-- /.sidebar-menu -->

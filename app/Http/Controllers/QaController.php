@@ -23,7 +23,6 @@ class QaController extends Controller {
         Bus::dispatch($c);
     }
 
-
 	public function getChangeExpiration(Request $request){
         $dt = Carbon::now();
 
@@ -37,9 +36,8 @@ class QaController extends Controller {
             $dt = $dt->addDays($request->get('d'));
         }
 
-//        $name  = "test318";
-        $name  = "jhuska4";
-//        dd($dt);
+
+        $name  = "test322";
         $subscriber = Subscriber::where('username', $name)->first();
 
         $subscriber->expires_on = $dt->toDateTimeString();
