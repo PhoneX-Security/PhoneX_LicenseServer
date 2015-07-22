@@ -3,6 +3,7 @@
 use Bus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Phonex\Group;
 use Phonex\Jobs\CreateSubscriberWithLicense;
 use Phonex\Jobs\CreateUser;
 use Phonex\Jobs\RefreshSubscribers;
@@ -93,22 +94,6 @@ class QaController extends Controller {
         return 'success';
     }
 
-    public function getAddContact(Request $request){
-        die('turned off');
-        $username = $request->get('username');
-
-        $master =  User::findByUsername('qa_dusan_master');
-        $user = User::findByUsername($username);
-
-        if (!$username || !$user){
-            return 'user does not exist';
-        }
-
-        $master->addToContactList($user);
-        return 'user added to contact list';
-    }
-
-
     public function getMigrateTurn(Request $request){
         die('turned off');
 
@@ -124,4 +109,51 @@ class QaController extends Controller {
 
         return 'turn passwords migrated';
     }
+
+    //Route::get('test_connect', function(){
+////    $prefix = "miro";
+////    $masterNum = 5;
+////    $poolNum = 20;
+////
+////    $masters = [];
+////    $pools = [];
+////
+////    for ($i=1; $i<=5; $i++){
+////        $masters[] = $prefix . '0' . $i;
+////    }
+////
+////    for ($i=6; $i<=9; $i++){
+////        $pools[] = $prefix . '0' . $i;
+////    }
+////
+////    for ($i=10; $i<=25; $i++){
+////        $pools[] = $prefix . $i;
+////    }
+////
+////    $mainUser = User::where('username', 'miro01')->first();
+////    $masterUsers = [];
+////    $poolUsers = [];
+////
+////    foreach($masters as $name){
+////        $masterUsers[] = User::where('username', $name)->first();
+////    }
+////
+////    foreach($pools as $name){
+////        $poolUsers[] = User::where('username', $name)->first();
+////    }
+////
+//////    // pool licenses have only main user
+//////    foreach($poolUsers as $user){
+//////        ContactList::addUsersToContactListMutually($mainUser, $user);
+//////    }
+////
+////    foreach($masterUsers as $u){
+////        foreach($masterUsers as $uu){
+////            if ($u != $uu){
+//////                echo $u->username . ' + ' . $uu->username . '<br />';
+////                $u->addToContactList($uu);
+////            }
+////        }
+////    }
+//});
 }
