@@ -62,7 +62,9 @@
                             <ul>
                                 <li>Total: {{$dd->totalCount}}</li>
                                 <li>Never logged in: {{$dd->neverLoggedIn['count']}}
-                                    @include('stats.chips.with-users', ['users' => $dd->neverLoggedIn['users'], 'withUsers' => $withUsers])
+                                    @if(isset($dd->neverLoggedIn['users']) && count($dd->neverLoggedIn['users']))
+                                        @include('stats.chips.with-users', ['users' => $dd->neverLoggedIn['users'], 'withUsers' => $withUsers])
+                                    @endif
                                 </li>
                                 <li>Countries:
                                     @foreach($dd->countries as $country => $data)
@@ -106,7 +108,7 @@
         <script>
             $(function() {
                 // Expansion function
-                $("a.link-expand").click(function(){
+                $(".link-expand").click(function(){
 //                    console.log($(this));
                     if ($(this).text() == "+"){
                         $(this).text("-")

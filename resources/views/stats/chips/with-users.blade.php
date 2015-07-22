@@ -1,5 +1,5 @@
 @if($withUsers)
-    [<a class="link-expand" href="#">+</a>]
+    [<span class="link-expand clickable">+</span>]
     <span style="display:none" class="expandable">
         <br />
         @foreach($users as $user)
