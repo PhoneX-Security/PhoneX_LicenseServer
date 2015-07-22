@@ -119,6 +119,17 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         }
     }
 
+    /**
+     * Returns small user object only containing user's id and username (used in text reports)
+     */
+    public function getUserObj()
+    {
+        $obj = new \stdClass();
+        $obj->id = $this->id;
+        $obj->username = $this->username;
+        return $obj;
+    }
+
     public static function findByUsername($username){
         return User::where('username', $username)->first();
     }

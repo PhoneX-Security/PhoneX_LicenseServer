@@ -14,9 +14,15 @@
                 <div class="box-tools">
                     <form class="form-inline inline-block"  action="/stats/text-report" method="get">
 
-                        <div class="form-group">
-                            <label for="exampleInputEmail1" style="margin: 0 5px"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i> Range </label>
+                        <div class="checkbox" style="margin: 0px 10px">
+                            <label>
+                                <input name="with-users" type="checkbox" @if(Request::has('with-users')) checked @endif> With users
+                            </label>
+                        </div>
+
+                        <div class="input-group form-group">
                             <input  type="text" class="form-control" value="{{old('daterange', $daterange)}}" name="daterange">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                         </div>
 
                         <script type="text/javascript">
@@ -55,15 +61,21 @@
                         <li>{{$licenseFuncTypes[$licFuncTypeId]->uc_name . " (" . $licenseTypes[$licTypeId]->name . ")" }} <br />
                             <ul>
                                 <li>Total: {{$dd->totalCount}}</li>
-                                <li>Never logged in: {{$dd->neverLoggedInCount}}</li>
+                                <li>Never logged in: {{$dd->neverLoggedIn['count']}}
+                                    @include('stats.chips.with-users', ['users' => $dd->neverLoggedIn['users'], 'withUsers' => $withUsers])
+                                </li>
                                 <li>Countries:
-                                    @foreach($dd->countriesCount as $country => $count)
-                                        {{$country . " (" . $count . "), "}}
+                                    @foreach($dd->countries as $country => $data)
+                                        {{$country . " (" . $data['count'] . ")"}}
+                                        @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
+                                        @if(!$withUsers && $data !== end($dd->countries)), @endif
                                     @endforeach
                                 </li>
                                 <li>Platforms:
-                                    @foreach($dd->platformsCount as $platform => $count)
-                                        {{$platform . " (" . $count . "), "}}
+                                    @foreach($dd->platforms as $platform => $data)
+                                        {{$platform . " (" . $data['count'] . ")"}}
+                                        @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
+                                        @if(!$withUsers && $data !== end($dd->platforms)), @endif
                                     @endforeach
                                 </li>
                             </ul>
@@ -79,7 +91,9 @@
                         @foreach($d as $licTypeId => $dd)
                             <li>{{$licenseFuncTypes[$licFuncTypeId]->uc_name . " (" . $licenseTypes[$licTypeId]->name . ")" }} <br />
                                 <ul>
-                                    <li>Total: {{$dd}}</li>
+                                    <li>Total: {{$dd['count']}}
+                                        @include('stats.chips.with-users', ['users' => $dd['users'], 'withUsers' => $withUsers])
+                                    </li>
                                 </ul>
                             </li>
                         @endforeach
@@ -88,6 +102,21 @@
 
             </div>
         </div>
+
+        <script>
+            $(function() {
+                // Expansion function
+                $("a.link-expand").click(function(){
+//                    console.log($(this));
+                    if ($(this).text() == "+"){
+                        $(this).text("-")
+                    } else {
+                        $(this).text("+");
+                    }
+                    $(this).next(".expandable").toggle();
+                });
+            });
+        </script>
 
     </section>
 @endsection

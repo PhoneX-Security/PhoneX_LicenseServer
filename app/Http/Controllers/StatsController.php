@@ -165,13 +165,13 @@ class StatsController extends Controller {
             $dateFrom = $dateFrom->startOfDay();
         }
 
-//        list($existingUsersData, $newUsersData) = $stats->reportPerPeriod(Carbon::createFromDate(2015, 5,1), Carbon::createFromDate(2015,5,6));
         list($existingUsersData, $newUsersData) = $stats->reportPerPeriod($dateFrom, $dateTo);
         $licenseTypes = LicenseType::all()->keyBy('id');
         $licenseFuncTypes = LicenseFuncType::all()->keyBy('id');
 
         $daterange = $dateFrom->toDateString() . " : " . $dateTo->toDateString();
-        return view('stats.text-report', compact('existingUsersData', 'newUsersData', 'licenseTypes', 'licenseFuncTypes', 'daterange'));
+        $withUsers = $request->has('with-users');
+        return view('stats.text-report', compact('existingUsersData', 'newUsersData', 'licenseTypes', 'licenseFuncTypes', 'daterange', 'withUsers'));
     }
 
     public function getLastActivity()

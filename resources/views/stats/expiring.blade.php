@@ -32,9 +32,9 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="exampleInputEmail1" style="margin: 0 5px"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i> License expiring in </label>
-                            <input type="text" class="form-control" value="{{old('daterange', $daterange)}}" name="daterange">
+                        <div class="input-group form-group">
+                            <input  type="text" class="form-control" value="{{old('daterange', $daterange)}}" name="daterange">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                         </div>
 
                         <script type="text/javascript">

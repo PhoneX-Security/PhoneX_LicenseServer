@@ -144,11 +144,13 @@ class Stats
             if (in_array($user->id, $newUsersIds)){
                 $newUsers[$lic->license_func_type_id][$lic->license_type_id][] = $lic->user;
             } else { // if existing user
-                if (isset($existingUsersData[$lic->license_func_type_id][$lic->license_type_id])){
-                    $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]++;
-                } else {
-                    $existingUsersData[$lic->license_func_type_id][$lic->license_type_id] = 1;
+
+                if (!isset($existingUsersData[$lic->license_func_type_id][$lic->license_type_id])) {
+                    $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['count'] = 0;
                 }
+
+                $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['count']++;
+                $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['users'][] = $user->getUserObj();
             }
         }
 
@@ -168,10 +170,12 @@ class Stats
         $info->totalCount = count($users);
 
         // Count platforms
-        $countriesCount = [];
-        $platformsCount = [];
-        $neverLoggedInCount = 0;
+        $countries = [];
+        $platforms = [];
+        $neverLoggedIn['count'] = 0;
         foreach($users as $user){
+            $userObj = $user->getUserObj();
+
             if (!$user->subscriber || $user->subscriber->date_first_login){
 
                 $key1 = $user->subscriber->location['country'];
@@ -179,28 +183,35 @@ class Stats
                     $key1= "unknown";
                 }
 
-                if (array_key_exists($key1, $countriesCount)){
-                    $countriesCount[$key1]++;
-                } else {
-                    $countriesCount[$key1] = 1;
+                if (!array_key_exists($key1, $countries)) {
+                    $countries[$key1]['count'] = 0;
                 }
+                $countries[$key1]['count']++;
+                $countries[$key1]['users'][] = $userObj;
+
+                arsort($countries);
 
                 if ($user->subscriber->app_version){
                     $key2 = $user->subscriber->app_version_obj->platformDesc();
-                    if (array_key_exists($key2, $platformsCount)){
-                        $platformsCount[$key2]++;
-                    } else {
-                        $platformsCount[$key2] = 1;
+                    if (!array_key_exists($key2, $platforms)){
+                        $platforms[$key2]['count'] = 0;
                     }
+
+                    $platforms[$key2]['count']++;
+                    $platforms[$key2]['users'][] = $userObj;
                 }
+
+                arsort($platforms);
+
             } else {
-                $neverLoggedInCount++;
+                $neverLoggedIn['count']++;
+                $neverLoggedIn['users'][] = $userObj;
             }
         }
 
-        $info->countriesCount = $countriesCount;
-        $info->platformsCount = $platformsCount;
-        $info->neverLoggedInCount = $neverLoggedInCount;
+        $info->countries = $countries;
+        $info->platforms = $platforms;
+        $info->neverLoggedIn = $neverLoggedIn;
         return $info;
     }
 }
