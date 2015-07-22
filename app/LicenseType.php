@@ -59,5 +59,10 @@ class LicenseType extends Model{
         return ucfirst($this->name) . " (" . $this->days . " days)";
     }
 
+    public function getUcNameAttribute()
+    {
+        return ucfirst($this->name);
+    }
+
 
 }

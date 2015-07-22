@@ -47,6 +47,48 @@
                                 </dl>
                             </div>
                         </div>
+
+                        @if($firstCode)
+                        <div class="row">
+                            <div class="col-md-2 ">
+                                <dl>
+                                    <dt>Type</dt>
+                                    <dd>{{ $firstCode->licenseFuncType->uc_name }}</dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-2 ">
+                                <dl>
+                                    <dt>Expiration</dt>
+                                    <dd>{{ $firstCode->licenseType->uc_name_with_days }}</dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-2 ">
+                                <dl>
+                                    <dt>Group</dt>
+                                    <dd>
+                                        @if($firstCode->group)
+                                            <a href="{{route('groups.show', $firstCode->group->id)}}">{{$firstCode->group->name}}</a>
+                                        @else
+                                            -
+                                        @endif
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-2 ">
+                                <dl>
+                                    <dt>Parent user</dt>
+                                    <dd>
+                                        @if($firstCode->parent)
+                                            <a href="{{ route('users.show', [$firstCode->parent->id]) }}">{{ $firstCode->parent->username }}</a>
+                                        @else
+                                            -
+                                        @endif
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="row">
                             <div class="col-md-4">
                                 @include('bcode.chips.code-pairs-table', ['codePairs' => $codePairs])

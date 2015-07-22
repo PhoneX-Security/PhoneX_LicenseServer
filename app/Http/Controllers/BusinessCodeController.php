@@ -53,7 +53,12 @@ class BusinessCodeController extends Controller {
             }
             $codePairs[$firstCode] = $secondCode;
         }
-        return view('bcode.export-details', compact('codePairs', 'export'));
+
+        // All codes in a single export have same properties
+        // TODO transfer those properties to export itself to avoid duplicated data
+        $firstCode = $export->codes->count() > 0 ? $export->codes[0] : null;
+
+        return view('bcode.export-details', compact('codePairs', 'export', 'firstCode'));
     }
 
     public function getGenerateSingleCodes()

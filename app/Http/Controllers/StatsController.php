@@ -154,6 +154,26 @@ class StatsController extends Controller {
         return view('stats.users-graphs', compact('counts', 'labels'));
     }
 
+    public function getTextReport(Request $request, Stats $stats)
+    {
+        // subtract to be day ago - end of sunday
+        $dateTo = Carbon::parse("next monday")->subSecond();
+        $dateFrom = Carbon::parse("last monday");
+        if ($request->has('daterange')){
+            list($dateFrom, $dateTo) = DateRangeValidator::retrieveDates($request->get('daterange'));
+            $dateTo = $dateTo->endOfDay();
+            $dateFrom = $dateFrom->startOfDay();
+        }
+
+//        list($existingUsersData, $newUsersData) = $stats->reportPerPeriod(Carbon::createFromDate(2015, 5,1), Carbon::createFromDate(2015,5,6));
+        list($existingUsersData, $newUsersData) = $stats->reportPerPeriod($dateFrom, $dateTo);
+        $licenseTypes = LicenseType::all()->keyBy('id');
+        $licenseFuncTypes = LicenseFuncType::all()->keyBy('id');
+
+        $daterange = $dateFrom->toDateString() . " : " . $dateTo->toDateString();
+        return view('stats.text-report', compact('existingUsersData', 'newUsersData', 'licenseTypes', 'licenseFuncTypes', 'daterange'));
+    }
+
     public function getLastActivity()
     {
 

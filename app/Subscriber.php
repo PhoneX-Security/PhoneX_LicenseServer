@@ -53,6 +53,7 @@ class Subscriber extends Model{
     }
 
     /* Accessors */
+    // ->app_version_obj
     public function getAppVersionObjAttribute()
     {
         if ($this->app_version){

@@ -2,8 +2,12 @@
 
 
 use Carbon\Carbon;
+use Phonex\License;
+use Phonex\LicenseFuncType;
+use Phonex\LicenseType;
 use Phonex\Model\UsageLogs;
 use Phonex\User;
+use stdClass;
 
 class Stats
 {
@@ -109,4 +113,94 @@ class Stats
         return $counts;
     }
 
+    public function reportPerPeriod(Carbon $dateFrom = null, Carbon $dateTo = null)
+    {
+        if ($dateFrom === null) {
+            $dateFrom = Carbon::parse('last monday');
+        }
+        if ($dateTo === null) {
+            $dateTo = Carbon::parse('next monday');
+        }
+
+        $lics = License::with('user', 'user.subscriber')
+            ->where('created_at', '>=', $dateFrom)
+            ->where('created_at', '<=', $dateTo)
+            ->get();
+
+        $users = User::select('users.id')
+            ->where('dateCreated', '>=', $dateFrom)
+            ->where('dateCreated', '<=', $dateTo)
+            ->get();
+        $newUsersIds = $users->pluck('id')->toArray();
+
+        $newUsers = [];
+        $newUsersData = [];
+        $existingUsersData = [];
+
+        // Filter users and licenses
+        foreach ($lics as $lic){
+            $user = $lic->user;
+            // if new user
+            if (in_array($user->id, $newUsersIds)){
+                $newUsers[$lic->license_func_type_id][$lic->license_type_id][] = $lic->user;
+            } else { // if existing user
+                if (isset($existingUsersData[$lic->license_func_type_id][$lic->license_type_id])){
+                    $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]++;
+                } else {
+                    $existingUsersData[$lic->license_func_type_id][$lic->license_type_id] = 1;
+                }
+            }
+        }
+
+        // Get statistics for new users
+        foreach($newUsers as $licFuncTypeId => $g){
+            foreach ($g as $licTypeId => $gg){
+                $newUsersData[$licFuncTypeId][$licTypeId] = $this->statsForUsers($gg);
+            }
+        }
+
+        return [$existingUsersData, $newUsersData];
+    }
+
+    private function statsForUsers($users)
+    {
+        $info = new stdClass();
+        $info->totalCount = count($users);
+
+        // Count platforms
+        $countriesCount = [];
+        $platformsCount = [];
+        $neverLoggedInCount = 0;
+        foreach($users as $user){
+            if (!$user->subscriber || $user->subscriber->date_first_login){
+
+                $key1 = $user->subscriber->location['country'];
+                if (!$key1){
+                    $key1= "unknown";
+                }
+
+                if (array_key_exists($key1, $countriesCount)){
+                    $countriesCount[$key1]++;
+                } else {
+                    $countriesCount[$key1] = 1;
+                }
+
+                if ($user->subscriber->app_version){
+                    $key2 = $user->subscriber->app_version_obj->platformDesc();
+                    if (array_key_exists($key2, $platformsCount)){
+                        $platformsCount[$key2]++;
+                    } else {
+                        $platformsCount[$key2] = 1;
+                    }
+                }
+            } else {
+                $neverLoggedInCount++;
+            }
+        }
+
+        $info->countriesCount = $countriesCount;
+        $info->platformsCount = $platformsCount;
+        $info->neverLoggedInCount = $neverLoggedInCount;
+        return $info;
+    }
 }

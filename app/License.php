@@ -45,7 +45,8 @@ class License extends Model{
         return $this->licenseFuncType->uc_name . ' / ' . $this->licenseType->uc_name_with_days;
     }
 
-    public function isActive(){
+    public function isActive()
+    {
         if (!$this->expires_at || Carbon::now()->gt(Carbon::parse($this->expires_at))) {
             return false;
         } else {
