@@ -16,6 +16,10 @@
 
             @include('errors.notifications')
 
+            <div class="alert alert-danger">
+                <strong>Warning!</strong> This is an experimental feature. Data shown below do not correspond to all user's activities, typically only to login and adding new contacts. We need to enhance this in the future.
+            </div>
+
             @include('user.chips.top-nav')
 
             <div class="box box-default">

@@ -14,11 +14,7 @@
                 <div class="box-tools">
                     <form class="form-inline inline-block"  action="/stats/text-report" method="get">
 
-                        <div class="checkbox" style="margin: 0px 10px">
-                            <label>
-                                <input name="with-users" type="checkbox" @if(Request::has('with-users')) checked @endif> With users
-                            </label>
-                        </div>
+
 
                         <div class="input-group form-group">
                             <input  type="text" class="form-control" value="{{old('daterange', $daterange)}}" name="daterange">
@@ -45,6 +41,12 @@
                                 }, cb);
                             });
                         </script>
+
+                        <div class="checkbox" style="margin: 0px 10px">
+                            <label>
+                                <input name="with-users" type="checkbox" @if(Request::has('with-users')) checked @endif> With users
+                            </label>
+                        </div>
 
 
                         <button type="submit" class="btn btn-default">Filter</button>
