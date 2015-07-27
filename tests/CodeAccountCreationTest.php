@@ -7,24 +7,23 @@ use Phonex\Jobs\CreateSubscriberWithLicense;
 use Phonex\Jobs\CreateUser;
 use Phonex\Group;
 use Phonex\Http\Controllers\AccountController;
+use Phonex\Jobs\NewCodePairsExport;
 use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\Subscriber;
 use Phonex\User;
 
-class BusinessAccountCreationTest extends TestCase {
+class CodeAccountCreationTest extends TestCase {
     use DatabaseTransactions;
 
     const URL = '/account/business-account';
     const TEST_USERNAME = "kajsmentke_sk1";
     const TEST_USERNAME2 = "kozmeker_sk";
     const TEST_USERNAME3 = "fajnsmeker_sk";
-    const TEST_USERNAME_NON_EXISTING = "kajsmeker";
+    const TEST_USERNAME_NON_EXISTING = "kajsmeker11";
 
     const GROUP_NAME = "slovenskooo";
-
-
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -87,32 +86,27 @@ class BusinessAccountCreationTest extends TestCase {
     }
 
     public function testExpiredBusinessCode(){
-        $someUser = User::find(1);
-
-        $licenseType = LicenseType::where('name', 'half_year')->first();
+        $licenseType = LicenseType::getHalfYear();
         $licenseFuncType = LicenseFuncType::getFull();
 
-        $c1 = new CreateBusinessCodePair($someUser, $licenseType, $licenseFuncType);
+        $c1 = new NewCodePairsExport(1, $licenseType, $licenseFuncType, 1);
         // code from past - this should fail
         $c1->addExpiration(Carbon::createFromDate(1999));
-        $expiredCodePair = Bus::dispatch($c1);
+        list($export, $codes) = Bus::dispatch($c1);
 
         $this->callAndCheckResponse(self::URL, [
             'version' => AccountController::VERSION,
             'imei' => 'a',
             'captcha' =>'captcha',
             'username' => self::TEST_USERNAME_NON_EXISTING,
-            'bcode' => $expiredCodePair[0]->code
+            'bcode' => $codes[0][0]->code
         ], AccountController::RESP_ERR_EXPIRED_BUSINESS_CODE);
     }
 
     /**
      * Main test
      */
-    public function testAccountCreation(){
-        // Mock Queue push because it might trigger Stack Overflow
-        $this->mockQueuePush();
-
+    public function testAccountCreation2(){
         try {
             $username1 = self::TEST_USERNAME;
             $username2 = self::TEST_USERNAME2;
@@ -127,13 +121,13 @@ class BusinessAccountCreationTest extends TestCase {
             Bus::dispatch($commandSub);
 
             // predefined group + license type
-            $group = Group::create(['name' => self::GROUP_NAME]);//Group::where('name', 'Mobil Pohotovost')->first();
+            $group = Group::create(['name' => self::GROUP_NAME]);
             $licenseType = LicenseType::getHalfYear();
             $licenseFuncType = LicenseFuncType::getFull();
 
-            $command = new CreateBusinessCodePair($user1, $licenseType, $licenseFuncType);
+            $command = new NewCodePairsExport(1, $licenseType, $licenseFuncType, 1);
             $command->addGroup($group);
-            $codePair = Bus::dispatch($command);
+            list($export1, $codes1) = Bus::dispatch($command);
 
             // remember counts
             $userCount = User::all()->count();
@@ -146,7 +140,7 @@ class BusinessAccountCreationTest extends TestCase {
                 'imei' => 'a',
                 'captcha' =>'captcha',
                 'username' => $username2,
-                'bcode' => $codePair[0]->code
+                'bcode' => $codes1[0][0]->code
             ], AccountController::RESP_OK);
             $this->assertEquals($username2, $json->username);
 
@@ -156,12 +150,12 @@ class BusinessAccountCreationTest extends TestCase {
             $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
 
             // check we cannot create another license on the same business code
-            $json = $this->callAndCheckResponse(self::URL, [
+            $this->callAndCheckResponse(self::URL, [
                 'version' => AccountController::VERSION,
                 'imei' => 'a',
                 'captcha' =>'captcha',
                 'username' => $username3,
-                'bcode' => $codePair[0]->code
+                'bcode' => $codes1[0][0]->code
             ], AccountController::RESP_ERR_ALREADY_USED_BUSINESS_CODE);
 
             // now use the second code to get a license
@@ -170,13 +164,15 @@ class BusinessAccountCreationTest extends TestCase {
                 'imei' => 'a',
                 'captcha' =>'captcha',
                 'username' => $username3,
-                'bcode' => $codePair[1]->code
+                'bcode' => $codes1[0][1]->code
             ], AccountController::RESP_OK);
             $this->assertEquals($username3, $json->username);
+
 
             // expect two users in contact list (support and another business user)
             $user3 = User::where('username', $username3)->first();
             $this->assertEquals(2, count($user3->subscriber->subscribersInContactList));
+
 
 //        // assert all records created
             $this->assertEquals($userCount + 2, User::all()->count());
@@ -190,9 +186,6 @@ class BusinessAccountCreationTest extends TestCase {
     }
 
     public function testAccountCreationWithParent(){
-        // Mock Queue push because it might trigger Stack Overflow
-        $this->mockQueuePush();
-
         try {
             $username1 = self::TEST_USERNAME;
             $username2 = self::TEST_USERNAME2;
@@ -206,24 +199,24 @@ class BusinessAccountCreationTest extends TestCase {
             $commandSub = new CreateSubscriberWithLicense($user1, $licType, $licFuncType, 'fasirka_heslo');
             Bus::dispatch($commandSub);
 
-            $command = new CreateBusinessCodePair($user1, $licType, $licFuncType);
+            $command = new NewCodePairsExport(1, $licType, $licFuncType);
             // some future expiration
             $command->addExpiration(Carbon::now()->addYears(2));
             // add parent - will be added as support account
             $command->addParent($user1);
-            $codePair = Bus::dispatch($command);
+            list($export1, $codes) = Bus::dispatch($command);
 
             // use 1. code
             $this->callAndCheckResponse(
                 self::URL,
-                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username2,'bcode' => $codePair[0]->code],
+                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username2,'bcode' => $codes[0][0]->code],
                 AccountController::RESP_OK
             );
 
             // use 2. code
             $this->callAndCheckResponse(
                 self::URL,
-                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username3,'bcode' => $codePair[1]->code],
+                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username3,'bcode' => $codes[0][1]->code],
                 AccountController::RESP_OK
             );
 
@@ -243,9 +236,6 @@ class BusinessAccountCreationTest extends TestCase {
     }
 
     public function testAccountCreationWithGroupOwner(){
-        // Mock Queue push because it might trigger Stack Overflow
-        $this->mockQueuePush();
-
         try {
             $username1 = self::TEST_USERNAME;
             $username2 = self::TEST_USERNAME2;
@@ -260,13 +250,14 @@ class BusinessAccountCreationTest extends TestCase {
             $group = Group::create(['name' => self::GROUP_NAME, 'owner_id' => $user1->id]);
 
             $command = new CreateBusinessCodePair($user1, $licType, $licFuncType);
+            $command = new NewCodePairsExport(1, $licType, $licFuncType);
             $command->addGroup($group);
-            $codePair = Bus::dispatch($command);
+            list($exp, $codes) = Bus::dispatch($command);
 
             // use 1. code
             $this->callAndCheckResponse(
                 self::URL,
-                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username2,'bcode' => $codePair[0]->code],
+                ['version' => AccountController::VERSION, 'imei' => 'a','captcha' =>'c', 'username' => $username2,'bcode' => $codes[0][0]->code],
                 AccountController::RESP_OK
             );
 

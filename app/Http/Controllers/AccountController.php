@@ -12,6 +12,7 @@ use Phonex\LicenseType;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
 use Phonex\User;
+use Phonex\Utils\BusinessCodeUtils;
 use Securimage;
 
 class AccountController extends Controller {
@@ -140,22 +141,22 @@ class AccountController extends Controller {
         return $this->issueBusinessAccount($request);
     }
 
-    private function issueBusinessAccount(Request $request){
-//        $isQaTrial = $this->isPhonexIp();
+    private function issueBusinessAccount(Request $request)
+    {
         $isQaTrial = false; // Turn this cool feature off
         $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
 
         $username = (!$isQaTrial) ? $request->get('username') : 'qa_trial' . $trialNumber;
         Log::info("Creating business account", [$username]);
         $sipPassword = rand(100000, 999999);
-        $businessCode = BusinessCode::where('code', $request->get('bcode'))->first();
+        $bcode = BusinessCode::with('export')->where('code', $request->get('bcode'))->first();
 
         try {
-            $licType = $businessCode->licenseType;
-            $licFuncType = $businessCode->licenseFuncType;
+            $licType = $bcode->getLicenseType();
+            $licFuncType = $bcode->getLicenseFuncType();
 
             // create user
-            $groups = $businessCode->group ? [$businessCode->group->id] : [];
+            $groups = $bcode->getGroup() ? [$bcode->getGroup()->id] : [];
             $command = new CreateUser($username,
                 $groups,
                 $isQaTrial,
@@ -163,18 +164,19 @@ class AccountController extends Controller {
             $user = $this->dispatch($command);
 
             $createSubscriberCommand = new CreateSubscriberWithLicense($user, $licType, $licFuncType, $sipPassword);
-            $this->dispatch($createSubscriberCommand);
-
-            // store business code
-            $user->business_code_id = $businessCode->id;
+            $license = $this->dispatch($createSubscriberCommand);
+            // Store to licenses and to user as well
+            $license->business_code_id = $bcode->id;
+            $license->save();
+            $user->business_code_id = $bcode->id;
             $user->save();
 
             // add support account
             // Biggest priority has parent, then group owner, than phonex-support
-            if ($businessCode->parent_id != null){
-                ContactList::addSupportToContactListMutually($user, $businessCode->parent);
-            } else if($businessCode->group && $businessCode->group->owner) {
-                ContactList::addSupportToContactListMutually($user, $businessCode->group->owner);
+            if ($bcode->getParent()){
+                ContactList::addSupportToContactListMutually($user, $bcode->getParent());
+            } else if($bcode->getGroup() && $bcode->getGroup()->owner) {
+                ContactList::addSupportToContactListMutually($user, $bcode->getGroup()->owner);
             } else {
                 // no parent id, add default support account
                 ContactList::addSupportToContactListMutually($user);
@@ -182,7 +184,7 @@ class AccountController extends Controller {
 
             // Add contact list mappings
             // each mapping adds every user created by give bc to contact list mutually
-            $clMappings = $businessCode->clMappings;
+            $clMappings = $bcode->clMappings;
             foreach ($clMappings as $clMapping){
                 foreach($clMapping->users as $mapUser){
                     ContactList::addUsersToContactListMutually($user, $mapUser);
@@ -239,7 +241,7 @@ class AccountController extends Controller {
         $code = null;
         // parity check
         try {
-            if (!BusinessCode::parityCheck($codeParam)){
+            if (!BusinessCodeUtils::parityCheck($codeParam)){
 //                Log::error("Requested business code has bad parity", [$request->all()]);
                 throw new \Exception("", self::RESP_ERR_BAD_BUSINESS_CODE);
             }
@@ -251,13 +253,12 @@ class AccountController extends Controller {
 
         // Check expiration
         $now = Carbon::now();
-        if ($code->expires_at && $code->expires_at->lte($now)){
+        if ($code->getExpiresAt() && $code->getExpiresAt()->lte($now)){
             throw new \Exception("", self::RESP_ERR_EXPIRED_BUSINESS_CODE);
         }
 
-        // Check user limit
-        $numberOfUsers = count($code->users);
-        if ($numberOfUsers >= $code->users_limit){
+        // Check license limit
+        if ($code->number_of_usages >= $code->getLicenseLimit()){
 //            Log::error("Requested business code is already used by #" . $numberOfUsers . " users", [$request->all()]);
             throw new \Exception("", self::RESP_ERR_ALREADY_USED_BUSINESS_CODE);
         }

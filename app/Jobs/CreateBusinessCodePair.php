@@ -10,6 +10,7 @@ use Phonex\Group;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\User;
+use Phonex\Utils\BusinessCodeUtils;
 
 /**
  * Class CreateBusinessCodePair
@@ -60,7 +61,7 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
         // first code
 
         $bc1 = new BusinessCode();
-        $bc1->code = BusinessCode::generateUniqueCode($this->prefix);
+        $bc1->code = BusinessCodeUtils::generateUniqueCode($this->prefix);
         $bc1->creator_id = $this->creator->id;
 
         if($this->group){
@@ -84,7 +85,7 @@ class CreateBusinessCodePair extends Command implements SelfHandling {
 
         // second code
         $bc2 = clone $bc1;
-        $bc2->code = BusinessCode::generateUniqueCode($this->prefix);
+        $bc2->code = BusinessCodeUtils::generateUniqueCode($this->prefix);
 
         $bc1->save();
         $bc2->save();

@@ -23,6 +23,7 @@
                             <th>Creator</th>
                             <th>Created at</th>
                             <th>Exported to email</th>
+                            <th>Group</th>
                             <th>Codes count</th>
                             <th class="text-center">Options</th>
                         </tr>
@@ -34,6 +35,7 @@
                             <td><a href="{{ route('users.show', $item->creator->id) }}">{{ $item->creator->username }}</a></td>
                             <td>{{ $item->created_at }}</td>
                             <td>{{ $item->email }}</td>
+                            <td>@if($item->group) <a href="{{route('groups.show', $item->group->id)}}">{{$item->group->name}}</a>@endif</td>
                             <td>{{ $item->codes->count() }}</td>
                             <td class="text-center">
                                 <div class="btn-group  btn-group-xs">

@@ -53,20 +53,35 @@
                             <div class="col-md-2 ">
                                 <dl>
                                     <dt>Type</dt>
-                                    <dd>{{ $firstCode->licenseFuncType->uc_name }}</dd>
+                                    <dd>
+                                        @if($export->licenseFuncType)
+                                            {{$export->licenseFuncType->uc_name}}
+                                        @else
+                                            {{ $firstCode->licenseFuncType->uc_name }}
+                                        @endif
+                                    </dd>
                                 </dl>
                             </div>
                             <div class="col-md-2 ">
                                 <dl>
                                     <dt>Expiration</dt>
-                                    <dd>{{ $firstCode->licenseType->uc_name_with_days }}</dd>
+                                    <dd>
+                                        @if($export->LicenseType)
+                                            {{$export->LicenseType->uc_name}}
+                                        @else
+                                            {{ $firstCode->licenseType->uc_name_with_days }}
+                                        @endif
+
+                                    </dd>
                                 </dl>
                             </div>
                             <div class="col-md-2 ">
                                 <dl>
                                     <dt>Group</dt>
                                     <dd>
-                                        @if($firstCode->group)
+                                        @if($export->group)
+                                            <a href="{{route('groups.show', $export->group->id)}}">{{$export->group->name}}</a>
+                                        @elseif($firstCode->group)
                                             <a href="{{route('groups.show', $firstCode->group->id)}}">{{$firstCode->group->name}}</a>
                                         @else
                                             -
@@ -78,7 +93,9 @@
                                 <dl>
                                     <dt>Parent user</dt>
                                     <dd>
-                                        @if($firstCode->parent)
+                                        @if($export->parent)
+                                            <a href="{{ route('users.show', [$export->parent->id]) }}">{{ $export->parent->username }}</a>
+                                        @elseif($firstCode->parent)
                                             <a href="{{ route('users.show', [$firstCode->parent->id]) }}">{{ $firstCode->parent->username }}</a>
                                         @else
                                             -
@@ -88,6 +105,15 @@
                             </div>
                         </div>
                         @endif
+
+                        <div class="row">
+                            <div class="col-md-2 ">
+                                <dl>
+                                    <dt>Comment</dt>
+                                    <dd>{{ $export->comment }}</dd>
+                                </dl>
+                            </div>
+                        </div>
 
                         <div class="row">
                             <div class="col-md-4">

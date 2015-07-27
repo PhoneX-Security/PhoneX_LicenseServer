@@ -1,8 +1,8 @@
 <h2>Generated code pairs</h2>
 
 <p>
-    Parent user: @if($parent) {{ $parent->username  }} @else -non- @endif <br />
-    Group: @if($group) {{ $group->name  }} @else -non- @endif
+    Parent user: @if($parent) {{ $parent->username  }} @else - @endif <br />
+    Group: @if($group) {{ $group->name  }} @else - @endif
 </p>
 
 <table>
@@ -10,10 +10,11 @@
         <td>Code 1</td>
         <td>Code 2</td>
     </tr>
-    @foreach($bcodes as $k=>$bcode)
-        @if($k % 2 == 0) <tr><td>{{ $bcode->code }}</td>
-        @else <td>{{ $bcode->code }}</td></tr>
-        @endif
+    @foreach($codePairs as $codePair)
+        <tr>
+            <td>{{ $codePair[0]->code }}</td>
+            <td>{{ $codePair[1]->code }}</td>
+        </tr>
     @endforeach
 </table>
 

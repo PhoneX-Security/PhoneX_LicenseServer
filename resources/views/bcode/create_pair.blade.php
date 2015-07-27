@@ -1,5 +1,5 @@
 @extends('form.form-create')
-@section('title', "New code pairs")
+@section('title', "New code pairs export")
 @section('form')
     <form  role="form" method="POST" action="/bcodes/generate-code-pairs">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -86,6 +86,15 @@
                             <span class="help-block">Parent user will be added as a support account. (This has bigger priority than group's owner)</span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 ">
+                <div class="form-group">
+                    <label for="comment" class="control-label">Comment</label>
+                    <textarea id="comment" name="comment" class="form-control" rows="3"></textarea>
                 </div>
             </div>
         </div>
