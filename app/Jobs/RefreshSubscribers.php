@@ -22,9 +22,8 @@ class RefreshSubscribers extends Command implements SelfHandling {
         Log::info('RefreshSubscribers is started');
         $chunk = 20;
         $counter = 0;
-//        $users = User::where('username','wtest63')->get();
 
-        User::with(['licenses', 'subscriber'])->chunk($chunk, function($users) use (&$counter){
+        User::with(['licenses', 'subscriber'])->chunk($chunk, function($users) use ($counter){
             foreach ($users as $user){
                 if(!$user->subscriber){
                     continue;
@@ -73,6 +72,8 @@ class RefreshSubscribers extends Command implements SelfHandling {
                         $user->active_license_id = $license->id;
                         $user->save();
 
+                        Log::info('RefreshSubscribers updating user: ' . $user->username);
+
                         // TODO enable this when we have confidence this function works well
 //                        Queue::push('licenseUpdated', ['username'=>$user->email], 'users');
                     }
@@ -80,7 +81,10 @@ class RefreshSubscribers extends Command implements SelfHandling {
             }
         });
 
-        Log::info('RefreshSubscribers is finished, ' . $counter . " users were updated.");
+        Log::info('RefreshSubscribers is finished');
+
+        // counter doesn't work - is not updated from closure
+//        Log::info('RefreshSubscribers is finished, ' . $counter . " users were updated.");
 	}
 
     public static function getActiveLicenseWithLatestExpiration(User $user)

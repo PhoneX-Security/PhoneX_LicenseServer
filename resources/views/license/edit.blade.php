@@ -34,12 +34,20 @@
                 <dd>{{ $license->licenseType->readableType() }}</dd>
             </dl>
         </div>
-        <div class="col-md-2 ">
-            <dl>
-                <dt>Type</dt>
-                <dd>{{ ucfirst($license->licenseFuncType->name) }}</dd>
-            </dl>
+        <div class="col-md-2">
+            <label class="control-label">Type</label>
+            <select name="license_func_type_id" class="form-control">
+                @foreach($licenseFuncTypes as $type)
+                    <option @if($type->selected) selected @endif value="{{ $type->id }}">{{ ucfirst($type->name) }} </option>
+                @endforeach
+            </select>
         </div>
+        {{--<div class="col-md-2 ">--}}
+            {{--<dl>--}}
+                {{--<dt>Type</dt>--}}
+                {{--<dd>{{ ucfirst($license->licenseFuncType->name) }}</dd>--}}
+            {{--</dl>--}}
+        {{--</div>--}}
     </div>
 
     <div class="row">

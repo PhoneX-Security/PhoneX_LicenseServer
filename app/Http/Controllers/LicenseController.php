@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\UpdateLicenseRequest;
 use Phonex\License;
+use Phonex\LicenseFuncType;
 use Phonex\User;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
@@ -110,7 +111,14 @@ class LicenseController extends Controller {
             throw new NotFoundHttpException;
         }
 
-        return view('license.edit', compact('license'));
+		$licenseFuncTypes = LicenseFuncType::all();
+		foreach($licenseFuncTypes as $ft){
+			if($license->licenseFuncType->id === $ft->id){
+				$ft->selected = true;
+			}
+		}
+
+        return view('license.edit', compact('license', 'licenseFuncTypes'));
 	}
 
     /**
@@ -134,11 +142,12 @@ class LicenseController extends Controller {
             $license->issuer_id = null;
         }
 
+		$license->license_func_type_id = $request->get('license_func_type_id');
         $license->comment = InputPost::get('comment');
         $license->save();
 
         return \Redirect::route('licenses.edit', [$id])
-            ->with('success', 'License has been updated.');
+            ->with('success', 'License has been updated. Propagation to users may take up to 24 hours.');
 	}
 
 	/**
