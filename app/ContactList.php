@@ -1,5 +1,6 @@
 <?php namespace Phonex;
 use Illuminate\Database\Eloquent\Model;
+use Log;
 
 /**
  * @property string entryState
@@ -21,8 +22,10 @@ class ContactList extends Model{
     const UPDATED_AT = 'dateLastEdit';
 
     public static function addSupportToContactListMutually(User $user, User $supportUser = null){
+        Log::info("addSupportToContactListMutually", [$user, $supportUser]);
         if ($supportUser == null){
             $supportUser = User::getSupportUser();
+            Log::info("addSupportToContactListMutually - null support user, taking default", [$supportUser]);
         }
 
         if (!$supportUser){

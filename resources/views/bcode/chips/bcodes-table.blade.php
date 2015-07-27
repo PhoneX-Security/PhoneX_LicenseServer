@@ -16,19 +16,19 @@
     @foreach($bcodes as $bcode)
         <tr>
             <td>{{ $bcode->id }}</td>
-            <td>{{ $bcode->code }}</td>
+            <td>{{ $bcode->printable_code }}</td>
             <td>
                 @if($bcode->clMappings)
                     @foreach($bcode->clMappings as $k => $assocCode)
-                        {{ $assocCode->code }}
+                        {{ $assocCode->printable_code }}
                         @if($k != 0), @endif
                     @endforeach
                 @else -
                 @endif </td>
             </td>
-            <td>{{ $bcode->expires_at }}</td>
-            <td>{{ $bcode->group->name or ''}}</td>
-            <td>{{ $bcode->parent->username or ''}}</td>
+            <td>@if($bcode->getExpiresAt()) {{ $bcode->getExpiresAt() }} @endif</td>
+            <td>{{ $bcode->getGroup()->name or ''}}</td>
+            <td>{{ $bcode->getParent()->username or ''}}</td>
             <td>{{ $bcode->users->count() . '/' . $bcode->users_limit  }}</td>
             <td>@if($bcode->users)
                     @foreach($bcode->users as $k => $user)

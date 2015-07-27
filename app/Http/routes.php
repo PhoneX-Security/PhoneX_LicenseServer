@@ -13,6 +13,7 @@
 
 use Carbon\Carbon;
 use Phonex\BusinessCode;
+use Phonex\ContactList;
 use Phonex\Jobs\IssueLicense;
 use Phonex\Group;
 use Phonex\Jobs\NewCodePairsExport;
@@ -79,19 +80,4 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     ]);
     Route::any('adminer', ['acl-resource' => 'adminer',
         'uses' => '\Miroc\LaravelAdminer\AdminerController@index']);
-});
-
-Route::get('x', function(){
-    $licenseType = LicenseType::getHalfYear();
-    $licenseFuncType = LicenseFuncType::getFull();
-
-    $c1 = new NewCodePairsExport(1, $licenseType, $licenseFuncType, 1);
-    // code from past - this should fail
-    $c1->addExpiration(Carbon::createFromDate(1999));
-    list($export, $codes) = Bus::dispatch($c1);
-
-
-    dd($codes[0][0]->number_of_usages);
-
-
 });

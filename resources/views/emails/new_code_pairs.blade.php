@@ -12,8 +12,8 @@
     </tr>
     @foreach($codePairs as $codePair)
         <tr>
-            <td>{{ $codePair[0]->code }}</td>
-            <td>{{ $codePair[1]->code }}</td>
+            <td>{{ $codePair[0]->printable_code }}</td>
+            <td>{{ $codePair[1]->printable_code }}</td>
         </tr>
     @endforeach
 </table>

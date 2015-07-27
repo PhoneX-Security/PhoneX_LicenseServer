@@ -1,6 +1,7 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Carbon\Carbon;
+use DB;
 use Illuminate\Http\Request;
 use Log;
 use Phonex\BusinessCode;
@@ -134,7 +135,6 @@ class AccountController extends Controller {
             $this->checkCorrectBusinessCode($request);
 
             // TODO add transaction code here
-
         } catch (\Exception $e){
             return $this->responseError($e->getCode());
         }
@@ -150,6 +150,7 @@ class AccountController extends Controller {
         Log::info("Creating business account", [$username]);
         $sipPassword = rand(100000, 999999);
         $bcode = BusinessCode::with('export')->where('code', $request->get('bcode'))->first();
+        Log::info("Creating business account", [$username]);
 
         try {
             $licType = $bcode->getLicenseType();
@@ -171,16 +172,24 @@ class AccountController extends Controller {
             $user->business_code_id = $bcode->id;
             $user->save();
 
+            // FCKIN IMPORANT - we need to reload business code here - there were problems otherwise and support account is assigned randomly!
+            // I was not able to find root cause here, maybe problem in eloquent
+            $bcode = BusinessCode::with('export')->where('code', $request->get('bcode'))->first();
+
             // add support account
-            // Biggest priority has parent, then group owner, than phonex-support
-            if ($bcode->getParent()){
-                ContactList::addSupportToContactListMutually($user, $bcode->getParent());
-            } else if($bcode->getGroup() && $bcode->getGroup()->owner) {
-                ContactList::addSupportToContactListMutually($user, $bcode->getGroup()->owner);
-            } else {
+            // Biggest priority has parent, then group owner, then phonex-support
+//            if ($bcode->getParent()){
+//                Log::info("support - parent", [$bcode->getParent()]);
+//                ContactList::addSupportToContactListMutually($user, $bcode->getParent());
+//            } else if($bcode->getGroup() && $bcode->getGroup()->owner) {
+//                Log::info("support - group", [$bcode->getGroup(), $bcode->getGroup()->owner]);
+//                ContactList::addSupportToContactListMutually($user, $bcode->getGroup()->owner);
+//            } else {
                 // no parent id, add default support account
+
+                // Support account is always default
                 ContactList::addSupportToContactListMutually($user);
-            }
+//            }
 
             // Add contact list mappings
             // each mapping adds every user created by give bc to contact list mutually
@@ -195,6 +204,8 @@ class AccountController extends Controller {
             Log::error("issueBusinessAccount, error", [$e]);
             return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
         }
+
+//        Log::warning("query log", [DB::getQueryLog()]);
 
         $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
         return $this->responseOk($user->username, $user->email, $sipPassword, $expiresAtUnixTime);

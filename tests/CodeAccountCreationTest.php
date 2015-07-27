@@ -202,7 +202,6 @@ class CodeAccountCreationTest extends TestCase {
             $command = new NewCodePairsExport(1, $licType, $licFuncType);
             // some future expiration
             $command->addExpiration(Carbon::now()->addYears(2));
-            // add parent - will be added as support account
             $command->addParent($user1);
             list($export1, $codes) = Bus::dispatch($command);
 
@@ -221,14 +220,18 @@ class CodeAccountCreationTest extends TestCase {
             );
 
             // check both have themselves and support account in cl
-            $user1 = User::findByUsername($username1);
+//            $user1 = User::findByUsername($username1);
+
+            $supportUser = User::getSupportUser();
             $user2 = User::findByUsername($username2);
             $user3 = User::findByUsername($username3);
 
-            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user1->subscriber));
+//            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user1->subscriber));
+            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($supportUser->subscriber));
             $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user3->subscriber));
 
-            $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user1->subscriber));
+//            $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user1->subscriber));
+            $this->assertTrue($user3->subscriber->subscribersInContactList->contains($supportUser->subscriber));
             $this->assertTrue($user3->subscriber->subscribersInContactList->contains($user2->subscriber));
         } finally {
             $this->deleteSubscribers([$username1, $username2, $username3]);
@@ -264,8 +267,10 @@ class CodeAccountCreationTest extends TestCase {
             // check both have themselves and support account in cl
             // check user2 has user1 as a support account (as a owner of a group)
             $user2 = User::findByUsername($username2);
+            $supportUser = User::getSupportUser();
 
-            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user1->subscriber));
+//            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($user1->subscriber));
+            $this->assertTrue($user2->subscriber->subscribersInContactList->contains($supportUser->subscriber));
         } finally {
             $this->deleteSubscribers([$username1, $username2]);
         }

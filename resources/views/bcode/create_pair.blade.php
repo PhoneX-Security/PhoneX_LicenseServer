@@ -74,7 +74,7 @@
                                     <option value="{{ $group->id }}">{{ $group->name }} </option>
                                 @endforeach
                             </select>
-                            <span class="help-block">User will be added to this group. Its owner will be added as a support account.</span>
+                            {{--<span class="help-block">User will be added to this group. Its owner will be added as a support account.</span>--}}
                         </div>
                     </div>
 
@@ -83,7 +83,7 @@
                             <label for="parent_username" class="control-label">Parent (username)</label>
                             <input class="form-control" value="{{ old('parent_username') }}"
                                    placeholder="Parent username" id="parent_username" type="text" name="parent_username">
-                            <span class="help-block">Parent user will be added as a support account. (This has bigger priority than group's owner)</span>
+                            {{--<span class="help-block">Parent user will be added as a support account. (This has bigger priority than group's owner)</span>--}}
                         </div>
                     </div>
                 </div>
