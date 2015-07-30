@@ -75,7 +75,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
                         Log::info('RefreshSubscribers updating user: ' . $user->username);
 
                         // TODO enable this when we have confidence this function works well
-//                        Queue::push('licenseUpdated', ['username'=>$user->email], 'users');
+                        Queue::push('licenseUpdated', ['username'=>$user->email], 'users');
                     }
                 }
             }
