@@ -13,6 +13,7 @@
 
 use Carbon\Carbon;
 use Phonex\BusinessCode;
+use Phonex\BusinessCodesExport;
 use Phonex\ContactList;
 use Phonex\Jobs\IssueLicense;
 use Phonex\Group;
@@ -38,6 +39,9 @@ Route::get('logout', 'Auth\AuthController@getLogout');
 // Non authenticated pages
 Route::resource('products', 'Api\ProductController', ['only' => ['show', 'index']]);
 Route::controller('qa', 'QaController'); // qa tools
+
+// API for auto messaging via support account
+Route::get('api\support-messaging\batch', 'Api\SupportMessaging@batch');
 
 // Authenticated pages
 Route::group(['middleware' => ['auth', 'acl']], function() {

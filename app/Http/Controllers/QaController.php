@@ -38,7 +38,7 @@ class QaController extends Controller {
         }
 
 
-        $name  = "phx14";
+        $name  = "jhuska4";
         $subscriber = Subscriber::where('username', $name)->first();
 
         $subscriber->expires_on = $dt->toDateTimeString();
