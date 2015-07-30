@@ -23,12 +23,12 @@ class AppVersion {
     {
         $obj = json_decode($json);
 
-        $this->platform = $obj->p; // android
+        $this->platform = isset($obj->p) ? $obj->p : null; // android
         $this->oscd = isset($obj->oscd) ? $obj->oscd : null; //  OS code, e.g. iOS 8.1.3
         $this->platformId = isset($obj->pid) ? $obj->pid : null; // e.g. kitkat
         $this->versionCode = isset($obj->rc) ? $obj->rc : null; //release code aka version code (android naming)
-        $this->versionName = $obj->ac; // e.g. 1.0.4
-        $this->appName = $obj->info;
+        $this->versionName = isset($obj->ac) ? $obj->ac : null; // e.g. 1.0.4
+        $this->appName = isset($obj->info) ? $obj->info : null;
     }
 
     public function platformDesc()
