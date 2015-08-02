@@ -282,7 +282,7 @@ class UserController extends Controller {
         $userToAdd = User::findByUsername($request->get('username'));
         try {
             if ($user->subscriber->subscribersInContactList->contains($userToAdd->subscriber)){
-                redirect()
+                return redirect()
                     ->back()
                     ->withErrors(['User is already in contact list.']);
             } else {
