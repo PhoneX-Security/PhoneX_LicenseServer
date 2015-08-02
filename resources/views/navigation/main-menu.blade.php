@@ -15,6 +15,7 @@
         <ul class="treeview-menu">
             <li><a href="/bcodes"><i class="fa fa-angle-double-right"></i> Index</a></li>
             <li><a href="/bcodes/generate-code-pairs"><i class="fa fa-angle-double-right"></i> New code pairs</a></li>
+            <li><a href="/bcodes/generate-single-codes"><i class="fa fa-angle-double-right"></i> New single codes</a></li>
             <li><a href="/bcodes/code-exports"><i class="fa fa-angle-double-right"></i> List of exports</a></li>
         </ul>
     </li>

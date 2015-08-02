@@ -10,6 +10,7 @@ use Phonex\Group;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\GenerateCodePairsRequest;
 use Phonex\Jobs\NewCodePairsExport;
+use Phonex\Jobs\NewSingleCodesExport;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\User;
@@ -63,7 +64,20 @@ class BusinessCodeController extends Controller {
 
     public function getGenerateSingleCodes()
     {
-        die('TODO');
+        $groups = Group::all();
+        $licenseTypes = LicenseType::all();
+        foreach ($licenseTypes as $lt){
+            if ($lt->name === LicenseType::EXPIRATION_QUARTER){
+                $lt->default = true;
+            }
+        }
+        $licenseFuncTypes = LicenseFuncType::all();
+        foreach ($licenseFuncTypes as $lft){
+            if ($lft->name === LicenseFuncType::TYPE_TRIAL){
+                $lt->default = true;
+            }
+        }
+        return view('bcode.create_single_codes', compact('groups', 'licenseTypes', 'licenseFuncTypes'));
     }
 
     public function getGenerateCodePairs()
@@ -84,6 +98,48 @@ class BusinessCodeController extends Controller {
 
         return view('bcode.create_pair', compact('groups', 'licenseTypes', 'licenseFuncTypes'));
     }
+    public function postGenerateSingleCodes(GenerateCodePairsRequest $request)
+    {
+        // TODO duplicated code with code pairs - simplify
+        $group = Group::find($request->get('group_id'));
+        $licenseType = LicenseType::find($request->get('license_type_id'));
+        $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
+
+        $number = $request->get('number');
+        $email = $request->get('email');
+        $parent = $request->has('parent_username') ? User::findByUsername($request->get('parent_username')) : null;
+
+        $command = new NewSingleCodesExport($number, $licenseType, $licenseFuncType, 1);
+        if ($request->has('comment')){
+            $command->addComment($request->get('comment'));
+        }
+        if ($group){
+            $command->addGroup($group);
+        }
+        if ($request->has('expires_at')){
+            $command->addExpiration(carbonFromInput($request->get('expires_at')));
+        }
+        if ($parent){
+            $command->addParent($parent);
+        }
+
+        list($export, $codes) = Bus::dispatch($command);
+        $text = "New $number business codes generated.";
+        if ($email) {
+            $export->email = $email;
+            $export->save();
+
+            Mail::send('emails.new_single_codes', ['codes' => $codes, 'parent' => $parent, 'group' => $group], function ($message) use ($email, $group) {
+                $message->from('license-server@phone-x.net', 'License server');
+                $message->to($email)->subject('New codes generated');
+            });
+            $text = "New $number business codes generated and sent to $email.";
+        }
+        return redirect('bcodes')
+            ->with('success', $text);
+
+    }
+
 
     public function postGenerateCodePairs(GenerateCodePairsRequest $request)
     {
@@ -91,7 +147,7 @@ class BusinessCodeController extends Controller {
         $licenseType = LicenseType::find($request->get('license_type_id'));
         $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
 
-        $numberOfPairs = $request->get('number_of_pairs');
+        $numberOfPairs = $request->get('number');
         $email = $request->get('email');
         $parent = $request->has('parent_username') ? User::findByUsername($request->get('parent_username')) : null;
 
@@ -110,16 +166,18 @@ class BusinessCodeController extends Controller {
         }
 
         list($export, $codePairs) = Bus::dispatch($command);
-        $export->email = $email;
-        $export->save();
+        $text = "New $numberOfPairs business code pairs generated.";
+        if ($email) {
+            $export->email = $email;
+            $export->save();
 
-        Mail::send('emails.new_code_pairs', ['codePairs' => $codePairs, 'parent'=>$parent, 'group'=>$group], function($message) use ($email, $group)
-        {
-            $message->from('license-server@phone-x.net', 'License server');
-            $message->to($email)->subject('New code pairs generated');
-        });
-
+            Mail::send('emails.new_code_pairs', ['codePairs' => $codePairs, 'parent' => $parent, 'group' => $group], function ($message) use ($email, $group) {
+                $message->from('license-server@phone-x.net', 'License server');
+                $message->to($email)->subject('New code pairs generated');
+            });
+            $text = "New $numberOfPairs business code pairs generated and sent to $email.";
+        }
         return redirect('bcodes')
-            ->with('success', "New $numberOfPairs business code pairs generated and sent to $email.");
+            ->with('success', $text);
     }
 }
