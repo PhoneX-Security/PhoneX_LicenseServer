@@ -22,6 +22,8 @@ class NewSingleCodesExport extends NewCodesExport {
                 $bc1->code = BusinessCodeUtils::generateUniqueCode($prefix);
                 $bc1->export_id = $exportId;
                 $bc1->save();
+
+                return $bc1;
         });
     }
 }
