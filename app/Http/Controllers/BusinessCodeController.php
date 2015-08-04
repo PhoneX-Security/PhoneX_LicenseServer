@@ -4,7 +4,6 @@ use Bus;
 use Illuminate\Http\Request;
 use Mail;
 use Phonex\BusinessCode;
-use Phonex\BusinessCodeExport;
 use Phonex\BusinessCodesExport;
 use Phonex\Group;
 use Phonex\Http\Requests;
@@ -13,6 +12,7 @@ use Phonex\Jobs\NewCodePairsExport;
 use Phonex\Jobs\NewSingleCodesExport;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Model\CodeExportType;
 use Phonex\User;
 
 class BusinessCodeController extends Controller {
@@ -41,7 +41,22 @@ class BusinessCodeController extends Controller {
     {
         $export = BusinessCodesExport::with(['creator','codes'])->findOrFail($id);
 
-        // Only code pairs are supported at the moment
+        switch($export->type){
+            case CodeExportType::SINGLE:
+                return $this->renderSingleCodes($export);
+                break;
+            case CodeExportType::PAIRS:
+                return $this->renderCodePairs($export);
+                break;
+            default:
+                throw new \Exception("Unsupported export type to render.");
+                break;
+        }
+
+    }
+
+    private function renderCodePairs(BusinessCodesExport $export)
+    {
         $codePairs = [];
 
         // Match pairs
@@ -61,6 +76,15 @@ class BusinessCodeController extends Controller {
 
         return view('bcode.export-details', compact('codePairs', 'export', 'firstCode'));
     }
+
+    private function renderSingleCodes(BusinessCodesExport $export)
+    {
+        $codes = $export->codes;
+        // All codes in a single export have same properties
+        $firstCode = $export->codes->count() > 0 ? $export->codes[0] : null;
+        return view('bcode.export-details', compact('codes', 'export', 'firstCode'));
+    }
+
 
     public function getGenerateSingleCodes()
     {
@@ -137,9 +161,7 @@ class BusinessCodeController extends Controller {
         }
         return redirect('bcodes')
             ->with('success', $text);
-
     }
-
 
     public function postGenerateCodePairs(GenerateCodePairsRequest $request)
     {

@@ -17,22 +17,28 @@ class CreateOrdersTable extends Migration
             $table->engine = 'InnoDB';
 
             $table->increments('id');
+            $table->string('hash_id', 40);
+            $table->unique('hash_id');
+
             $table->timestamps();
             $table->string('email');
-            $table->boolean('to_existing_users');
+            $table->boolean('existing_users');
             $table->smallInteger('state');
 
             $table->text('note');
+            $table->string('locale', 10);
             $table->string('currency');
             $table->decimal('total_cost_no_vat',10,2);
             $table->decimal('vat',10,2);
             $table->decimal('total_cost',10,2);
 
-            $table->integer('gopay_id');
-            $table->integer('gopay_result_code');
+            $table->integer('gopay_id')->nullable();
+            $table->integer('gopay_result_code')->nullable();
 
             $table->integer('business_codes_export_id')->unsigned()->nullable();
             $table->foreign('business_codes_export_id')->references('id')->on('business_codes_exports');
+
+
         });
     }
 

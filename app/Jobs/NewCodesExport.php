@@ -6,13 +6,16 @@ use Phonex\BusinessCodesExport;
 use Phonex\Group;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Model\CodeExportType;
 use Phonex\User;
 
 /**
  * Class CreateBusinessCodePair
  * @package Phonex\Jobs
  */
-class NewCodesExport extends Command implements SelfHandling {
+abstract class NewCodesExport extends Command implements SelfHandling {
+    const TYPE = CodeExportType::SINGLE;// default type single, rewrite it if required
+
     private $licenseType;
     private $licenseFuncType;
     private $group;
@@ -31,7 +34,6 @@ class NewCodesExport extends Command implements SelfHandling {
         $this->licenseFuncType = $licenseFuncType;
         $this->callback = $callback;
     }
-
 
     public function addPrefix($prefix)
     {
@@ -63,6 +65,7 @@ class NewCodesExport extends Command implements SelfHandling {
         $export->license_type_id = $this->licenseType->id;
         $export->license_func_type_id = $this->licenseFuncType->id;
         $export->license_limit_per_code = $this->licenseLimitPerCode;
+        $export->type = static::TYPE; // late static binding
 
         if ($this->parent){
             $export->parent_id = $this->parent->id;

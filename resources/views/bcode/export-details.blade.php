@@ -37,7 +37,7 @@
                             <div class="col-md-2 ">
                                 <dl>
                                     <dt>Created by</dt>
-                                    <dd><a href="{{ route('users.show', [$export->creator->id]) }}">{{ $export->creator->username }}</a></dd>
+                                    <dd>@if($export->creator)<a href="{{ route('users.show', [$export->creator->id]) }}">{{ $export->creator->username }}</a>@endif</dd>
                                 </dl>
                             </div>
                             <div class="col-md-2 ">
@@ -117,7 +117,11 @@
 
                         <div class="row">
                             <div class="col-md-4">
-                                @include('bcode.chips.code-pairs-table', ['codePairs' => $codePairs])
+                                @if(isset($codePairs))
+                                    @include('bcode.chips.code-pairs-table', compact('codePairs'))
+                                @elseif(isset($codes))
+                                    @include('bcode.chips.single-codes-table', compact('codes'))
+                                @endif
                             </div>
                         </div>
 

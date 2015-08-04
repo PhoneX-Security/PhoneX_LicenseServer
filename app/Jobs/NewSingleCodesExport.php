@@ -4,6 +4,7 @@ use Phonex\BusinessCode;
 use Phonex\BusinessCodeClMapping;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Model\CodeExportType;
 use Phonex\Utils\BusinessCodeUtils;
 
 /**
@@ -11,6 +12,8 @@ use Phonex\Utils\BusinessCodeUtils;
  * @package Phonex\Jobs
  */
 class NewSingleCodesExport extends NewCodesExport {
+    const TYPE = CodeExportType::SINGLE;
+
     public function __construct($pairsCount, LicenseType $licenseType, LicenseFuncType $licenseFuncType, $licenseLimitPerCode)
     {
         parent::__construct($pairsCount,

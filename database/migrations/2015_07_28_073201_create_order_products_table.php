@@ -12,14 +12,14 @@ class CreateOrderProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('order_products_table', function (Blueprint $table) {
+        Schema::create('order_products', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
 
             $table->integer('quantity');
             $table->string('currency');
             $table->decimal('cost',10,2);
-            $table->smallInteger('order')->default(0);
+            $table->smallInteger('onum')->default(0);
 
             $table->string('name');
             $table->string('display_name');
@@ -41,6 +41,6 @@ class CreateOrderProductsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('order_products_table');
+        Schema::drop('order_products');
     }
 }

@@ -20,6 +20,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Type</th>
                             <th>Creator</th>
                             <th>Created at</th>
                             <th>Exported to email</th>
@@ -32,7 +33,8 @@
                     @foreach($items as $item)
                         <tr>
                             <td>{{ $item->id }}</td>
-                            <td><a href="{{ route('users.show', $item->creator->id) }}">{{ $item->creator->username }}</a></td>
+                            <td>{{ $item->type }}</td>
+                            <td>@if($item->creator)<a href="{{ route('users.show', $item->creator->id) }}">{{ $item->creator->username }}@endif</a></td>
                             <td>{{ $item->created_at }}</td>
                             <td>{{ $item->email }}</td>
                             <td>@if($item->group) <a href="{{route('groups.show', $item->group->id)}}">{{$item->group->name}}</a>@endif</td>
