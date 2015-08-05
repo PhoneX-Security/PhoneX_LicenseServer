@@ -3,7 +3,7 @@
 use Phonex\Http\Controllers\Controller;
 use Phonex\Http\Requests;
 
-class SupportMessagingController extends Controller {
+class SupportNotificationsController extends Controller {
 
 	public function __construct(){
 	}

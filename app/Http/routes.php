@@ -41,7 +41,7 @@ Route::resource('products', 'Api\ProductController', ['only' => ['show', 'index'
 Route::controller('qa', 'QaController'); // qa tools
 
 // API for auto messaging via support account
-Route::get('api/support-messaging/batch', 'Api\SupportMessagingController@batch');
+Route::get('api/support-messaging/batch', 'Api\SupportNotificationsController@batch');
 
 // Authenticated pages
 Route::group(['middleware' => ['auth', 'acl']], function() {

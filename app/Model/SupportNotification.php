@@ -5,6 +5,7 @@ use Phonex\User;
 
 class SupportNotification extends Model{
     protected $table = "support_notifications";
+    protected $visible = ['id', 'sip'];
 
     public function notificationType()
     {
@@ -14,6 +15,20 @@ class SupportNotification extends Model{
     public function user()
     {
         return $this->belongsTo('Phonex\User', 'user_id');
+    }
+
+    // we manually want to include 'type' accessor in array/json
+    public function toArray()
+    {
+        $array = parent::toArray();
+        $array['type'] = $this->type;
+        return $array;
+    }
+
+    /* Accessors */
+    public function getTypeAttribute()
+    {
+        return $this->notificationType->type;
     }
 
     /* Helpers */

@@ -12,6 +12,10 @@ class NotificationType extends Model{
 
     public $translatedAttributes = ['text'];
     protected $fillable = ['type', 'text'];
+    protected $visible = ['type', 'translations'];
+
+    // what relationships load eagerly on every query
+    protected $with = ['translations'];
 
     /* Helpers */
     public static function getWelcomeNotification()
