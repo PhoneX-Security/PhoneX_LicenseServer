@@ -31,7 +31,7 @@
                             <div class="col-md-4 ">
                                 <div class="form-group"><label for="owner_username" class="control-label">Owner*</label>
                                     <input class="form-control" required value="{{ old('owner_username') }}" placeholder="Enter owner's username" id="owner_username" type="text" name="owner_username">
-                                    <span class="help-block">Owner of the group will be assigned as a support contact for newly created licenses (if not chosen otherwise during user creation).</span>
+                                    {{--<span class="help-block">Owner of the group will be assigned as a support contact for newly created licenses (if not chosen otherwise during user creation).</span>--}}
                                 </div>
                             </div>
                         </div>
