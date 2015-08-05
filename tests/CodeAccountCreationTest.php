@@ -11,6 +11,8 @@ use Phonex\Jobs\NewCodePairsExport;
 use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Model\NotificationType;
+use Phonex\Model\SupportNotification;
 use Phonex\Subscriber;
 use Phonex\User;
 
@@ -168,6 +170,10 @@ class CodeAccountCreationTest extends TestCase {
             ], AccountController::RESP_OK);
             $this->assertEquals($username3, $json->username);
 
+
+            // check user has welcome message dispatched
+            $notification = SupportNotification::where(['user_id' => $user1->id, 'notification_type_id' => NotificationType::getWelcomeNotification()->id])->first();
+            $this->assertNotNull($notification);
 
             // expect two users in contact list (support and another business user)
             $user3 = User::where('username', $username3)->first();

@@ -10,6 +10,7 @@ use Phonex\Jobs\CreateUser;
 use Phonex\ContactList;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Model\SupportNotification;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
 use Phonex\User;
@@ -188,7 +189,7 @@ class AccountController extends Controller {
                 // no parent id, add default support account
 
                 // Support account is always default
-                ContactList::addSupportToContactListMutually($user);
+            ContactList::addSupportToContactListMutually($user);
 //            }
 
             // Add contact list mappings

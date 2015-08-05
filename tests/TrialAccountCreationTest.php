@@ -3,11 +3,13 @@
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Phonex\Http\Controllers\AccountController;
 use Phonex\License;
+use Phonex\Model\NotificationType;
+use Phonex\Model\SupportNotification;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
 use Phonex\User;
 
-class gTrialAccountCreationTest extends TestCase {
+class TrialAccountCreationTest extends TestCase {
     // this wraps all tests in a transaction
     use DatabaseTransactions;
 
@@ -111,6 +113,12 @@ class gTrialAccountCreationTest extends TestCase {
             ], AccountController::RESP_OK);
             $this->assertEquals(self::TEST_USERNAME, $json->username);
 
+            // check user has welcome message dispatched
+            $user = User::where('username', $json->username)->first();
+            $notification = SupportNotification::where(['user_id' => $user->id, 'notification_type_id' => NotificationType::getWelcomeNotification()->id])->first();
+            $this->assertNotNull($notification);
+
+            //
             // assert all records created
             $this->assertEquals($userCount + 1, User::all()->count());
             $this->assertEquals($licenseCount + 1, License::all()->count());

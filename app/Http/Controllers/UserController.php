@@ -20,6 +20,7 @@ use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Model\SupportNotification;
 use Phonex\Role;
 use Phonex\Subscriber;
 use Phonex\User;

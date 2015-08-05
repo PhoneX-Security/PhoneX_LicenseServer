@@ -2,7 +2,7 @@
 
 use Phonex\Utils\BasicEnum;
 
-abstract class StatusNotificationState extends BasicEnum
+abstract class SupportNotificationState extends BasicEnum
 {
     const CREATED = 1;
     const PROCESSING = 2;
