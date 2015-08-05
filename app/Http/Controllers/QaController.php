@@ -24,6 +24,20 @@ class QaController extends Controller {
         Bus::dispatch($c);
     }
 
+    public function getRemoveAllOrders()
+    {
+        $orders = Order::all();
+        foreach($orders as $order){
+            if ($order->businessCodesExport){
+
+            } else {
+
+            }
+
+        }
+
+    }
+
 	public function getChangeExpiration(Request $request){
         $dt = Carbon::now();
 
@@ -52,18 +66,23 @@ class QaController extends Controller {
 
         $sub = User::getSupportUser()->subscriber;
 
-        $time = Carbon::now()->subDays(2);
+        $time = Carbon::now()->subDays(30);
+        $timeLastActivity = Carbon::now()->subDays(14);
 
         $contacts = Subscriber::select('subscriber.*')
             ->join('contactlist', 'subscriber.id', '=', 'contactlist.int_usr_id')
             ->where('contactlist.subscriber_id', $sub->id)
 
-//            ->where('expires_on', '<', $time->toDateTimeString())
+            ->where('license_type', 'trial')
+            ->where('expires_on', '<', $time->toDateTimeString())
+            ->where('expires_on', '<', $time->toDateTimeString())
+            ->whereNotNull('date_last_activity')
+            ->where('date_last_activity', '<', $timeLastActivity->toDateTimeString())
 //            ->whereNull('date_first_login')
-            ->where('subscriber.username','LIKE','%vymaztemamatej%')
+//            ->where('subscriber.username','LIKE','%honza%')
             ->get();
 
-        dd($contacts);
+        dd($contacts[0]);
 
 //        $count = count($contacts);
         $count = 0;
