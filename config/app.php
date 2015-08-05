@@ -159,6 +159,8 @@ return [
         // Breadcrumbs
         'DaveJamesMiller\Breadcrumbs\ServiceProvider',
         'Torann\GeoIP\GeoIPServiceProvider',
+		// Translatable models
+		'Dimsav\Translatable\TranslatableServiceProvider',
 	],
 
 	/*
@@ -219,6 +221,8 @@ return [
 
         'Breadcrumbs' => 'DaveJamesMiller\Breadcrumbs\Facade',
         'GeoIP' => 'Torann\GeoIP\GeoIPFacade',
+
+
 	],
 
 ];

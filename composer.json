@@ -18,7 +18,8 @@
 		"guzzlehttp/guzzle": "^6.0",
         "torann/geoip": "0.2.*@dev",
 		"davejamesmiller/laravel-breadcrumbs": "^3.0",
-		"beatswitch/lock": "^0.1.0"
+		"beatswitch/lock": "^0.1.0",
+		"dimsav/laravel-translatable": "^5.1"
 
 	},
 	"require-dev": {
