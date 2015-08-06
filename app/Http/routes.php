@@ -40,8 +40,9 @@ Route::get('logout', 'Auth\AuthController@getLogout');
 Route::resource('products', 'Api\ProductController', ['only' => ['show', 'index']]);
 Route::controller('qa', 'QaController'); // qa tools
 
-// API for auto messaging via support account
-Route::get('api/support-messaging/batch', 'Api\SupportNotificationsController@batch');
+// API for auto notifications via support account
+Route::get('api/support-notifications/batch', 'Api\SupportNotificationsController@getBatch');
+Route::post('api/support-notifications/batch', 'Api\SupportNotificationsController@postBatch');
 
 // Authenticated pages
 Route::group(['middleware' => ['auth', 'acl']], function() {
