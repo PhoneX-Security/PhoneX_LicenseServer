@@ -1,5 +1,6 @@
 <?php namespace Phonex\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -18,7 +19,6 @@ class SupportNotificationsController extends Controller {
 
     public function getBatch(Request $request)
     {
-        Log::info("SupportNotifications - retrieving batch");
         // temporarily until oauth
         $key = $request->get('k');
         if ($key !== self::SHARED_SECRET){
@@ -50,22 +50,36 @@ class SupportNotificationsController extends Controller {
         $jsonObj->notifications = $notifications;
         $jsonObj->notification_types = $notificationTypes;
 
-        Log::info("SupportNotifications - notifications to be sent.", [$notifications]);
-
         return json_encode($jsonObj);
     }
 
     public function postBatch(Request $request)
     {
         // temporarily until oauth
+        $key = $request->get('k');
+        if ($key !== self::SHARED_SECRET){
+            abort(401);
+        }
+
+        $ack = $request->get('ack');
+        if (!$ack || !in_array($ack, ['pos', 'neg'])){
+            abort(400);
+        }
+
         $ids = $request->get('id');
         if (!is_array($ids)){
+//            $actualLink = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+//            Log::warning("postBatch - bad request", [$actualLink, $request]);
             // bad request
             abort(400);
         }
 
         // Update processing to sent
         $idsToUpdate = SupportNotification::whereIn('id', $ids)->where('state', SupportNotificationState::PROCESSING)->get()->pluck('id')->toArray();
-        SupportNotification::whereIn('id', $idsToUpdate)->update(['state' => SupportNotificationState::SENT]);
+        if ($ack == 'pos'){
+            SupportNotification::whereIn('id', $idsToUpdate)->update(['state' => SupportNotificationState::SENT, 'sent_at' => Carbon::now()]);
+        } else {
+            SupportNotification::whereIn('id', $idsToUpdate)->update(['state' => SupportNotificationState::CREATED]);
+        }
     }
 }
