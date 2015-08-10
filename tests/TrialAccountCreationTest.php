@@ -14,7 +14,7 @@ class TrialAccountCreationTest extends TestCase {
     use DatabaseTransactions;
 
     const URL = '/account/trial';
-    const TEST_USERNAME = "qatrialacctest2";
+    const TEST_USERNAME = "qatrialaccst23";
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -124,6 +124,35 @@ class TrialAccountCreationTest extends TestCase {
             $this->assertEquals($licenseCount + 1, License::all()->count());
             $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
             $this->assertEquals($trialReqCount + 1, TrialRequest::all()->count());
+        } finally {
+            $user = User::where('username', $json->username)->first();
+            if ($user){
+                $user->subscriber->deleteWithContactListRecords();
+            }
+        }
+    }
+
+    public function testImeiBlockation(){
+        try {
+            $imei = "360a2d6bea383d73581d7a1a9";
+
+            // First time should work
+            $json = $this->callAndCheckResponse(self::URL, [
+                'version' => AccountController::VERSION,
+                'imei' => $imei,
+                'captcha' =>'captcha',
+                'username' => self::TEST_USERNAME
+            ], AccountController::RESP_OK);
+            $this->assertEquals(self::TEST_USERNAME, $json->username);
+
+            // Second time should be blocked because of the same IMEI
+            $this->callAndCheckResponse(self::URL, [
+                'version' => AccountController::VERSION,
+                'imei' => $imei,
+                'captcha' =>'captcha',
+                'username' => self::TEST_USERNAME . "8" // try with different username
+            ], AccountController::RESP_ERR_TRIAL_EXISTS);
+
         } finally {
             $user = User::where('username', $json->username)->first();
             if ($user){

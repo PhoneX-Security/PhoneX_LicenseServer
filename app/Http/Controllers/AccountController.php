@@ -111,7 +111,6 @@ class AccountController extends Controller {
         $trialRequest->ip = $request->getClientIp();
         $trialRequest->isApproved = $isValid;
         $trialRequest->username = $username;
-
         $trialRequest->save();
 
         if ($isValid) {
@@ -329,13 +328,13 @@ class AccountController extends Controller {
     private function isValidRequest(Request $request){
         $ip = $request->getClientIp();
         $imei = $request->get('imei');
-        $dateThresholdStart = dbDatetime(strtotime('-14 days'));
-        $dateThresholdEnd = dbDatetime(strtotime('-6 days'));
+        $thresholdStart = Carbon::now()->subMonths(6);//dbDatetime(strtotime('-14 days'));
+        $thresholdEnd = Carbon::now();//dbDatetime(strtotime('-6 days'));
 
         $count =  TrialRequest::where('isApproved', 1)
             ->where('imei', $imei)
-            ->where('dateCreated', "<=", $dateThresholdStart)
-            ->where('dateCreated', ">=",$dateThresholdEnd )
+            ->where('dateCreated', "<=", $thresholdEnd)
+            ->where('dateCreated', ">=", $thresholdStart)
             ->count();
 
         if ($count > 0){

@@ -6,7 +6,7 @@ use Phonex\User;
 class SupportNotification extends Model{
     protected $table = "support_notifications";
     protected $visible = ['id', 'sip'];
-    private $dates = ['sent_at'];
+    protected $dates = ['sent_at'];
 
     public function notificationType()
     {

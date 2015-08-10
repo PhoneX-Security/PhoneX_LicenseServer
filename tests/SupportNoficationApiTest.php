@@ -9,8 +9,8 @@ class SupportNotificationApiTest extends TestCase {
     // this wraps all tests in a transaction
     use DatabaseTransactions;
 
-    const URL = '/api/support-messaging/batch';
-    const TEST_USERNAME = "jsonbstuser12";
+    const URL = '/api/support-notifications/batch';
+    const TEST_USERNAME = "jsonbstuser17";
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -23,13 +23,13 @@ class SupportNotificationApiTest extends TestCase {
             // create trial account
             $userJson = $this->callAndCheckResponse(TrialAccountCreationTest::URL, [
                 'version' => AccountController::VERSION,
-                'imei' => 'a',
+                'imei' => 'abcde',
                 'captcha' =>'captcha',
                 'username' => self::TEST_USERNAME
             ], AccountController::RESP_OK);
 
             // check that support notification batch contains given user
-            $response = $this->call('GET', self::URL);
+            $response = $this->call('GET', self::URL, ['k' => 'ovual3ohshiChai5EiPeeP4ma']);
             $json = json_decode($response->getContent());
 
             $this->assertEquals(1, count($json->notifications));
@@ -39,7 +39,7 @@ class SupportNotificationApiTest extends TestCase {
             $this->assertEquals(NotificationType::TYPE_WELCOME_MESSAGE, $json->notification_types[0]->type);
 
             // check that when called twice, user is not contained in the batch
-            $response = $this->call('GET', self::URL);
+            $response = $this->call('GET', self::URL, ['k' => 'ovual3ohshiChai5EiPeeP4ma']);
             $json = json_decode($response->getContent());
             $this->assertEquals(0, count($json->notifications));
             $this->assertEquals(0, count($json->notification_types));
