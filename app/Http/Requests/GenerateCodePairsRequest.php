@@ -20,7 +20,7 @@ class GenerateCodePairsRequest extends Request {
 	public function rules()
 	{
 		return [
-            'group_id' => 'exists:groups,id',
+            'group_id' => 'required|exists:groups,id',
             'license_type_id' => 'exists:license_types,id',
             'license_func_type_id' => 'exists:license_func_types,id',
 			'number' => 'required|integer|between:1,100',

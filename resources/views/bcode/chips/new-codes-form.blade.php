@@ -58,7 +58,7 @@
 
             <div class="col-md-2">
                 <div class="form-group">
-                    <label for="group_id" class="control-label">Group</label>
+                    <label for="group_id" class="control-label">Group*</label>
                     <select name="group_id" class="form-control">
                         <option selected disabled>-Select group-</option>
                         @foreach($groups as $group)
