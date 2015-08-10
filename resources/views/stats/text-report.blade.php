@@ -62,24 +62,31 @@
                     @foreach($d as $licTypeId => $dd)
                         <li>{{$licenseFuncTypes[$licFuncTypeId]->uc_name . " (" . $licenseTypes[$licTypeId]->name . ")" }} <br />
                             <ul>
-                                <li>Total: {{$dd->totalCount}}</li>
-                                <li>Never logged in: {{$dd->neverLoggedIn['count']}}
-                                    @if(isset($dd->neverLoggedIn['users']) && count($dd->neverLoggedIn['users']))
-                                        @include('stats.chips.with-users', ['users' => $dd->neverLoggedIn['users'], 'withUsers' => $withUsers])
+                                <li>Total: {{$dd['count']}}</li>
+                                <li>Never logged in: {{$dd['neverLoggedIn']['count']}}
+                                    @if(isset($dd['neverLoggedIn']['users']) && count($dd['neverLoggedIn']['users']))
+                                        @include('stats.chips.with-users', ['users' => $dd['neverLoggedIn']['users'], 'withUsers' => $withUsers])
                                     @endif
                                 </li>
                                 <li>Countries:
-                                    @foreach($dd->countries as $country => $data)
+                                    @foreach($dd['countries'] as $country => $data)
                                         {{$country . " (" . $data['count'] . ")"}}
                                         @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
-                                        @if(!$withUsers && $data !== end($dd->countries)), @endif
+                                        @if(!$withUsers && $data !== end($dd['countries'])), @endif
                                     @endforeach
                                 </li>
                                 <li>Platforms:
-                                    @foreach($dd->platforms as $platform => $data)
+                                    @foreach($dd['platforms'] as $platform => $data)
                                         {{$platform . " (" . $data['count'] . ")"}}
                                         @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
-                                        @if(!$withUsers && $data !== end($dd->platforms)), @endif
+                                        @if(!$withUsers && $data !== end($dd['platforms'])), @endif
+                                    @endforeach
+                                </li>
+                                <li><b>Groups:</b>
+                                    @foreach($dd['groups'] as $key => $data)
+                                        {{$key . " (" . $data['count'] . ")"}}
+                                        @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
+                                        @if(!$withUsers && $data !== end($dd['groups'])), @endif
                                     @endforeach
                                 </li>
                             </ul>

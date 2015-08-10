@@ -135,22 +135,45 @@ class Stats
 
         $newUsers = [];
         $newUsersData = [];
+        $existingUsers = [];
         $existingUsersData = [];
 
         // Filter users and licenses
         foreach ($lics as $lic){
             $user = $lic->user;
+
+            // point to license which is taken into account
+            $lic->user->relevant_license = $lic;
+
             // if new user
             if (in_array($user->id, $newUsersIds)){
                 $newUsers[$lic->license_func_type_id][$lic->license_type_id][] = $lic->user;
             } else { // if existing user
+                $existingUsers[$lic->license_func_type_id][$lic->license_type_id][] = $lic->user;
 
-                if (!isset($existingUsersData[$lic->license_func_type_id][$lic->license_type_id])) {
-                    $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['count'] = 0;
-                }
+//                if (!isset($existingUsersData[$lic->license_func_type_id][$lic->license_type_id])) {
+//                    $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['count'] = 0;
+//                }
+//
+//                $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['count']++;
+//                $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['users'][] = $user->getUserObj();
+//                if ($lic->businessCode){
+//                    $groupName = $lic->businessCode->getGroup();
+//                    if (!$groupName){
+//                        $groupName = 'no_group';
+//                    }
+//
+//                    if (!isset($existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['codes'][$groupName])){
+//                        $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['codes'][$groupName]
+//                    }
+//                }
+            }
+        }
 
-                $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['count']++;
-                $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['users'][] = $user->getUserObj();
+        // Get statistics for existing users
+        foreach($existingUsers as $licFuncTypeId => $g){
+            foreach ($g as $licTypeId => $gg){
+                $existingUsersData[$licFuncTypeId][$licTypeId] = $this->statsForUsers($gg);
             }
         }
 
@@ -166,18 +189,22 @@ class Stats
 
     private function statsForUsers($users)
     {
-        $info = new stdClass();
-        $info->totalCount = count($users);
+        $info = [];
+        $info['count'] = count($users);
+        $info['users'] = [];
 
         // Count platforms
         $countries = [];
         $platforms = [];
+        $groups = [];
         $neverLoggedIn['count'] = 0;
         foreach($users as $user){
             $userObj = $user->getUserObj();
+            $info['users'][] = $userObj;
 
             if (!$user->subscriber || $user->subscriber->date_first_login){
 
+                // Countries
                 $key1 = $user->subscriber->location['country'];
                 if (!$key1){
                     $key1= "unknown";
@@ -191,6 +218,7 @@ class Stats
 
                 arsort($countries);
 
+                // Platforms
                 if ($user->subscriber->app_version){
                     $key2 = $user->subscriber->app_version_obj->platformDesc();
                     if (!array_key_exists($key2, $platforms)){
@@ -203,15 +231,32 @@ class Stats
 
                 arsort($platforms);
 
+                // Groups
+                if ($user->relevant_license->businessCode){
+                    $group = $user->relevant_license->businessCode->getGroup();
+                    $groupName = 'no_group';
+                    if ($group){
+                        $groupName = $group->name;
+                    }
+                    if (!array_key_exists($groupName, $groups)){
+                        $groups[$groupName]['count'] = 0;
+                    }
+                    $groups[$groupName]['count']++;
+                    $groups[$groupName]['users'][] = $userObj;
+                }
+
+                arsort($groups);
+
             } else {
                 $neverLoggedIn['count']++;
                 $neverLoggedIn['users'][] = $userObj;
             }
         }
 
-        $info->countries = $countries;
-        $info->platforms = $platforms;
-        $info->neverLoggedIn = $neverLoggedIn;
+        $info['countries'] = $countries;
+        $info['platforms'] = $platforms;
+        $info['neverLoggedIn'] = $neverLoggedIn;
+        $info['groups'] = $groups;
         return $info;
     }
 }
