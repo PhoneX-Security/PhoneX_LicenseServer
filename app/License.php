@@ -38,6 +38,10 @@ class License extends Model{
         return $this->belongsTo('Phonex\LicenseFuncType', 'license_func_type_id');
     }
 
+    public function businessCode() {
+        return $this->belongsTo('Phonex\BusinessCode', 'business_code_id');
+    }
+
     /* Accessors */
     // readable_type
     public function getReadableTypeAttribute()

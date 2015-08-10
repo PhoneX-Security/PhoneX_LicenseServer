@@ -3,6 +3,7 @@
 use Bus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Phonex\BusinessCodesExport;
 use Phonex\Group;
 use Phonex\Jobs\CreateSubscriberWithLicense;
 use Phonex\Jobs\CreateUser;
@@ -24,18 +25,47 @@ class QaController extends Controller {
         Bus::dispatch($c);
     }
 
-    public function getRemoveAllOrders()
+    public function getUpdateExports()
     {
-        $orders = Order::all();
-        foreach($orders as $order){
-            if ($order->businessCodesExport){
+        $users = User::whereNotNull('business_code_id')->get();
+//
+//        foreach($users as $user){
+//            if ($user->licenses->count() > 1){
+//
+//            }
+//
+////            dd($user);
+//            $lic = $user->licenses[0];
+//            $lic->business_code_id = $user->business_code_id;
+//            $lic->save();
+//        }
 
-            } else {
-
-            }
-
-        }
-
+//        $exports = BusinessCodesExport::all();
+//        foreach($exports as $export){
+//            $codes = $export->codes;
+//            if ($codes && $codes->count()>0){
+//                $code = $codes[0];
+//
+//                if ($code->parent_id){
+//                    $export->parent_id = $code->parent_id;
+//                }
+//                if ($code->group_id){
+//                    $export->group_id = $code->group_id;
+//                }
+//                if ($code->license_type_id && $code->license_type_id!=0){
+//                    $export->license_type_id = $code->license_type_id;
+//                }
+//                if ($code->license_func_type_id && $code->license_func_type_id!=0){
+//                    $export->license_func_type_id = $code->license_func_type_id;
+//                }
+//                if ($code->users_limit && $code->users_limit!=0){
+//                    $export->license_limit_per_code = $code->users_limit;
+//                }
+////                dd([$code,$export]);
+//
+//                $export->save();
+//            }
+//        }
     }
 
 	public function getChangeExpiration(Request $request){

@@ -329,7 +329,7 @@ class AccountController extends Controller {
         $ip = $request->getClientIp();
         $imei = $request->get('imei');
         $thresholdStart = Carbon::now()->subMonths(6);//dbDatetime(strtotime('-14 days'));
-        $thresholdEnd = Carbon::now();//dbDatetime(strtotime('-6 days'));
+        $thresholdEnd = Carbon::now()->subDays(2);//dbDatetime(strtotime('-6 days'));
 
         $count =  TrialRequest::where('isApproved', 1)
             ->where('imei', $imei)

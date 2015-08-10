@@ -67,6 +67,7 @@
                             <th >{!! link_to_sort('username', 'Username') !!}</th>
                             <th>{!! link_to_sort('license_type', 'Expiration') !!}</th>
                             <th>{!! link_to_sort('license_func_type', 'Type') !!}</th>
+                            <th>License code (code/group)</th>
                             <th>Active</th>
                             <th>{!! link_to_sort('starts_at', 'Start date') !!}</th>
                             <th>{!! link_to_sort('expires_at', 'Expiration date') !!}</th>
@@ -81,6 +82,12 @@
                             <td><a href="{{ \URL::route('users.show', [$lic->user_id]) }}">{{ $lic->username }}</a></td>
                             <td>{{ ucfirst($lic->license_type) }}</td>
                             <td>{{ ucfirst($lic->license_func_type) }}</td>
+                            <td>
+                                @if($lic->business_code_id)
+                                    {{$lic->businessCode->printable_code }} /
+                                    {{ $lic->businessCode->getGroup()->name or 'unknown-group' }}
+                                @else - @endif
+                            </td>
                             <td>@if($lic->active) Yes @else No @endif</td>
                             <td>{{ $lic->formatted_starts_at}}</td>
                             <td>{{ $lic->formatted_expires_at }}</td>

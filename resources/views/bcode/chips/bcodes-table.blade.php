@@ -29,7 +29,7 @@
             <td>@if($bcode->getExpiresAt()) {{ $bcode->getExpiresAt() }} @endif</td>
             <td>{{ $bcode->getGroup()->name or ''}}</td>
             <td>{{ $bcode->getParent()->username or ''}}</td>
-            <td>{{ $bcode->users->count() . '/' . $bcode->users_limit  }}</td>
+            <td>{{ $bcode->users->count() . '/' . $bcode->getLicenseLimit()  }}</td>
             <td>@if($bcode->users)
                     @foreach($bcode->users as $k => $user)
                         <a href="{{route('users.show',$user->id)}}">{{ $user->username }}</a>

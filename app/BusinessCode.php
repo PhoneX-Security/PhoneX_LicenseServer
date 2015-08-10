@@ -15,6 +15,7 @@ class BusinessCode extends Model{
     protected $table = 'business_codes';
     protected $dates = ['expires_at'];
 
+    // WARNING - use get<GROUP|CREATOR|PARENT> instead of these functions
     public function group(){
         return $this->belongsTo('Phonex\Group', 'group_id');
     }
@@ -56,14 +57,15 @@ class BusinessCode extends Model{
     // number_of_usages
     public function getNumberOfUsagesAttribute()
     {
-        $usersIds = $this->users->pluck('id')->toArray();
-        foreach($this->licenses as $lic){
-            $id = $lic->user->id;
-            if (!in_array($id, $usersIds)){
-                $usersIds[] = $id;
-            }
-        }
-        return count($usersIds);
+        return $this->licenses->count();
+//        $usersIds = $this->users->pluck('id')->toArray();
+//        foreach($this->licenses as $lic){
+//            $id = $lic->user->id;
+//            if (!in_array($id, $usersIds)){
+//                $usersIds[] = $id;
+//            }
+//        }
+//        return count($usersIds);
     }
 
 

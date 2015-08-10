@@ -104,7 +104,11 @@
                     @endforeach
                 </ul>
 
+                <h3>Activation by license codes</h3>
+
             </div>
+
+
         </div>
 
         <script>

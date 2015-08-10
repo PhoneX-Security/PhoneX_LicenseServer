@@ -16,6 +16,8 @@ Parameters: $licenses, $show_username, $show_issuer
                 <th>Issuer</th>
             @endif
 
+            <th>License code (code/group)</th>
+
             <th>Active</th>
             <th>Start date</th>
             <th>Expiration date</th>
@@ -38,6 +40,12 @@ Parameters: $licenses, $show_username, $show_issuer
                     @else - @endif</td>
                 @endif
 
+                <td>
+                    @if($license->business_code_id)
+                        {{$license->businessCode->printable_code }} /
+                        {{ $license->businessCode->getGroup()->name or 'unknown-group' }}
+                    @else - @endif
+                </td>
                 <td>@if($license->active) Yes @else No @endif</td>
                 <td>{{ date_simple($license->starts_at) }}</td>
                 <td>{{ date_simple($license->expires_at) }}</td>

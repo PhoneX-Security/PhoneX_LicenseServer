@@ -21,6 +21,11 @@ class Group extends Model{
         return $this->hasMany('Phonex\BusinessCode', 'group_id');
     }
 
+    public function exports()
+    {
+        return $this->hasMany('Phonex\BusinessCode', 'group_id');
+    }
+
     /* Helpers */
     public static function findByName($groupName)
     {
