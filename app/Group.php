@@ -18,8 +18,13 @@ class Group extends Model{
 
     public function bcodes()
     {
-        return $this->hasMany('Phonex\BusinessCode', 'group_id');
+        return $this->hasManyThrough('Phonex\BusinessCode', 'Phonex\BusinessCodesExport', 'group_id', 'export_id');
     }
+
+//    public function bcodes()
+//    {
+//        return $this->hasMany('Phonex\BusinessCode', 'group_id');
+//    }
 
     public function exports()
     {

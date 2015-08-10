@@ -53,7 +53,7 @@ class GroupController extends Controller {
 
     public function showCodes($id)
     {
-        $group = Group::with('bcodes')->findOrFail($id);
+        $group = Group::with('exports')->findOrFail($id);
         return view('group.show-bcodes', compact('group'));
     }
 
