@@ -66,15 +66,10 @@ class GroupController extends Controller {
     public function update($id, UpdateGroupRequest $request)
     {
         $group = Group::findOrFail($id);
-//        try {
-            $this->validate($request,
-                [
-                    'name' => 'required|min:5|max:255|unique:groups,name,' . $group->id
-                ]);
-
-//        } catch (Exception $e) {
-//            dd('sakafaka');
-//        }
+        $this->validate($request,
+        [
+            'name' => 'required|min:5|max:255|unique:groups,name,' . $group->id
+        ]);
 
         $user = User::findByUsername($request->get('owner_username'));
 

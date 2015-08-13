@@ -5,7 +5,7 @@ use Phonex\User;
 
 class SupportNotification extends Model{
     protected $table = "support_notifications";
-    protected $visible = ['id', 'sip'];
+    protected $visible = ['id', 'sip', 'locale'];
     protected $dates = ['sent_at'];
 
     public function notificationType()
@@ -18,11 +18,12 @@ class SupportNotification extends Model{
         return $this->belongsTo('Phonex\User', 'user_id');
     }
 
-    // we manually want to include 'type' accessor in array/json
+    // we manually want to include 'type' and 'text' accessors in array/json
     public function toArray()
     {
         $array = parent::toArray();
         $array['type'] = $this->type;
+        $array['text'] = $this->text;
         return $array;
     }
 
@@ -30,6 +31,15 @@ class SupportNotification extends Model{
     public function getTypeAttribute()
     {
         return $this->notificationType->type;
+    }
+
+    public function getTextAttribute()
+    {
+        if ($this->locale && $this->notificationType){
+            return $this->notificationType->translate($this->locale)->text;
+        } else {
+            return null;
+        }
     }
 
     /* Helpers */
@@ -41,6 +51,8 @@ class SupportNotification extends Model{
         $notification->sip = $user->email;
         $notification->notification_type_id = $notificationType->id;
         $notification->state = SupportNotificationState::CREATED;
+
+        // at this moment, we do not know locale
         $notification->save();
         return $notification;
     }

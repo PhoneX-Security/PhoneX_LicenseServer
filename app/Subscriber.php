@@ -13,6 +13,7 @@ use GeoIP;
  * @property  license_type
  */
 class Subscriber extends Model{
+    /* Definition */
     protected $connection = 'mysql_opensips';
     protected $table = 'subscriber';
 

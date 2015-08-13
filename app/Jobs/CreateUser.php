@@ -1,15 +1,9 @@
 <?php namespace Phonex\Jobs;
 
-use Carbon\Carbon;
-use Log;
-
 use Illuminate\Contracts\Bus\SelfHandling;
-use Phonex\ContactList;
+use Log;
 use Phonex\Events\AuditEvent;
-use Phonex\License;
-use Phonex\LicenseType;
 use Phonex\Model\SupportNotification;
-use Phonex\Subscriber;
 use Phonex\User;
 
 class CreateUser extends Command implements SelfHandling {
@@ -98,10 +92,8 @@ class CreateUser extends Command implements SelfHandling {
             $user->roles()->attach($this->roleIds);
         }
 
-
         // newly created user - dispatch a welcome notification via support
         SupportNotification::dispatchWelcomeNotification($user);
-
         return $user;
 	}
 }

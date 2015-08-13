@@ -30,8 +30,7 @@ class SupportNotificationsController extends Controller {
         try
         {
             // Load all notifications in CREATED state - switch them to PROCESSING state and return them to processing for phonex-support
-            // Also return all message types
-            $notifications = SupportNotification::with('notificationType')->where(['state' => SupportNotificationState::CREATED])->get();
+            $notifications = SupportNotification::with('notificationType','user.subscriber')->where(['state' => SupportNotificationState::CREATED])->get();
             $ids = $notifications->pluck('id')->toArray();
             SupportNotification::whereIn('id', $ids)->update(['state' => SupportNotificationState::PROCESSING]);
 
@@ -43,14 +42,41 @@ class SupportNotificationsController extends Controller {
             Log::error('SupportNotificationsController@batch - cannot load messages batch', [$e]);
             return json_encode([]);
         }
-        $types = $notifications->pluck('type')->toArray();
-        $notificationTypes = NotificationType::whereIn('type', $types)->get();
+
+        // update locales - get only those notifications we can figure out locale for, otherwise put them back to CREATED state
+        $notifications = $this->notificationsWithLocales($notifications);
 
         $jsonObj = new \stdClass();
         $jsonObj->notifications = $notifications;
-        $jsonObj->notification_types = $notificationTypes;
-
         return json_encode($jsonObj);
+    }
+
+    // update locale according to subscriber->app_version object
+    private function notificationsWithLocales($notifications)
+    {
+        $toReturn = [];
+        foreach($notifications as $notification){
+            $appVersionObj = $notification->user->subscriber->app_version_obj;
+            if (!$appVersionObj || !$appVersionObj->locales){
+                // if we cannot figure locale out from app_version, put notification back to created state
+                SupportNotification::where('id', $notification->id)->update(['state'=> SupportNotificationState::CREATED]);
+            } else {
+                // locales are order by priority
+                // locale can be in format "en_US", split string by '_' and take the first part
+                $locale = explode('_', $appVersionObj->locales[0])[0];
+
+                if (!$notification->notificationType->hasTranslation($locale)){
+                    // if such translation does not exist, put default locale as 'en'
+                    $locale = 'en';
+                }
+
+                $notification->locale = $locale;
+                $notification->save();
+
+                $toReturn[] = $notification;
+            }
+        }
+        return $toReturn;
     }
 
     public function postBatch(Request $request)

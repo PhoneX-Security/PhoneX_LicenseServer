@@ -26,6 +26,7 @@ class SupportNotificationsTable extends Migration
             $table->foreign('notification_type_id')->references('id')->on('notification_types');
 
             $table->integer('state');
+            $table->string('locale', 100)->nullable();
         });
     }
 

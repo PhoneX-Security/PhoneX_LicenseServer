@@ -3,7 +3,7 @@
 
 /**
  * Android example:
- * {"ac":"1.1.5","v":1,"pid":19,"rc":2277,"info":"PhoneX","p":"android"}
+ * {"ac":"1.1.5","v":1,"pid":19,"rc":2277,"info":"PhoneX","p":"android", "locales":["en_EN"]}
  *
  * iOS version:
  * {"p":"iOS","oscd":"8.1.3","info":"PhoneX","v":1,"ac":"1.0.3"}
@@ -17,6 +17,7 @@ class AppVersion {
     public $versionCode;
     public $versionName;
     public $appName;
+    public $locales = [];
 
 
     function __construct($json)
@@ -29,6 +30,9 @@ class AppVersion {
         $this->versionCode = isset($obj->rc) ? $obj->rc : null; //release code aka version code (android naming)
         $this->versionName = isset($obj->ac) ? $obj->ac : null; // e.g. 1.0.4
         $this->appName = isset($obj->info) ? $obj->info : null;
+        if (isset($obj->locales) && is_array($obj->locales)){ // preferred locales
+            $this->locales = $obj->locales;
+        }
     }
 
     public function platformDesc()
