@@ -48,7 +48,9 @@ class SupportNotificationsController extends Controller {
 
         $jsonObj = new \stdClass();
         $jsonObj->notifications = $notifications;
-        return json_encode($jsonObj);
+        $json = json_encode($jsonObj);
+        Log::info("Retrieving notification batch", [$json]);
+        return $json;
     }
 
     // update locale according to subscriber->app_version object
