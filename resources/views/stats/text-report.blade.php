@@ -10,7 +10,7 @@
 
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">...</h3>
+                <h3 class="box-title"></h3>
                 <div class="box-tools">
                     <form class="form-inline inline-block"  action="/stats/text-report" method="get">
 
@@ -48,6 +48,12 @@
                             </label>
                         </div>
 
+                        <div class="checkbox" style="margin: 0px 10px">
+                            <label>
+                                <input name="relevant-only" type="checkbox" @if(Request::has('relevant-only')) checked @endif> For investors
+                            </label>
+                        </div>
+
 
                         <button type="submit" class="btn btn-default">Filter</button>
                     </form>
@@ -68,6 +74,8 @@
                                         @include('stats.chips.with-users', ['users' => $dd['neverLoggedIn']['users'], 'withUsers' => $withUsers])
                                     @endif
                                 </li>
+
+                                @if($dd['countries'])
                                 <li>Countries:
                                     @foreach($dd['countries'] as $country => $data)
                                         {{$country . " (" . $data['count'] . ")"}}
@@ -75,20 +83,27 @@
                                         @if(!$withUsers && $data !== end($dd['countries'])), @endif
                                     @endforeach
                                 </li>
-                                <li>Platforms:
-                                    @foreach($dd['platforms'] as $platform => $data)
-                                        {{$platform . " (" . $data['count'] . ")"}}
-                                        @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
-                                        @if(!$withUsers && $data !== end($dd['platforms'])), @endif
-                                    @endforeach
-                                </li>
-                                <li><b>Groups:</b>
-                                    @foreach($dd['groups'] as $key => $data)
-                                        {{$key . " (" . $data['count'] . ")"}}
-                                        @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
-                                        @if(!$withUsers && $data !== end($dd['groups'])), @endif
-                                    @endforeach
-                                </li>
+                                @endif
+
+                                @if($dd['platforms'])
+                                    <li>Platforms:
+                                        @foreach($dd['platforms'] as $platform => $data)
+                                            {{$platform . " (" . $data['count'] . ")"}}
+                                            @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
+                                            @if(!$withUsers && $data !== end($dd['platforms'])), @endif
+                                        @endforeach
+                                    </li>
+                                @endif
+
+                                @if($dd['groups'])
+                                    <li><b>OZ Groups:</b>
+                                        @foreach($dd['groups'] as $key => $data)
+                                            {{$key . " (" . $data['count'] . ")"}}
+                                            @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
+                                            @if(!$withUsers && $data !== end($dd['groups'])), @endif
+                                        @endforeach
+                                    </li>
+                                @endif
                             </ul>
                         </li>
                     @endforeach
@@ -110,8 +125,6 @@
                         @endforeach
                     @endforeach
                 </ul>
-
-                <h3>Activation by license codes</h3>
 
             </div>
 

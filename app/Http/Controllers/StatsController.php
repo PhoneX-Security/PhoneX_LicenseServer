@@ -171,6 +171,10 @@ class StatsController extends Controller {
 
         $daterange = $dateFrom->toDateString() . " : " . $dateTo->toDateString();
         $withUsers = $request->has('with-users');
+
+        // report specifically for investor
+        $relevantOnly = $request->has('relevant-only');
+
         return view('stats.text-report', compact('existingUsersData', 'newUsersData', 'licenseTypes', 'licenseFuncTypes', 'daterange', 'withUsers'));
     }
 
