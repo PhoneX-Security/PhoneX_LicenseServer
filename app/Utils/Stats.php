@@ -145,28 +145,13 @@ class Stats
             // point to license which is taken into account
             $lic->user->relevant_license = $lic;
 
-            // if new user
-            if (in_array($user->id, $newUsersIds)){
-                $newUsers[$lic->license_func_type_id][$lic->license_type_id][] = $lic->user;
-            } else { // if existing user
-                $existingUsers[$lic->license_func_type_id][$lic->license_type_id][] = $lic->user;
 
-//                if (!isset($existingUsersData[$lic->license_func_type_id][$lic->license_type_id])) {
-//                    $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['count'] = 0;
-//                }
-//
-//                $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['count']++;
-//                $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['users'][] = $user->getUserObj();
-//                if ($lic->businessCode){
-//                    $groupName = $lic->businessCode->getGroup();
-//                    if (!$groupName){
-//                        $groupName = 'no_group';
-//                    }
-//
-//                    if (!isset($existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['codes'][$groupName])){
-//                        $existingUsersData[$lic->license_func_type_id][$lic->license_type_id]['codes'][$groupName]
-//                    }
-//                }
+            if (in_array($user->id, $newUsersIds)){
+                // if new user
+                $newUsers[$lic->license_func_type_id][$lic->license_type_id][] = $lic->user;
+            } else {
+                // if existing user
+                $existingUsers[$lic->license_func_type_id][$lic->license_type_id][] = $lic->user;
             }
         }
 
@@ -202,7 +187,7 @@ class Stats
             $userObj = $user->getUserObj();
             $info['users'][] = $userObj;
 
-            if (!$user->subscriber || $user->subscriber->date_first_login){
+            if ($user->subscriber && $user->subscriber->date_first_login){
 
                 // Countries
                 $key1 = $user->subscriber->location['country'];
