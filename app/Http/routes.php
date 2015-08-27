@@ -71,7 +71,8 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     Route::get('groups/{user}/bcodes', ['as' => 'groups.bcodes', 'uses' => 'GroupController@showCodes']);
 
     /* Licenses */
-    Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update']]);
+    Route::resource('licenses', 'LicenseController', ['only' => ['index', 'edit', 'update', 'destroy']]);
+    Route::get('licenses/delete/{id}', ['as'=>'licenses.delete', 'uses' => 'LicenseController@destroy']);
 
     /* Business Codes */
     Route::controller('bcodes', 'BusinessCodeController');

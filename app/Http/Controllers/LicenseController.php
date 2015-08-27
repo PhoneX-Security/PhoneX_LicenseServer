@@ -1,8 +1,10 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Carbon\Carbon;
+use Log;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\UpdateLicenseRequest;
+use Phonex\Jobs\RefreshSubscribers;
 use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\User;
@@ -108,7 +110,8 @@ class LicenseController extends Controller {
 	{
 		$license = License::find($id);
         if ($license == null){
-            throw new NotFoundHttpException;
+			return redirect()->route('licenses.index');
+//            throw new NotFoundHttpException;
         }
 
 		$licenseFuncTypes = LicenseFuncType::all();
@@ -158,7 +161,29 @@ class LicenseController extends Controller {
 	 */
 	public function destroy($id)
 	{
-		//
-	}
+		$license = License::find($id);
+		if ($license == null){
+			throw new NotFoundHttpException;
+		}
 
+		try {
+			// if this license is set as active license, please delete it
+			$user = $license->user;
+			if ($user->active_license_id === $license->id){
+				$user->active_license_id = null;
+				$user->save();
+			}
+			$license->delete();
+			RefreshSubscribers::refreshSingleUser($user);
+
+		} catch (\Exception $e) {
+			Log::error("Unable to delete license", [$e]);
+			return redirect()
+				->back()
+				->withErrors(['Server error: Unable to delete license, it is probably referenced by other records. Please contact support.']);
+		}
+		return redirect()
+			->back()
+			->with('success', 'License has been deleted.');
+	}
 }

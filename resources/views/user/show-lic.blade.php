@@ -29,10 +29,10 @@
 
                 <div class="box-body">
                     <h4>Licenses</h4>
-                    @include('license.chips.licenses_table', ['licenses' => $user->licenses, 'show_issuer'=>true])
+                    @include('license.chips.licenses-table', ['licenses' => $user->licenses, 'show_issuer'=>true])
 
                     <h4>Licenses issued by user</h4>
-                    @include('license.chips.licenses_table', ['licenses' => $user->issuedLicenses, 'show_username'=>true])
+                    @include('license.chips.licenses-table', ['licenses' => $user->issuedLicenses, 'show_username'=>true])
                 </div>
             </div>
 

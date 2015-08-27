@@ -53,12 +53,16 @@ Parameters: $licenses, $show_username, $show_issuer
                 <td>
                     {{--class="text-center"--}}
                     <div class="btn-group  btn-group-xs">
-                        <a type="button" class="btn btn-info   view-btn-edit" href="{{ \URL::route('licenses.edit', $license->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>
+                        <a type="button" class="btn btn-info view-btn-edit" href="{{ route('licenses.edit', $license->id) }}" title="Edit"><i class="fa fa-pencil-square-o"></i> Edit</a>
+
+                        <a type="button" class="btn btn-danger" href="#" title="Delete"
+                           data-href="{{ route('licenses.delete', $license->id) }}" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i> Delete</a>
                     </div>
                 </td>
             </tr>
         @endforeach
     </table>
-@else
-    No licenses
+
+    @include('dialogs.license-delete')
+
 @endif

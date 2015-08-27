@@ -5,9 +5,16 @@
 @section('form-nav')
     <div class="row form-inline" style="margin-bottom: 5px">
         <div class="col-sm-6">
-            <a class="btn btn-sm btn-primary view-btn-create" href="/licenses">
+            <a class="btn btn-sm btn-primary" href="/licenses">
                 <i class="fa fa-angle-left"></i> Back to licenses
             </a>
+
+            <a class="btn btn-sm btn-danger"
+               href="#" title="Delete" data-href="{{ route('licenses.delete', $license->id) }}" data-toggle="modal" data-target="#confirm-delete">
+                <i class="fa fa-trash-o"></i> Delete
+            </a>
+
+            @include('dialogs.license-delete')
         </div>
 
         <div class="col-sm-6 text-right">

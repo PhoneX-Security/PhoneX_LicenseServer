@@ -35,8 +35,7 @@ Parameters: $user
     Empty contact list
 @endif
 
-@include('dialogs.confirm_delete')
-
+@include('dialogs.contact-delete')
 
 <hr />
 

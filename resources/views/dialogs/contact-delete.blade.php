@@ -5,7 +5,7 @@
                 Deleting the record
             </div>
             <div class="modal-body">
-                Are you sure?
+                Are you sure you want to remove this contact from user's contact list?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

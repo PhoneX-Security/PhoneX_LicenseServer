@@ -28,7 +28,19 @@ class RefreshSubscribers extends Command implements SelfHandling {
                 if(!$user->subscriber){
                     continue;
                 }
-                /*
+                self::refreshSingleUser($user);
+
+            }
+        });
+
+        Log::info('RefreshSubscribers is finished');
+
+        // counter doesn't work - is not updated from closure
+//        Log::info('RefreshSubscribers is finished, ' . $counter . " users were updated.");
+	}
+
+    public static function refreshSingleUser(User $user, $sendPushNotification = true){
+        /*
                 We want to update Subscriber table (in opensips database) together with auxiliary fields in users table with issued_on, expires_on and license type things.
                 As user may have multiple licenses, we want to find out the recent one, that should be used.
                 Strategy:
@@ -38,54 +50,49 @@ class RefreshSubscribers extends Command implements SelfHandling {
                 4. With the license find, update above mentioned information for subscriber and send push notification (but only if data has changed, to avoid spamming users)
                  */
 
-                $license = self::getActiveLicenseWithLatestExpiration($user);
-                if ($license == null){
-                    $license = self::getFutureLicenseWithEarliestStart($user);
-                }
-                if ($license == null){
-                    $license = self::getPastLicenseWithLatestExpiration($user);
-                }
+        $license = self::getActiveLicenseWithLatestExpiration($user);
+        if ($license == null){
+            $license = self::getFutureLicenseWithEarliestStart($user);
+        }
+        if ($license == null){
+            $license = self::getPastLicenseWithLatestExpiration($user);
+        }
 
-                if ($license != null){
-                    // If auxiliary user columns are empty, fill them out
-                    if (!$user->activeLicense){
-                        $user->active_license_id = $license->id;
-                        $user->save();
-                    }
+        if ($license != null){
+            // If auxiliary user columns are empty, fill them out
+            if (!$user->activeLicense){
+                $user->active_license_id = $license->id;
+                $user->save();
+            }
 
-                    $subscriber = $user->subscriber;
+            $subscriber = $user->subscriber;
 
-                    // Checking non-equality of Carbon instances or string change of license type
-                    if (!$subscriber->issued_on
-                        || !$subscriber->expires_on
-                        || $subscriber->issued_on->ne($license->starts_at)
-                        || $subscriber->expires_on->ne($license->expires_at)
-                        || $subscriber->license_type !== $license->licenseFuncType->name){
+            // Checking non-equality of Carbon instances or string change of license type
+            if (!$subscriber->issued_on
+                || !$subscriber->expires_on
+                || $subscriber->issued_on->ne($license->starts_at)
+                || $subscriber->expires_on->ne($license->expires_at)
+                || $subscriber->license_type !== $license->licenseFuncType->name){
 
-                        // something has changed, update subscribers table
-                        $subscriber->issued_on = $license->starts_at;
-                        $subscriber->expires_on = $license->expires_at;
-                        $subscriber->license_type = $license->licenseFuncType->name;
-                        $subscriber->save();
+                // something has changed, update subscribers table
+                $subscriber->issued_on = $license->starts_at;
+                $subscriber->expires_on = $license->expires_at;
+                $subscriber->license_type = $license->licenseFuncType->name;
+                $subscriber->save();
 //
 //                        // also update user's auxiliary column
-                        $user->active_license_id = $license->id;
-                        $user->save();
+                $user->active_license_id = $license->id;
+                $user->save();
 
-                        Log::info('RefreshSubscribers updating user: ' . $user->username);
+                Log::info('RefreshSubscribers updating user: ' . $user->username);
 
-                        // TODO enable this when we have confidence this function works well
-                        Queue::push('licenseUpdated', ['username'=>$user->email], 'users');
-                    }
+                // TODO enable this when we have confidence this function works well
+                if($sendPushNotification){
+                    Queue::push('licenseUpdated', ['username'=>$user->email], 'users');
                 }
             }
-        });
-
-        Log::info('RefreshSubscribers is finished');
-
-        // counter doesn't work - is not updated from closure
-//        Log::info('RefreshSubscribers is finished, ' . $counter . " users were updated.");
-	}
+        }
+    }
 
     public static function getActiveLicenseWithLatestExpiration(User $user)
     {
