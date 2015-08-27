@@ -96,6 +96,9 @@ class UserController extends Controller {
         if ($roleIds){
             $userRequest->addRoles($roleIds);
         }
+        if ($request->has('user-comment')){
+            $userRequest->addComment($request->get('user-comment'));
+        }
 
         $user = $this->dispatch($userRequest);
 
@@ -105,6 +108,10 @@ class UserController extends Controller {
         $licRequest = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $defaultPassword);
         $startsAt = carbonFromInput($request->get('starts_at'));//Carbon::createFromFormat("d-m-Y", $request->get('starts_at'));
         $licRequest->startingAt($startsAt);
+        if ($request->has('comment')){
+            $licRequest->comment = $request->get('comment');
+        }
+
         $this->dispatch($licRequest);
 
         // add support to contact list

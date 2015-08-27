@@ -32,6 +32,8 @@ class CreateUser extends Command implements SelfHandling {
 
     private $roleIds;
 
+    private $comment;
+
 
     public function __construct($username, $groupsId = array(), $isQaTrial = false, $trialNumber = null){
         $this->username = $username;
@@ -47,6 +49,11 @@ class CreateUser extends Command implements SelfHandling {
     public function addAccess($password){
         $this->password = $password;
         return $this;
+    }
+
+    public function addComment($comment)
+    {
+        $this->comment = $comment;
     }
 
     // for legacy users already existing in subscriber table
@@ -70,6 +77,9 @@ class CreateUser extends Command implements SelfHandling {
         }
         if ($this->subscriberId){
             $user->subscriber_id = $this->subscriberId;
+        }
+        if ($this->comment){
+            $user->comment = $this->comment;
         }
 
 
@@ -96,4 +106,6 @@ class CreateUser extends Command implements SelfHandling {
         SupportNotification::dispatchWelcomeNotification($user);
         return $user;
 	}
+
+
 }

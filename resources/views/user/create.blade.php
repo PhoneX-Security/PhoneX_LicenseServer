@@ -54,33 +54,33 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-4 ">
-                                <div class="form-group"><label class="control-label">Groups (TODO)</label>
-                                    <select multiple name="groups" class="form-control">
-                                        @foreach($groups as $group)
-                                            <option value="{{$group->id}}">{{ $group->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+                        {{--<div class="row">--}}
+                            {{--<div class="col-md-4 ">--}}
+                                {{--<div class="form-group"><label class="control-label">Groups (TODO)</label>--}}
+                                    {{--<select multiple name="groups" class="form-control">--}}
+                                        {{--@foreach($groups as $group)--}}
+                                            {{--<option value="{{$group->id}}">{{ $group->name }}</option>--}}
+                                        {{--@endforeach--}}
+                                    {{--</select>--}}
+                                {{--</div>--}}
+                            {{--</div>--}}
 
-                            <div class="col-md-4 ">
-                                <div class="form-group"><label class="control-label">Roles (TODO)</label>
-                                    <select multiple name="roles" class="form-control">
-                                        @foreach($roles as $role)
-                                            <option value="{{$role->id}}">{{ $role->display_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                            {{--<div class="col-md-4 ">--}}
+                                {{--<div class="form-group"><label class="control-label">Roles (TODO)</label>--}}
+                                    {{--<select multiple name="roles" class="form-control">--}}
+                                        {{--@foreach($roles as $role)--}}
+                                            {{--<option value="{{$role->id}}">{{ $role->display_name }}</option>--}}
+                                        {{--@endforeach--}}
+                                    {{--</select>--}}
+                                {{--</div>--}}
+                            {{--</div>--}}
+                        {{--</div>--}}
 
                         <div class="row">
                             <div class="col-md-4 ">
                                 <div class="form-group">
                                     <label for="password" class="control-label">User comment</label>
-                                    <textarea name="comment" class="form-control" rows="3"></textarea>
+                                    <textarea name="user-comment" class="form-control" rows="3">{{ old('user-comment') }}</textarea>
                                 </div>
                             </div>
                         </div>

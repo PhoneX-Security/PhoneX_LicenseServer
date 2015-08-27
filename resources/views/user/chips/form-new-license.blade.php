@@ -41,7 +41,7 @@
     <div class="col-md-4 ">
         <div class="form-group">
             <label for="password" class="control-label">License notes</label>
-            <textarea name="comment" class="form-control" rows="3"></textarea>
+            <textarea name="comment" class="form-control" rows="3">{{ old('comment') }}</textarea>
         </div>
     </div>
 </div>

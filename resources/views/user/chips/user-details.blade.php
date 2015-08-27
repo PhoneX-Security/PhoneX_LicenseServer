@@ -26,22 +26,31 @@ Parameters: $user
             <dd>@if ($user->has_access) Yes @else No @endif</dd>
         </dl>
     </div>
-</div>
-
-<div class="row">
     <div class="col-md-4 ">
         </dl>
-        <dt>Date created</dt>
-        <dd>{{ date_simple($user->created_at) }}</dd>
+            <dt>Date created</dt>
+            <dd>{{ date_simple($user->dateCreated) }}</dd>
         </dl>
     </div>
     <div class="col-md-4 ">
         <dl>
             <dt>Date updated</dt>
-            <dd>{{ date_simple($user->updated_at) }}</dd>
+            <dd>{{ date_simple($user->dateUpdated) }}</dd>
         </dl>
     </div>
 </div>
+
+
+@if($user->comment)
+    <div class="row">
+        <div class="col-md-4 ">
+            </dl>
+                <dt>Comment</dt>
+                <dd>{{ $user->comment }}</dd>
+            </dl>
+        </div>
+    </div>
+@endif
 
 <h4>Login details</h4>
 

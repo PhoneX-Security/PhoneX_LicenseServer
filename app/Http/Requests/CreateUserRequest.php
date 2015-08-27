@@ -25,7 +25,7 @@ class CreateUserRequest extends Request {
 			'username' => 'required|max:255|unique:users',
 			'password' => 'required|min:8|max:255',
 
-            'groups' => '',
+//            'groups' => '',
 //            'roles' => '',
 
 			'starts_at' => 'required|date_format:"d-m-Y"',
