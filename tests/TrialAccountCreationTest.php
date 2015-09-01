@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Phonex\Http\Controllers\AccountController;
 use Phonex\License;
@@ -14,7 +15,7 @@ class TrialAccountCreationTest extends TestCase {
     use DatabaseTransactions;
 
     const URL = '/account/trial';
-    const TEST_USERNAME = "qatrialaccst23";
+    const TEST_USERNAME = "qtraaabbccd";
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -136,27 +137,41 @@ class TrialAccountCreationTest extends TestCase {
         try {
             $imei = "360a2d6bea383d73581d7a1a9";
 
-            // First time should work
-            $json = $this->callAndCheckResponse(self::URL, [
-                'version' => AccountController::VERSION,
-                'imei' => $imei,
-                'captcha' =>'captcha',
-                'username' => self::TEST_USERNAME
-            ], AccountController::RESP_OK);
-            $this->assertEquals(self::TEST_USERNAME, $json->username);
+            $usernames = [];
 
-            // Second time should be blocked because of the same IMEI
-            $this->callAndCheckResponse(self::URL, [
-                'version' => AccountController::VERSION,
-                'imei' => $imei,
-                'captcha' =>'captcha',
-                'username' => self::TEST_USERNAME . "8" // try with different username
-            ], AccountController::RESP_ERR_TRIAL_EXISTS);
+            for($i=1; $i<=3; $i++){
+                $expectedResponse = AccountController::RESP_OK;
+                if ($i >= 3){
+                    // third user should not be created (because second has successfully logged in)
+                    $expectedResponse = AccountController::RESP_ERR_TRIAL_EXISTS;
+                }
 
+                $json = $this->callAndCheckResponse(self::URL, [
+                    'version' => AccountController::VERSION,
+                    'imei' => $imei,
+                    'captcha' =>'captcha',
+                    'username' => self::TEST_USERNAME . $i
+                ], $expectedResponse, null, "Trying to create user " . self::TEST_USERNAME . $i);
+
+                // fake second user has logged in
+                if ($i == 2){
+                    $user = User::where('username', $json->username)->first();
+                    $user->subscriber->date_first_login = Carbon::now();
+                    $user->subscriber->save();
+                }
+
+                if ($expectedResponse == AccountController::RESP_OK){
+                    $this->assertEquals(self::TEST_USERNAME . $i, $json->username);
+                }
+
+                $usernames[] = self::TEST_USERNAME . $i;
+            }
         } finally {
-            $user = User::where('username', $json->username)->first();
-            if ($user){
-                $user->subscriber->deleteWithContactListRecords();
+            foreach($usernames as $username){
+                $user = User::where('username', $username)->first();
+                if ($user){
+                    $user->subscriber->deleteWithContactListRecords();
+                }
             }
         }
     }

@@ -24,7 +24,7 @@ trait TestUtils{
         Queue::shouldReceive('connected');
     }
 
-    public function callAndCheckResponse($url, array $params, $expectedJsonCode, $ip = null){
+    public function callAndCheckResponse($url, array $params, $expectedJsonCode, $ip = null, $message = null){
         $response = null;
         if ($ip){
             $response = $this->call('POST', $url, $params, [], [], ['REMOTE_ADDR' => $ip]);
@@ -33,7 +33,7 @@ trait TestUtils{
         }
 //        dd($response);
         $json = json_decode($response->getContent());
-        $this->assertEquals($expectedJsonCode, $json->responseCode);
+        $this->assertEquals($expectedJsonCode, $json->responseCode, $message);
         return $json;
     }
 

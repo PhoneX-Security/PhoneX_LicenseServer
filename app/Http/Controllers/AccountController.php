@@ -34,6 +34,8 @@ class AccountController extends Controller {
 
     const USERNAME_REGEX = "/^[A-Za-z0-9_-]{3,18}$/";
 
+    const MAX_TRIAL_PER_IMEI = 3;
+
     // testing constants
     const TEST_NON_QA_IP = "127.0.0.2";
     const TEST_QA_IP = "127.0.0.1";
@@ -104,7 +106,7 @@ class AccountController extends Controller {
             return $this->responseError($e->getCode());
         }
 
-        $isValid = $this->isValidRequest($request);
+        $isValid = $this->isValidRequest($request, $username);
 
         $trialRequest = new TrialRequest();
         $trialRequest->fill($request->all());
@@ -325,23 +327,53 @@ class AccountController extends Controller {
         }
     }
 
-    private function isValidRequest(Request $request){
+    private function isValidRequest(Request $request, $username){
         $ip = $request->getClientIp();
         $imei = $request->get('imei');
         $thresholdStart = Carbon::now()->subMonths(6);//dbDatetime(strtotime('-14 days'));
-        $thresholdEnd = Carbon::now()->subDays(2);//dbDatetime(strtotime('-6 days'));
+//        $thresholdEnd = Carbon::now()->subDays(2);//dbDatetime(strtotime('-6 days'));
+        $thresholdEnd = Carbon::now();//dbDatetime(strtotime('-6 days'));
 
-        $count =  TrialRequest::where('isApproved', 1)
-            ->where('imei', $imei)
+//        Log::info("isValidRequest - checking imei", [$imei]);
+        // there was a bug..
+        $imeiPrefix = substr($imei,0,24);
+
+        $approvedRequests =  TrialRequest::where('isApproved', 1)
+//            ->where('imei', $imei)
+            ->where('imei', "LIKE", $imeiPrefix . "%")
             ->where('dateCreated', "<=", $thresholdEnd)
             ->where('dateCreated', ">=", $thresholdStart)
-            ->count();
+            ->get();
 
-        if ($count > 0){
-            return false;
-        } else {
-            return true;
+//        Log::info("isValidRequest - checking imei prefix", [$imeiPrefix]);
+
+//        Log::info("isValidRequest - approved requests", [$approvedRequests]);
+
+        if ($approvedRequests->count() > 0) {
+
+            // check if user has logged in - if so, do not allow creating a new account
+            foreach($approvedRequests as $approvedRequest){
+                // imei code was shortened because of varchar limit 25 .. this was fixed arround id 2255, therefore checking this one
+                if ($approvedRequest->id > 2262){
+                    Log::info("isValidRequest - skipping this id", [$approvedRequest->id]);
+
+                    if ($approvedRequest->imei != $imei){
+                        // we were lucky to get the same prefix, but the imei is not the same, therefore skippping
+                        continue;
+                    }
+                }
+
+                if ($approvedRequest->username){
+                    $user = User::where('username', $approvedRequest->username)->first();
+                    if ($user && $user->subscriber && $user->subscriber->date_first_login){
+                        Log::info("isValidRequest - invalid", [$imei]);
+                        return false;
+                    }
+                }
+            }
         }
+//        Log::info("isValidRequest - valid", [$request]);
+        return true;
     }
 
 
