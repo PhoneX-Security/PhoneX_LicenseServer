@@ -174,6 +174,26 @@ class StatsController extends Controller {
 
         // report specifically for investor
         $relevantOnly = $request->has('relevant-only');
+        if ($relevantOnly){
+            $trialFuncType = LicenseFuncType::getTrial();
+
+            $relevantTypeIds = [
+                LicenseType::getWeek()->id,
+                LicenseType::getMonth()->id,
+                LicenseType::getQuarterOfYear()->id
+            ];
+
+            foreach($existingUsersData[$trialFuncType->id] as $k=>$trialData){
+                if(!in_array($k, $relevantTypeIds)){
+                    unset($existingUsersData[$trialFuncType->id][$k]);
+                }
+            }
+            foreach($newUsersData[$trialFuncType->id] as $k=>$trialData){
+                if(!in_array($k, $relevantTypeIds)){
+                    unset($newUsersData[$trialFuncType->id][$k]);
+                }
+            }
+        }
 
         return view('stats.text-report', compact('existingUsersData', 'newUsersData', 'licenseTypes', 'licenseFuncTypes', 'daterange', 'withUsers'));
     }

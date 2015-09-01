@@ -138,6 +138,17 @@ class Stats
         $existingUsers = [];
         $existingUsersData = [];
 
+
+        // First fill out empty data
+        $licFuncTypes = LicenseFuncType::orderBy('order')->get();
+        $licTypes = LicenseType::orderBy('order')->get();
+        foreach($licFuncTypes as $licFuncType){
+            foreach($licTypes as $licType){
+                $existingUsersData[$licFuncType->id][$licType->id] = $this->statsForUsers([]);
+                $newUsersData[$licFuncType->id][$licType->id] = $this->statsForUsers([]);
+            }
+        }
+
         // Filter users and licenses
         foreach ($lics as $lic){
             $user = $lic->user;

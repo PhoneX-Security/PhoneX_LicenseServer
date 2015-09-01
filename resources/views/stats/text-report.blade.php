@@ -54,74 +54,83 @@
                             </label>
                         </div>
 
-
                         <button type="submit" class="btn btn-default">Filter</button>
                     </form>
 
                 </div>
             </div>
             <div class="box-body">
-                <h3>New users with licenses</h3>
+                <h3>Report ({{$daterange}})</h3>
+                <h4>New users with licenses</h4>
 
-                <ul>
                 @foreach($newUsersData as $licFuncTypeId => $d)
+                    <ul>
                     @foreach($d as $licTypeId => $dd)
-                        <li>{{$licenseFuncTypes[$licFuncTypeId]->uc_name . " (" . $licenseTypes[$licTypeId]->name . ")" }} <br />
-                            <ul>
-                                <li>Total: {{$dd['count']}}</li>
-                                <li>Never logged in: {{$dd['neverLoggedIn']['count']}}
-                                    @if(isset($dd['neverLoggedIn']['users']) && count($dd['neverLoggedIn']['users']))
-                                        @include('stats.chips.with-users', ['users' => $dd['neverLoggedIn']['users'], 'withUsers' => $withUsers])
+                        @if($dd['count']>0)
+
+                            <li>{{$licenseFuncTypes[$licFuncTypeId]->uc_name . " (" . $licenseTypes[$licTypeId]->name . ")" }} <br />
+                                <ul>
+                                    <li>Total: {{$dd['count']}}</li>
+                                    @if($dd['neverLoggedIn']['count']>0)
+                                        <li>Never logged in: {{$dd['neverLoggedIn']['count']}}
+                                            @if(isset($dd['neverLoggedIn']['users']) && count($dd['neverLoggedIn']['users']))
+                                                @include('stats.chips.with-users', ['users' => $dd['neverLoggedIn']['users'], 'withUsers' => $withUsers])
+                                            @endif
+                                        </li>
                                     @endif
-                                </li>
 
-                                @if($dd['countries'])
-                                <li>Countries:
-                                    @foreach($dd['countries'] as $country => $data)
-                                        {{$country . " (" . $data['count'] . ")"}}
-                                        @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
-                                        @if(!$withUsers && $data !== end($dd['countries'])), @endif
-                                    @endforeach
-                                </li>
-                                @endif
+                                    @if($dd['countries'])
+                                        <li>Countries:
+                                            @foreach($dd['countries'] as $country => $data)
+                                                {{$country . " (" . $data['count'] . ")"}}
+                                                @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
+                                                @if(!$withUsers && $data !== end($dd['countries'])), @endif
+                                            @endforeach
+                                        </li>
+                                    @endif
 
-                                @if($dd['platforms'])
-                                    <li>Platforms:
-                                        @foreach($dd['platforms'] as $platform => $data)
-                                            {{$platform . " (" . $data['count'] . ")"}}
-                                            @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
-                                            @if(!$withUsers && $data !== end($dd['platforms'])), @endif
-                                        @endforeach
-                                    </li>
-                                @endif
+                                    @if($dd['platforms'])
+                                        <li>Platforms:
+                                            @foreach($dd['platforms'] as $platform => $data)
+                                                {{$platform . " (" . $data['count'] . ")"}}
+                                                @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
+                                                @if(!$withUsers && $data !== end($dd['platforms'])), @endif
+                                            @endforeach
+                                        </li>
+                                    @endif
 
-                                @if($dd['groups'])
-                                    <li><b>OZ Groups:</b>
-                                        @foreach($dd['groups'] as $key => $data)
-                                            {{$key . " (" . $data['count'] . ")"}}
-                                            @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
-                                            @if(!$withUsers && $data !== end($dd['groups'])), @endif
-                                        @endforeach
-                                    </li>
-                                @endif
-                            </ul>
-                        </li>
+                                    @if($dd['groups'])
+                                        <li><b>OZ Groups:</b>
+                                            @foreach($dd['groups'] as $key => $data)
+                                                {{$key . " (" . $data['count'] . ")"}}
+                                                @include('stats.chips.with-users', ['users' => $data['users'], 'withUsers' => $withUsers])
+                                                @if(!$withUsers && $data !== end($dd['groups'])), @endif
+                                            @endforeach
+                                        </li>
+                                    @endif
+                                </ul>
+                            </li>
+
+                        @endif
                     @endforeach
+                    </ul>
                 @endforeach
-                </ul>
 
-                <h3>Licenses issued to existing users</h3>
+
+                <h4>Licenses issued to existing users</h4>
 
                 <ul>
                     @foreach($existingUsersData as $licFuncTypeId => $d)
                         @foreach($d as $licTypeId => $dd)
-                            <li>{{$licenseFuncTypes[$licFuncTypeId]->uc_name . " (" . $licenseTypes[$licTypeId]->name . ")" }} <br />
-                                <ul>
-                                    <li>Total: {{$dd['count']}}
-                                        @include('stats.chips.with-users', ['users' => $dd['users'], 'withUsers' => $withUsers])
-                                    </li>
-                                </ul>
-                            </li>
+                            @if($dd['count']>0)
+                                <li>{{$licenseFuncTypes[$licFuncTypeId]->uc_name . " (" . $licenseTypes[$licTypeId]->name . ")" }} <br />
+                                    <ul>
+                                        <li>Total: {{$dd['count']}}
+                                            @include('stats.chips.with-users', ['users' => $dd['users'], 'withUsers' => $withUsers])
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endif
                         @endforeach
                     @endforeach
                 </ul>
