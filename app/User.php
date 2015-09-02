@@ -90,6 +90,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     public function getRolesListAttribute(){
         return implode(", ", $this->roles->fetch('display_name')->toArray());
     }
+    // successful_trial_request
+    public function getSuccessfulTrialRequestAttribute()
+    {
+        return TrialRequest::where(['username' => $this->username, 'isApproved'=>1])->first();
+    }
 
     /* Helper functions */
     public function addToContactList(User $user, $displayName = null){

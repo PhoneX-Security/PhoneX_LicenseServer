@@ -23,10 +23,12 @@ use Phonex\LicenseType;
 use Phonex\Model\SupportNotification;
 use Phonex\Role;
 use Phonex\Subscriber;
+use Phonex\TrialRequest;
 use Phonex\User;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
 use Phonex\Utils\Stats;
+use Queue;
 use Redirect;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -248,6 +250,46 @@ class UserController extends Controller {
 	{
 		//
 	}
+
+
+    /* Few actions */
+
+    /**
+     * Delete all successful trial requests for user with this username
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function resetTrialCounter($id)
+    {
+        $user = User::find($id);
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
+
+        $counter = TrialRequest::where(["username" => $user->username, "isApproved"=>1])->delete();
+
+        return redirect()
+            ->back()
+            ->with("success", 'Trial counter has been reset (' . $counter . ' row(s) were deleted).');
+    }
+
+    /**
+     * Logout user on all devices
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function forceLogout($id)
+    {
+        $user = User::find($id);
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
+        // force logout of users on all devices -- aka kill switch
+        Queue::push('logout', ['username'=>$user->email], 'users');
+        return redirect()
+            ->back()
+            ->with("success", 'User has been logged out on all devices.');
+    }
 
     public function changePassword($id, Request $request)
     {
