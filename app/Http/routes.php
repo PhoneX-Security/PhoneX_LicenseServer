@@ -56,6 +56,7 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     Route::get('users/{user}/licenses', ['as' => 'users.licenses', 'uses' => 'UserController@showLicenses']);
     Route::get('users/{user}/cl', ['as' => 'users.cl', 'uses' => 'UserController@showCl']);
     Route::get('users/{user}/stats', ['as' => 'users.stats', 'uses' => 'UserController@showStats']);
+    Route::get('users/{user}/error-reports', ['as' => 'users.error-reports', 'uses' => 'UserController@showErrorReports']);
 
     // Contact lists + alternative via get
     Route::delete('users/{user}/cl', ['uses' => 'UserController@deleteContact']);
@@ -81,6 +82,11 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
 
     /* Statistics */
     Route::controller('stats', 'StatsController');
+
+    /* Reports */
+    Route::get('reports/last-errors', 'ReportsController@lastErrors');
+    Route::get('reports/last-trial-requests', 'ReportsController@lastTrialRequests');
+    Route::post('reports/reset-trial-counter', 'ReportsController@resetTrialCounter');
 
     /* Admin only pages */
     Route::get('logs', ['acl-resource' => 'logs',

@@ -30,4 +30,11 @@
             {{--<li><a href="/stats/devices"><i class="fa fa-angle-double-right"></i> Devices</a></li>--}}
         </ul>
     </li>
+    <li class="treeview">
+        <a href="#"><i class='fa fa-bolt'></i> <span>Error & reports</span> <i class="fa fa-angle-left pull-right"></i></a>
+        <ul class="treeview-menu">
+            <li><a href="/reports/last-errors"><i class="fa fa-angle-double-right"></i> Last errors</a></li>
+            <li><a href="/reports/last-trial-requests"><i class="fa fa-angle-double-right"></i> Last trial requests</a></li>
+        </ul>
+    </li>
 </ul><!-- /.sidebar-menu -->

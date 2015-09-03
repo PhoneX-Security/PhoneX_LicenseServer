@@ -2,9 +2,9 @@
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Phonex\Http\Requests\ResetTrialCounterByImeiRequest;
 use Phonex\Jobs\CreateSubscriberWithLicense;
 use Phonex\Jobs\CreateUser;
 use Phonex\Jobs\IssueLicense;
@@ -17,10 +17,9 @@ use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\DeleteContactRequest;
 use Phonex\Http\Requests\NewLicenseRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
-use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
-use Phonex\Model\SupportNotification;
+use Phonex\Model\ErrorReport;
 use Phonex\Role;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
@@ -154,6 +153,18 @@ class UserController extends Controller {
         }
 
         return view('user.show-lic', compact('user'));
+    }
+
+    public function showErrorReports($id)
+    {
+        $user = User::find($id);
+
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
+
+        $reports = ErrorReport::where('userName', $user->email)->orderBy('date_created','desc')->get();
+        return view('user.show-error-reports', compact('user', 'reports'));
     }
 
     public function getNewLicense($id)

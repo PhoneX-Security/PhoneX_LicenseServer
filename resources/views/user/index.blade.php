@@ -81,7 +81,6 @@
                         <a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
                             <i class="fa fa-plus-circle"></i> New User
                         </a>
-
                     </div>
                 </div>
 
@@ -165,7 +164,7 @@
 
 
                 <div class="pull-right">
-                    {!! $users->appends(Request::except('page'))->render(); !!}
+                    {!! $users->appends(Request::except('page'))->render() !!}
                 </div>
 
             </div>
