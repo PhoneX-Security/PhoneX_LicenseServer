@@ -345,9 +345,8 @@ class AccountController extends Controller {
             ->where('dateCreated', ">=", $thresholdStart)
             ->get();
 
-//        Log::info("isValidRequest - checking imei prefix", [$imeiPrefix]);
-
-//        Log::info("isValidRequest - approved requests", [$approvedRequests]);
+        Log::info("isValidRequest - checking imei prefix", [$imeiPrefix]);
+        Log::info("isValidRequest - approved requests", [$approvedRequests]);
 
         if ($approvedRequests->count() > 0) {
 

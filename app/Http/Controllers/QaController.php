@@ -25,6 +25,17 @@ class QaController extends Controller {
         Bus::dispatch($c);
     }
 
+    public function getCleanTestAccounts(){
+        dd('turned off');
+        $usernames = ['qatrial236' , 'qatrial224' , 'qatrial238' , 'qatrial239' , 'qatrial288' , 'qatrial290' , 'qatrial291' , 'qatrial294' , 'qatrial296' , 'qatrial351' , 'qatrial444' , 'qatrial543' , 'qatrial435' , 'qatrial111' , 'qatrial112' , 'qatrial113'];
+//        ,
+        foreach($usernames as $username){
+            $user = User::findByUsername($username);
+            $user->deleteWithLicenses();
+        }
+        var_dump('deleted ' . count($usernames));
+    }
+
     public function getUpdateExports()
     {
         $users = User::whereNotNull('business_code_id')->get();
@@ -96,8 +107,8 @@ class QaController extends Controller {
 
         $sub = User::getSupportUser()->subscriber;
 
-        $time = Carbon::now()->subDays(30);
-        $timeLastActivity = Carbon::now()->subDays(14);
+        $time = Carbon::now()->subDays(45);
+        $timeLastActivity = Carbon::now()->subDays(30);
 
         $contacts = Subscriber::select('subscriber.*')
             ->join('contactlist', 'subscriber.id', '=', 'contactlist.int_usr_id')
@@ -105,14 +116,13 @@ class QaController extends Controller {
 
             ->where('license_type', 'trial')
             ->where('expires_on', '<', $time->toDateTimeString())
-            ->where('expires_on', '<', $time->toDateTimeString())
             ->whereNotNull('date_last_activity')
             ->where('date_last_activity', '<', $timeLastActivity->toDateTimeString())
 //            ->whereNull('date_first_login')
 //            ->where('subscriber.username','LIKE','%honza%')
             ->get();
 
-        dd($contacts[0]);
+        dd($contacts);
 
 //        $count = count($contacts);
         $count = 0;

@@ -27,11 +27,14 @@ class GroupController extends Controller {
 
     public function store(CreateGroupRequest $request)
     {
-        $owner = User::findByUsername($request->get('owner_username'));
-
         $group = new Group();
         $group->name = $request->get('name');
-        $group->owner_id = $owner->id;
+
+        if ($request->has('owner_username')){
+            $owner = User::findByUsername($request->get('owner_username'));
+            $group->owner_id = $owner->id;
+        }
+
         $group->comment= $request->get('comment');
         $group->save();
 

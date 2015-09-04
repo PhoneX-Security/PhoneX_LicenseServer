@@ -45,7 +45,15 @@ class ReportsController extends Controller {
 
     public function lastTrialRequests(Request $request){
         $limit = InputGet::getInteger('limit', 100);
-        $requests = TrialRequest::limit($limit)->orderBy('dateCreated','desc')->get();
+        $imeiPrefix = $request->get('imei');
+
+        $requests = null;
+        if ($imeiPrefix){
+            $requests = TrialRequest::where('imei', 'like', $imeiPrefix . '%')->limit($limit)->orderBy('dateCreated','desc')->get();
+        } else {
+            $requests = TrialRequest::limit($limit)->orderBy('dateCreated','desc')->get();
+        }
+
         return view('reports.last-trial-requests', compact('requests'));
     }
 
