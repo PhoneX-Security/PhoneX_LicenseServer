@@ -27,11 +27,12 @@ class QaController extends Controller {
 
     public function getCleanTestAccounts(){
         dd('turned off');
-        $usernames = ['qatrial236' , 'qatrial224' , 'qatrial238' , 'qatrial239' , 'qatrial288' , 'qatrial290' , 'qatrial291' , 'qatrial294' , 'qatrial296' , 'qatrial351' , 'qatrial444' , 'qatrial543' , 'qatrial435' , 'qatrial111' , 'qatrial112' , 'qatrial113'];
+        $usernames = ['qatrial801', 'qatrial802', 'qatrial803', 'qatrial804', 'qatrial805'];
 //        ,
         foreach($usernames as $username){
             $user = User::findByUsername($username);
-            $user->deleteWithLicenses();
+            if ($user)
+                $user->deleteWithLicenses();
         }
         var_dump('deleted ' . count($usernames));
     }

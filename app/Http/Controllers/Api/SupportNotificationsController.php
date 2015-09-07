@@ -49,7 +49,7 @@ class SupportNotificationsController extends Controller {
         $jsonObj = new \stdClass();
         $jsonObj->notifications = $notifications;
         $json = json_encode($jsonObj);
-        Log::info("Retrieving notification batch", [$json]);
+//        Log::info("Retrieving notification batch", [$json]);
         return $json;
     }
 
@@ -58,7 +58,10 @@ class SupportNotificationsController extends Controller {
     {
         $toReturn = [];
         foreach($notifications as $notification){
-            $appVersionObj = $notification->user->subscriber->app_version_obj;
+            $appVersionObj = null;
+            if ($notification->user->subscriber && $notification->user->subscriber->app_version_obj){
+                $appVersionObj = $notification->user->subscriber->app_version_obj;
+            }
             if (!$appVersionObj || !$appVersionObj->locales){
                 // if we cannot figure locale out from app_version, put notification back to created state
                 SupportNotification::where('id', $notification->id)->update(['state'=> SupportNotificationState::CREATED]);
@@ -101,6 +104,8 @@ class SupportNotificationsController extends Controller {
             // bad request
             abort(400);
         }
+
+        Log::debug("postBatch", [$ack, $ids]);
 
         // Update processing to sent
         $idsToUpdate = SupportNotification::whereIn('id', $ids)->where('state', SupportNotificationState::PROCESSING)->get()->pluck('id')->toArray();
