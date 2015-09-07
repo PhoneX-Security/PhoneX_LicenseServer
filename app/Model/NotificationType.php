@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class NotificationType extends Model{
     use Translatable;
     const TYPE_WELCOME_MESSAGE = "welcome_message";
+    const TYPE_NON_OFFICE_HOURS_MESSAGE = "non_office_hours_message";
 
     protected $table = "notification_types";
 

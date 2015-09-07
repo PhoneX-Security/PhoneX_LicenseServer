@@ -54,6 +54,19 @@ class Subscriber extends Model{
     }
 
     /* Accessors */
+    // helper to resolve locale of subscriber - might be null if locale is not recorder
+    public function getAppPriorityLocaleAttribute()
+    {
+        if (!$this->app_version_obj || !$this->app_version_obj->locales){
+            // if we cannot figure locale, return null
+            return null;
+        }
+        // locales are order by priority
+        // locale can be in format "en_US", split string by '_' and take the first part
+//        $locale = explode('_', $appVersionObj->locales[0])[0];
+        $this->app_version_obj->locales[0];
+    }
+
     // ->app_version_obj
     public function getAppVersionObjAttribute()
     {

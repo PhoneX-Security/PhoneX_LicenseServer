@@ -11,18 +11,6 @@
 |
 */
 
-use Carbon\Carbon;
-use Phonex\BusinessCode;
-use Phonex\BusinessCodesExport;
-use Phonex\ContactList;
-use Phonex\Jobs\IssueLicense;
-use Phonex\Group;
-use Phonex\Jobs\NewCodePairsExport;
-use Phonex\Jobs\RefreshSubscribers;
-use Phonex\LicenseFuncType;
-use Phonex\LicenseType;
-use Phonex\User;
-
 Route::get('home', 'HomeController@index');
 Route::get('/', 'HomeController@index');
 
@@ -43,6 +31,7 @@ Route::controller('qa', 'QaController'); // qa tools
 // API for auto notifications via support account
 Route::get('api/support-notifications/batch', 'Api\SupportNotificationsController@getBatch');
 Route::post('api/support-notifications/batch', 'Api\SupportNotificationsController@postBatch');
+Route::get('api/support-notification/{user}/{notification}', 'Api\SupportNotificationsController@getNotificationForUser');
 
 // Authenticated pages
 Route::group(['middleware' => ['auth', 'acl']], function() {

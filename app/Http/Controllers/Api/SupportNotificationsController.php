@@ -9,6 +9,7 @@ use Phonex\Http\Requests;
 use Phonex\Model\NotificationType;
 use Phonex\Model\SupportNotification;
 use Phonex\Model\SupportNotificationState;
+use Phonex\User;
 
 class SupportNotificationsController extends Controller {
 
@@ -114,5 +115,47 @@ class SupportNotificationsController extends Controller {
         } else {
             SupportNotification::whereIn('id', $idsToUpdate)->update(['state' => SupportNotificationState::CREATED]);
         }
+    }
+
+    public function getNotificationForUser($sip, $notificationName, Request $request){
+        $key = $request->get('k');
+        if ($key !== self::SHARED_SECRET){
+            abort(401);
+        }
+
+        $user = User::findByEmail($sip);
+        if (!$user || !$user->subscriber){
+            abort(400);
+        }
+
+        $notificationType = NotificationType::findByType($notificationName);
+        if (!$notificationType){
+            abort(400);
+        }
+
+        Log::debug("getNotificationForUser", [$sip, $notificationName]);
+
+        $locale = $user->subscriber->app_priority_locale;
+        if ($locale == null){
+            $locale = 'en';
+        } else {
+            // locale can be in format "en_US", split string by '_' and take the first part
+            $locale = explode('_', $locale)[0];
+        }
+
+        // insert into table as sent to have a record we did this
+        $notification = new SupportNotification();
+        $notification->user_id = $user->id;
+        $notification->sip = $user->email;
+        $notification->notification_type_id = $notificationType->id;
+        $notification->state = SupportNotificationState::SENT;
+        $notification->sent_at = Carbon::now();
+        $notification->locale = $locale;
+        $notification->save();
+
+        // return
+        $jsonObj = new \stdClass();
+        $jsonObj->notification = $notification;
+        return json_encode($jsonObj);
     }
 }

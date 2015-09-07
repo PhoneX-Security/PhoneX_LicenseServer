@@ -139,6 +139,10 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return User::where('username', $username)->first();
     }
 
+    public static function findByEmail($email){
+        return User::where('email', $email)->first();
+    }
+
     public static function getSupportUser(){
         return User::where('username', "phonex-support")->first();
     }

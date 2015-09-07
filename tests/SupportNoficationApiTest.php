@@ -11,9 +11,11 @@ class SupportNotificationApiTest extends TestCase {
     use DatabaseTransactions;
 
     const URL = '/api/support-notifications/batch';
-    const TEST_USERNAME = "jsonbstuser20";
+    const GET_NOTIFICATION_URL = '/api/support-notification/';
+    const TEST_USERNAME = "jsonbstser22";
 
     const WELCOME_TEXT_EN = "WELCOME DEAR STRANGER!";
+    const NON_OFFICE_HOURS_TEXT_EN = "GET AWAY!";
     const APP_VERSION_EN = '{"v":1,"dev":"samsung;jflte;GT-I9505","locales":["en_US"],"p":"android","ac":"1.4.2-Alpha","pid":19,"rc":2293,"info":"PhoneX"}';
     const APP_VERSION_NON_EXISTING_LOCALE = '{"v":1,"dev":"samsung;jflte;GT-I9505","locales":["nonexisting"],"p":"android","ac":"1.4.2-Alpha","pid":19,"rc":2293,"info":"PhoneX"}';
 
@@ -93,6 +95,40 @@ class SupportNotificationApiTest extends TestCase {
             $this->assertEquals($userJson->username . "@phone-x.net", $json->notifications[0]->sip);
             // check text is in english as default locale
             $this->assertEquals(self::WELCOME_TEXT_EN, $json->notifications[0]->text);
+        } finally {
+            $user = User::where('username', $userJson->username)->first();
+            if ($user){
+                $user->subscriber->deleteWithContactListRecords();
+            }
+        }
+    }
+
+    public function testRetrievingNotification(){
+        try {
+            // create trial account
+            $userJson = $this->callAndCheckResponse(TrialAccountCreationTest::URL, [
+                'version' => AccountController::VERSION,
+                'imei' => 'abcde',
+                'captcha' =>'captcha',
+                'username' => self::TEST_USERNAME
+            ], AccountController::RESP_OK);
+
+            // save translation for english locale
+            $notificationType = NotificationType::findByType(NotificationType::TYPE_NON_OFFICE_HOURS_MESSAGE);
+            $notificationType->translate('en')->text = self::NON_OFFICE_HOURS_TEXT_EN;
+            $notificationType->save();
+
+            // Simulate login with non existing locale
+            Subscriber::where('username', $userJson->username)->update(['app_version' => self::APP_VERSION_NON_EXISTING_LOCALE]);
+
+            $url = self::GET_NOTIFICATION_URL . $userJson->username . "@phone-x.net" . "/" . NotificationType::TYPE_NON_OFFICE_HOURS_MESSAGE;
+            $response = $this->call('GET', $url, ['k' => 'ovual3ohshiChai5EiPeeP4ma']);
+            $json = json_decode($response->getContent());
+
+//            var_dump($json);
+
+            $this->assertEquals($userJson->username . "@phone-x.net", $json->notification->sip);
+            $this->assertEquals(self::NON_OFFICE_HOURS_TEXT_EN, $json->notification->text);
         } finally {
             $user = User::where('username', $userJson->username)->first();
             if ($user){
