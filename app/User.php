@@ -160,9 +160,18 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         $subscriber = $this->subscriber;
         // delete cl
         if ($subscriber){
+            // delete records in cl
             ContactList::where('subscriber_id', $subscriber->id)
                 ->orWhere('int_usr_id', $subscriber->id)
                 ->delete();
+
+            // delete support_contacts record
+            $supportContacts = SupportContact::where('owner_sip', $this->email)->get();
+            if ($supportContacts){
+                foreach($supportContacts as $supportContact){
+                    $supportContact->delete();
+                }
+            }
 
             $subscriber->delete();
         }

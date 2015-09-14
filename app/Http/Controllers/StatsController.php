@@ -165,7 +165,7 @@ class StatsController extends Controller {
             $dateFrom = $dateFrom->startOfDay();
         }
 
-        list($existingUsersData, $newUsersData) = $stats->reportPerPeriod($dateFrom, $dateTo);
+        list($existingUsersData, $newUsersData) = $stats->reportPerPeriod($dateFrom, $dateTo, false);
         $licenseTypes = LicenseType::all()->keyBy('id');
         $licenseFuncTypes = LicenseFuncType::all()->keyBy('id');
 

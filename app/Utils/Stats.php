@@ -113,7 +113,7 @@ class Stats
         return $counts;
     }
 
-    public function reportPerPeriod(Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function reportPerPeriod(Carbon $dateFrom = null, Carbon $dateTo = null, $includeQaTrial = true)
     {
         if ($dateFrom === null) {
             $dateFrom = Carbon::parse('last monday');
@@ -152,6 +152,10 @@ class Stats
         // Filter users and licenses
         foreach ($lics as $lic){
             $user = $lic->user;
+
+            if (!$includeQaTrial && starts_with($user->username, "qatrial")){
+                continue;
+            }
 
             // point to license which is taken into account
             $lic->user->relevant_license = $lic;
