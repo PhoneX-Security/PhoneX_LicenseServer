@@ -24,7 +24,8 @@ class BusinessCodeController extends Controller {
         $query = BusinessCode::with(['clMappings', 'users', 'group', 'creator', 'parent']);
 
         if ($request->has('code')){
-            $query = $query->where('code', 'LIKE', '%'. $request->get('code') .'%');
+            $code = str_replace("-", "", $request->get('code'));
+            $query = $query->where('code', 'LIKE', '%'. $code .'%');
         }
 
         $bcodes = $query->paginate(15);
