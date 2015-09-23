@@ -33,6 +33,14 @@ Route::get('api/support-notifications/batch', 'Api\SupportNotificationsControlle
 Route::post('api/support-notifications/batch', 'Api\SupportNotificationsController@postBatch');
 Route::get('api/support-notification/{user}/{notification}', 'Api\SupportNotificationsController@getNotificationForUser');
 
+// Authenticated api using client certs
+Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], function(){
+    Route::get('test', function(){
+        return 'welcome you are authenticated using client cert!';
+    });
+});
+
+
 // Authenticated pages
 Route::group(['middleware' => ['auth', 'acl']], function() {
     Route::get('/', 'HomeController@index');

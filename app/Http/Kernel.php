@@ -28,6 +28,7 @@ class Kernel extends HttpKernel {
 	protected $routeMiddleware = [
 		'auth' => 'Phonex\Http\Middleware\Authenticate',
 		'auth.basic' => 'Illuminate\Auth\Middleware\AuthenticateWithBasicAuth',
+		'auth.client_cert' => 'Phonex\Http\Middleware\ClientCertAuth',
 		'guest' => 'Phonex\Http\Middleware\RedirectIfAuthenticated',
         'acl' => 'Phonex\Http\Middleware\AclRoute',
 	];
