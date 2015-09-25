@@ -1,4 +1,4 @@
-<?php namespace Phonex;
+<?php namespace Phonex\Model;
 
 use Illuminate\Database\Eloquent\Model;
 

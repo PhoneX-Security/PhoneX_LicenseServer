@@ -23,7 +23,7 @@ class ClientCertAuth{
 	{
 		// check if local environment
 		// if so, skip client cert authentication
-		if (App::isLocal()){
+		if (App::isLocal() || App::environment() === 'testing'){
 			return $next($request);
 		}
 

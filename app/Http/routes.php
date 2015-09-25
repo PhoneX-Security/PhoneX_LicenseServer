@@ -11,6 +11,7 @@
 |
 */
 
+// Non authenticated pages
 Route::get('home', 'HomeController@index');
 Route::get('/', 'HomeController@index');
 
@@ -24,24 +25,19 @@ Route::controllers([
 Route::get('login', 'Auth\AuthController@getLogin');
 Route::get('logout', 'Auth\AuthController@getLogout');
 
-// Non authenticated pages
-Route::resource('products', 'Api\ProductController', ['only' => ['show', 'index']]);
+Route::resource('products', 'Api\ProductControllerLegacy', ['only' => ['show', 'index']]);
 Route::controller('qa', 'QaController'); // qa tools
-
-// API for auto notifications via support account
 Route::get('api/support-notifications/batch', 'Api\SupportNotificationsController@getBatch');
 Route::post('api/support-notifications/batch', 'Api\SupportNotificationsController@postBatch');
 Route::get('api/support-notification/{user}/{notification}', 'Api\SupportNotificationsController@getNotificationForUser');
 
-// Authenticated api using client certs
+// Authenticated API using client certs
 Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], function(){
-    Route::get('test', function(){
-        return 'welcome you are authenticated using client cert!';
-    });
+    Route::get('products', 'Api\ProductController@index');
+
 });
 
-
-// Authenticated pages
+// Authenticated pages using client credentials
 Route::group(['middleware' => ['auth', 'acl']], function() {
     Route::get('/', 'HomeController@index');
 
