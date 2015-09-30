@@ -2,23 +2,29 @@
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
+use Phonex\Events\AuditEvent;
 use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Subscriber;
 use Phonex\User;
-use Queue;
 
-class IssueLicense extends Command implements SelfHandling {
+class CreateSubscriberWithLicense extends Command implements SelfHandling {
     private $user;
     private $licenseType;
     private $licenseFuncType;
+    private $sipPassword;
     private $startsAt;
-    private $comment;
 
-    public function __construct(User $user, LicenseType $licenseType, LicenseFuncType $licenseFuncType){
+
+    // publicly settable attributes
+    public $comment;
+
+    public function __construct(User $user, LicenseType $licenseType, LicenseFuncType $licenseFuncType, $sipPassword){
         $this->user = $user;
         $this->licenseType = $licenseType;
         $this->licenseFuncType = $licenseFuncType;
+        $this->sipPassword = $sipPassword;
     }
 
     public function startingAt(Carbon $startsAt){
@@ -26,29 +32,14 @@ class IssueLicense extends Command implements SelfHandling {
         return $this;
     }
 
-    public function setComment($comment){
-        $this->comment = $comment;
-        return $this;
-    }
-
 	public function handle(){
-        $subscriber = $this->user->subscriber;
-        if (!$subscriber){
-            throw new \Exception("Cannot issue license for user with no subscriber record");
-        }
-
-
         // if not set, license starts now
         if (!$this->startsAt){
             $this->startsAt = Carbon::now();
         }
 
-        // reset to start of a day
-        $this->startsAt = $this->startsAt->startOfDay();
-
         $startsAt = $this->startsAt->toDateTimeString();
-        // take end of a day for the new license
-        $c_expiresAt = $this->startsAt->addDays($this->licenseType->days)->endOfDay();
+        $c_expiresAt = $this->startsAt->addDays($this->licenseType->days);
         $expiresAt = $c_expiresAt->toDateTimeString();
 
         // create license
@@ -58,29 +49,26 @@ class IssueLicense extends Command implements SelfHandling {
         $license->license_func_type_id = $this->licenseFuncType->id;
         $license->starts_at = $startsAt;
         $license->expires_at = $expiresAt;
+        if (\Auth::user()){
+            $license->issuer_id = \Auth::user()->id;
+        }
+        
         if ($this->comment){
-            $license->comment = $this->comment;
+            $license->comment=$this->comment;
         }
 
-        $license->issuer_id = \Auth::user()->id;
-
         $license->save();
+        event(AuditEvent::create('license', $license->id));
 
-        // update subscriber
-        $subscriber->issued_on = $startsAt;
-        $subscriber->expires_on = $expiresAt;
-        $subscriber->license_type = $this->licenseFuncType->name;
-
-        // in case flag deleted is turned on, turn it off
-        $subscriber->deleted = 0;
-
+        // Create a new user on the SOAP server
+        $subscriber = Subscriber::createSubscriber($this->user->username, $this->sipPassword, $startsAt, $expiresAt, $this->licenseFuncType->name);
         $subscriber->save();
 
-        // update User's auxiliary columns
+        $this->user->subscriber_id = $subscriber->id;
+        // update User's auxiliary columns pointing to current license
         $this->user->active_license_id = $license->id;
         $this->user->save();
 
-        Queue::push('licenseUpdated', ['username'=>$this->user->email], 'users');
         return $license;
 	}
 }

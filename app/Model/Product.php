@@ -13,4 +13,14 @@ class Product extends Model{
     public function productPrices(){
         return $this->hasMany(ProductPrice::class);
     }
+
+    public function licenseType() {
+        return $this->belongsTo('Phonex\LicenseType', 'license_type_id');
+    }
+
+    public function licenseFuncType() {
+        return $this->belongsTo('Phonex\LicenseFuncType', 'license_func_type_id');
+    }
+
+
 }
