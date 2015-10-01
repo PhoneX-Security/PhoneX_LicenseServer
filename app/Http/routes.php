@@ -12,6 +12,12 @@
 */
 
 // Non authenticated pages
+use Phonex\Jobs\CreateUserWithSubscriber;
+use Phonex\Jobs\IssueProductLicense;
+use Phonex\Jobs\RefreshSubscribers;
+use Phonex\Model\Product;
+use Phonex\User;
+
 Route::get('home', 'HomeController@index');
 Route::get('/', 'HomeController@index');
 
@@ -35,6 +41,34 @@ Route::get('api/support-notification/{user}/{notification}', 'Api\SupportNotific
 Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], function(){
     Route::get('products', 'Api\ProductController@index');
 
+});
+
+Route::get('x', function(){
+    $slaveProduct = Product::find(5);
+
+
+
+//   dd('x');
+
+//    $user = User::findByUsername("mirojepan");
+
+
+//    $json = RefreshSubscribers::refreshUsagePolicy($user, false);
+//    dd($json);
+//    $c1 = new CreateUserWithSubscriber("mirojepan","bbbbbbbb1");
+//    $c1->addAccess();
+//
+//    $user = Bus::dispatch($c1);
+//    $productSubscription = Product::find(5);
+//    $productConsumable = Product::find(7);
+//
+//    $c2 = new IssueProductLicense($user, $productSubscription);
+//    $lic1 = Bus::dispatch($c2);
+//
+//    $c3 = new IssueProductLicense($user, $productConsumable);
+//    $lic2 = Bus::dispatch($c3);
+
+//    dd('success');
 });
 
 // Authenticated pages using client credentials

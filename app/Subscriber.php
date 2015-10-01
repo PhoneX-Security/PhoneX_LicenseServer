@@ -139,6 +139,13 @@ class Subscriber extends Model{
         $this->subscribersInContactList()->detach($subscriber->id);
     }
 
+    public static function newSubscriber($username, $password, $startsAt = null, $expiresAt = null, $licenseType = "custom", $domain = 'phone-x.net'){
+        return self::createSubscriber($username, $password, $startsAt, $expiresAt, $licenseType, $domain);
+    }
+
+    /**
+     * @deprecated use newSubscriber, license start/end is now stored in usage_policy_current and usage_policy_expired
+     */
     public static function createSubscriber($username, $password, $startsAt, $expiresAt, $licenseType, $domain = 'phone-x.net'){
         $sip = $username . "@" . $domain;
         $ha1 = getHA1_1($sip, $password);

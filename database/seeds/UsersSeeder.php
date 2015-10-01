@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Phonex\Jobs\CreateUser;
-use Phonex\LicenseType;
 
 class UsersSeeder extends Seeder {
 
@@ -14,9 +12,9 @@ class UsersSeeder extends Seeder {
     public function run()
     {
         // create user with access
-        $command = new CreateUser('admin');
-        $command->addAccess('admin');
-        $user = Bus::dispatch($command);
+//        $command = new CreateUser('admin');
+//        $command->addAccess('admin');
+//        $user = Bus::dispatch($command);
     }
 
 }

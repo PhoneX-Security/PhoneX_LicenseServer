@@ -4,10 +4,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Phonex\Http\Requests\ResetTrialCounterByImeiRequest;
-use Phonex\Jobs\CreateSubscriberWithLicense;
-use Phonex\Jobs\CreateUser;
-use Phonex\Jobs\IssueLicense;
 use Phonex\ContactList;
 use Phonex\Events\AuditEvent;
 use Phonex\Group;
@@ -17,9 +13,10 @@ use Phonex\Http\Requests\CreateUserRequest;
 use Phonex\Http\Requests\DeleteContactRequest;
 use Phonex\Http\Requests\NewLicenseRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
-use Phonex\LicenseFuncType;
-use Phonex\LicenseType;
+use Phonex\Jobs\CreateUserWithSubscriber;
+use Phonex\Jobs\IssueProductLicense;
 use Phonex\Model\ErrorReport;
+use Phonex\Model\Product;
 use Phonex\Role;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
@@ -74,13 +71,12 @@ class UserController extends Controller {
 
 	public function create()
 	{
-		$licenseTypes = LicenseType::all()->sortBy('order');
-        $licenseFuncTypes = LicenseFuncType::all()->sortBy('order');
+        $products = Product::allForDirectSalePlatform()->sortBy('onum');
         $groups = Group::all();
         $roles = Role::all();
 
         $randomPassword = getRandomString(8, 'abcdefghjkmnpqrstuvwxyz23456789');
-		return view('user.create', compact('licenseTypes', 'licenseFuncTypes', 'groups', 'roles', 'randomPassword'));
+		return view('user.create', compact('products', 'groups', 'roles', 'randomPassword'));
 	}
 
 
@@ -91,26 +87,30 @@ class UserController extends Controller {
         $groupIds = [];
         $roleIds = [];
 
+
         $defaultPassword = $request->get('password');
-        $userRequest = new CreateUser($request->get('username'), $groupIds);
-        $userRequest->addAccess($defaultPassword);
+        $username = $request->get('username');
+        $userRequest = new CreateUserWithSubscriber($username, $defaultPassword);
+        $userRequest->addAccess();
         if ($roleIds){
             $userRequest->addRoles($roleIds);
         }
+        if ($groupIds){
+            $userRequest->addGroups($groupIds);
+        }
+
         if ($request->has('user-comment')){
             $userRequest->addComment($request->get('user-comment'));
         }
 
         $user = $this->dispatch($userRequest);
+        $product = Product::find($request->get('product_id'));
 
-        $licenseType = LicenseType::find($request->get('license_type_id'));
-        $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
-
-        $licRequest = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $defaultPassword);
+        $licRequest = new IssueProductLicense($user, $product);
         $startsAt = carbonFromInput($request->get('starts_at'));//Carbon::createFromFormat("d-m-Y", $request->get('starts_at'));
         $licRequest->startingAt($startsAt);
         if ($request->has('comment')){
-            $licRequest->comment = $request->get('comment');
+            $licRequest->setComment($request->get('comment'));
         }
 
         $this->dispatch($licRequest);
@@ -137,20 +137,22 @@ class UserController extends Controller {
     {
         $user = User::with([
             'licenses.licenseType',
+            'licenses.product',
             'issuedLicenses.licenseType',
+            'issuedLicenses.product',
             'subscriber.subscribersInContactList.user'])->find($id);
 
         if ($user == null){
             throw new NotFoundHttpException;
         }
 
-        foreach($user->licenses as $license){
-            if (!$license->expires_at || Carbon::now()->gt(Carbon::parse($license->expires_at))) {
-                $license->active = false;
-            } else {
-                $license->active = true;
-            }
-        }
+//        foreach($user->licenses as $license){
+//            if (!$license->expires_at || Carbon::now()->gt(Carbon::parse($license->expires_at))) {
+//                $license->active = false;
+//            } else {
+//                $license->active = true;
+//            }
+//        }
 
         return view('user.show-lic', compact('user'));
     }
@@ -170,18 +172,16 @@ class UserController extends Controller {
     public function getNewLicense($id)
     {
         $user = $this->getUserOr404($id);
-        $licenseTypes = LicenseType::all()->sortBy('order');
-        $licenseFuncTypes = LicenseFuncType::all()->sortBy('order');
-        return view('user.new-license', compact('user', 'licenseTypes', 'licenseFuncTypes'));
+        $products = Product::allForDirectSalePlatform()->sortBy('onum');
+        return view('user.new-license', compact('user', 'products'));
     }
 
     public function postNewLicense($id, NewLicenseRequest $request)
     {
         $user = $this->getUserOr404($id);
-        $licenseType = LicenseType::find($request->get('license_type_id'));
-        $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
+        $product = Product::find($request->get('product_id'));
 
-        $licRequest = new IssueLicense($user, $licenseType, $licenseFuncType);
+        $licRequest = new IssueProductLicense($user, $product);
         if ($request->has('comment')){
             $licRequest->setComment($request->get('comment'));
         }

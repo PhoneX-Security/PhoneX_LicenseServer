@@ -2,16 +2,14 @@
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Phonex\Jobs\CreateBusinessCodePair;
-use Phonex\Jobs\CreateSubscriberWithLicense;
-use Phonex\Jobs\CreateUser;
 use Phonex\Group;
 use Phonex\Http\Controllers\AccountController;
+use Phonex\Jobs\CreateUserWithSubscriber;
+use Phonex\Jobs\IssueProductLicense;
 use Phonex\Jobs\NewCodePairsExport;
 use Phonex\License;
-use Phonex\LicenseFuncType;
-use Phonex\LicenseType;
 use Phonex\Model\NotificationType;
+use Phonex\Model\Product;
 use Phonex\Model\SupportNotification;
 use Phonex\Subscriber;
 use Phonex\User;
@@ -20,12 +18,12 @@ class CodeAccountCreationTest extends TestCase {
     use DatabaseTransactions;
 
     const URL = '/account/business-account';
-    const TEST_USERNAME = "kajsmentke_sk1";
-    const TEST_USERNAME2 = "kozmeker_sk";
-    const TEST_USERNAME3 = "fajnsmeker_sk";
+    const TEST_USERNAME = "ckajsmetke_sk1";
+    const TEST_USERNAME2 = "ckozmker_sk";
+    const TEST_USERNAME3 = "cfansmeker_sk";
     const TEST_USERNAME_NON_EXISTING = "kajsmeker11";
 
-    const GROUP_NAME = "slovenskooo";
+    const GROUP_NAME = "slovensko";
 
     public function setUp(){
         // has to do this here before the framework is started because phpunit prints something before headers are sent
@@ -88,10 +86,9 @@ class CodeAccountCreationTest extends TestCase {
     }
 
     public function testExpiredBusinessCode(){
-        $licenseType = LicenseType::getHalfYear();
-        $licenseFuncType = LicenseFuncType::getFull();
+        $product = Product::getFullMonth();
 
-        $c1 = new NewCodePairsExport(1, $licenseType, $licenseFuncType, 1);
+        $c1 = new NewCodePairsExport(1, $product, 1);
         // code from past - this should fail
         $c1->addExpiration(Carbon::createFromDate(1999));
         list($export, $codes) = Bus::dispatch($c1);
@@ -114,20 +111,17 @@ class CodeAccountCreationTest extends TestCase {
             $username2 = self::TEST_USERNAME2;
             $username3 = self::TEST_USERNAME3;
 
-            // now create user1 and generate code pair
-            $trialLic = LicenseType::find(1);
-            $trialLicFunc = \Phonex\LicenseFuncType::getTrial();
-            $command = new CreateUser($username1);
+            $product = Product::getTrialWeek();
+
+            $command = new CreateUserWithSubscriber($username1, "fasirka_heslo");
             $user1 = Bus::dispatch($command);
-            $commandSub = new CreateSubscriberWithLicense($user1, $trialLic, $trialLicFunc, 'fasirka_heslo');
+            $commandSub = new IssueProductLicense($user1, $product);
             Bus::dispatch($commandSub);
 
             // predefined group + license type
             $group = Group::create(['name' => self::GROUP_NAME]);
-            $licenseType = LicenseType::getHalfYear();
-            $licenseFuncType = LicenseFuncType::getFull();
 
-            $command = new NewCodePairsExport(1, $licenseType, $licenseFuncType, 1);
+            $command = new NewCodePairsExport(1, $product, 1);
             $command->addGroup($group);
             list($export1, $codes1) = Bus::dispatch($command);
 
@@ -198,14 +192,13 @@ class CodeAccountCreationTest extends TestCase {
             $username3 = self::TEST_USERNAME3;
 
             // now create user1 and generate code pair
-            $licType = LicenseType::find(1);
-            $licFuncType = LicenseFuncType::getTrial();
-            $command = new CreateUser($username1);
+            $product = Product::getTrialWeek();
+            $command = new CreateUserWithSubscriber($username1, "fasirka_heslo");
             $user1 = Bus::dispatch($command);
-            $commandSub = new CreateSubscriberWithLicense($user1, $licType, $licFuncType, 'fasirka_heslo');
+            $commandSub = new IssueProductLicense($user1, $product);
             Bus::dispatch($commandSub);
 
-            $command = new NewCodePairsExport(1, $licType, $licFuncType);
+            $command = new NewCodePairsExport(1, $product);
             // some future expiration
             $command->addExpiration(Carbon::now()->addYears(2));
             $command->addParent($user1);
@@ -249,17 +242,15 @@ class CodeAccountCreationTest extends TestCase {
             $username1 = self::TEST_USERNAME;
             $username2 = self::TEST_USERNAME2;
 
-            $licType = LicenseType::getWeek();
-            $licFuncType = LicenseFuncType::getTrial();
-            $command = new CreateUser($username1);
+            $product = Product::getTrialWeek();
+            $command = new CreateUserWithSubscriber($username1, "fasirka_heslo");
             $user1 = Bus::dispatch($command);
-            $commandSub = new CreateSubscriberWithLicense($user1, $licType, $licFuncType, 'fasirka_heslo');
+            $commandSub = new IssueProductLicense($user1, $product);
             Bus::dispatch($commandSub);
 
             $group = Group::create(['name' => self::GROUP_NAME, 'owner_id' => $user1->id]);
 
-            $command = new CreateBusinessCodePair($user1, $licType, $licFuncType);
-            $command = new NewCodePairsExport(1, $licType, $licFuncType);
+            $command = new NewCodePairsExport(1, $product);
             $command->addGroup($group);
             list($exp, $codes) = Bus::dispatch($command);
 

@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Phonex\Jobs\CreateSubscriberWithLicense;
-use Phonex\Jobs\CreateUser;
 use Phonex\ContactList;
-use Phonex\LicenseFuncType;
-use Phonex\LicenseType;
+use Phonex\Jobs\CreateUser;
+use Phonex\Jobs\CreateUserWithSubscriber;
+use Phonex\Jobs\IssueProductLicense;
+use Phonex\Model\Product;
 use Phonex\User;
 
 class ContactListUpdateTest extends TestCase {
@@ -33,16 +33,14 @@ class ContactListUpdateTest extends TestCase {
 
 
         try {
-            $licType = LicenseType::find(1);
-            $licFuncType = LicenseFuncType::getFull();
+            $product = Product::getFullMonth();
 
             $clCount = ContactList::all()->count();
 
-            $u1 = Bus::dispatch(new CreateUser(self::TEST_USER1));
-            $u2 = Bus::dispatch(new CreateUser(self::TEST_USER2));
-
-            Bus::dispatch(new CreateSubscriberWithLicense($u1, $licType, $licFuncType, "pass"));
-            Bus::dispatch(new CreateSubscriberWithLicense($u2, $licType, $licFuncType, "pass"));
+            $u1 = Bus::dispatch(new CreateUserWithSubscriber(self::TEST_USER1, "pass"));
+            $u2 = Bus::dispatch(new CreateUserWithSubscriber(self::TEST_USER2, "pass"));
+            Bus::dispatch(new IssueProductLicense($u1, $product));
+            Bus::dispatch(new IssueProductLicense($u2, $product));
 
             $u1->addToContactList($u2);
             $this->assertTrue($u1->subscriber->subscribersInContactList->contains($u2->subscriber));

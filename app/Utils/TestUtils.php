@@ -1,21 +1,9 @@
 <?php namespace Phonex\Utils;
 
-use Bus;
-use Phonex\Jobs\CreateUser;
 use Phonex\User;
 use Queue;
 
 trait TestUtils{
-
-    public function createUser($username)
-    {
-        $oldUser = User::where('username', $username)->first();
-        if ($oldUser != null){
-            $oldUser->deleteWithLicenses();
-        }
-        $u1 = Bus::dispatch(new CreateUser($username));
-        return $u1;
-    }
 
     // temp fix for Queue push calls in test - causing failures
     public function mockQueuePush()

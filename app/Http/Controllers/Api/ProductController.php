@@ -15,17 +15,19 @@ class ProductController extends Controller {
         $platform = $request->has('platform') ? $request->get('platform') : null;
 
 //        $query = Product::with('productPrices')->with('appPermissions');
-        $query = Product::with('appPermissions');
+        $query = Product::with(['appPermissions', 'permissionParent', 'permissionParent.appPermissions']);
         if ($platform){
             $query = $query->where(['platform' => $platform]);
         }
 
         $results = $query->get();
-//        foreach($results as $result){
-            // set all visible
-//            $result->setVisible(['name', 'appPermissions']);
-//            dd($result->appPermissions[0]->count);
-//        }
+        foreach($results as $result){
+            // for some products load permissions from their permission parent
+            if (!$result->appPermission && $result->permissionParent){
+                // rewrite originally loaded relation
+                $result->setRelation('appPermissions', $result->permissionParent->appPermissions);
+            }
+        }
         return $results->toJson();
     }
 

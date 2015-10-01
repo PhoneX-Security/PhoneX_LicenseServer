@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
+use League\Flysystem\Exception;
 use Log;
 use Phonex\License;
 use Phonex\User;
@@ -39,7 +40,57 @@ class RefreshSubscribers extends Command implements SelfHandling {
 //        Log::info('RefreshSubscribers is finished, ' . $counter . " users were updated.");
 	}
 
-    public static function refreshSingleUser(User $user, $sendPushNotification = true){
+    public static function refreshUsagePolicy(User $user, $sendPushNotification = true)
+    {
+        $subscriptions = [];
+        $consumables = [];
+
+        if (!$user->subscriber){
+            throw new Exception("Given user has no subscriber");
+        }
+        $subscriber = $user->subscriber;
+
+        foreach ($user->licenses as $license){
+            if (!$license->product){
+                // skipping license not having product_id - legacy licenses
+                continue;
+            }
+
+            $product = $license->product;
+
+            foreach ($product->appPermissions as $permission){
+                $obj = new \stdClass();
+
+                try {
+                    $obj->permission = $permission->permission;
+                    $obj->count = $permission->pivot->count;
+                    $obj->starts_at = $license->starts_at->timestamp;
+                    $obj->license_id = $license->id;
+                    $obj->permission_id = $permission->id;
+//
+                    if ($product->isConsumable()){
+                        $consumables[] = $obj;
+                    } else {
+                        $obj->expires_at = $license->expires_at->timestamp;
+                        $subscriptions[] = $obj;
+                    }
+                } catch (Exception $e){
+                    Log::error("Cannot store permission object because of the error.", [$permission, $e]);
+                }
+            }
+        }
+
+        $currentUsagePolicy = new \stdClass();
+        $currentUsagePolicy->subscriptions = $subscriptions;
+        $currentUsagePolicy->consumables = $consumables;
+
+        $subscriber->usage_policy_current = json_encode($currentUsagePolicy);
+        $subscriber->save();
+        return $subscriber->usage_policy_current;
+    }
+
+    public static function refreshSingleUser(User $user, $sendPushNotification = true)
+    {
         /*
                 We want to update Subscriber table (in opensips database) together with auxiliary fields in users table with issued_on, expires_on and license type things.
                 As user may have multiple licenses, we want to find out the recent one, that should be used.

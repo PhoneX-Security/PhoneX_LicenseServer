@@ -14,6 +14,7 @@ class LicenseType extends Model{
     const EXPIRATION_HALF_YEAR = "half_year";
     const EXPIRATION_YEAR = "year";
     const EXPIRATION_INFINITE = "infinite";
+    const EXPIRATION_CONSUMABLE = "consumable";
 
     protected $table = "license_types";
     

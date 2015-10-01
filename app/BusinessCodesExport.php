@@ -1,6 +1,7 @@
 <?php namespace Phonex;
 
 use Illuminate\Database\Eloquent\Model;
+use Phonex\Model\Product;
 
 class BusinessCodesExport extends Model{
 	protected $table = 'business_codes_exports';
@@ -25,11 +26,22 @@ class BusinessCodesExport extends Model{
 		return $this->belongsTo('Phonex\User', 'parent_id');
 	}
 
+	public function product()
+	{
+		return $this->belongsTo(Product::class, 'product_id');
+	}
+
+	/**
+	 * @deprecated
+	 */
 	public function licenseType()
 	{
 		return $this->belongsTo('Phonex\LicenseType', 'license_type_id');
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function licenseFuncType()
 	{
 		return $this->belongsTo('Phonex\LicenseFuncType', 'license_func_type_id');

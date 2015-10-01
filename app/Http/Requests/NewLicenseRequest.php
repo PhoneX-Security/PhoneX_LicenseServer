@@ -23,8 +23,7 @@ class NewLicenseRequest extends Request {
 	{
 		return [
 			'starts_at' => 'required|date_format:"d-m-Y"',
-			'license_type_id' => 'required|exists:license_types,id',
-			'license_func_type_id' => 'required|exists:license_func_types,id',
+			'product_id' => 'required|exists:products,id',
 		];
 	}
 

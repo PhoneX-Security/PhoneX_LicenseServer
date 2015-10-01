@@ -3,15 +3,8 @@
 use Bus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Phonex\BusinessCodesExport;
-use Phonex\Group;
-use Phonex\Jobs\CreateSubscriberWithLicense;
-use Phonex\Jobs\CreateUser;
-use Phonex\Jobs\RefreshSubscribers;
-use Phonex\ContactList;
 use Phonex\Http\Requests;
-use Phonex\LicenseFuncType;
-use Phonex\LicenseType;
+use Phonex\Jobs\RefreshSubscribers;
 use Phonex\Subscriber;
 use Phonex\User;
 use Queue;
@@ -135,24 +128,6 @@ class QaController extends Controller {
         return 'all deleted users removed from support account cl (' . $count . ')';
     }
 
-    public function getCreateDusanTestEnv(Request $request){
-        die('turned off');
-        $users = User::orderBy('id', 'DESC')->limit(510)->get();
-
-        $licType = LicenseType::find(2); // year
-        $licFuncType = LicenseFuncType::getFull();
-        $masterName = 'qa_dusan_master';
-//        $slaveNamePrefix = 'qa_dusan_slave';
-        $pass = 'gragbadd0';
-
-        $masterUser = Bus::dispatch(new CreateUser($masterName));
-        Bus::dispatch(new CreateSubscriberWithLicense($masterUser, $licType, $licFuncType, $pass));
-
-        foreach($users as $u){
-            $masterUser->addToContactList($u);
-        }
-        return 'success';
-    }
 
     public function getMigrateTurn(Request $request){
         die('turned off');

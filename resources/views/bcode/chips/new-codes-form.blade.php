@@ -37,24 +37,36 @@
         <div class="row">
             <div class="col-md-2">
                 <div class="form-group">
-                    <label for="password" class="control-label">Expiration</label>
-                    <select name="license_type_id" class="form-control" >
-                        @foreach($licenseTypes as $type)
-                            <option @if($type->default) selected="selected" @endif
-                            value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
+                    <label for="product_id" class="control-label">Product</label>
+                    <select name="product_id" id="product_id" class="form-control" >
+                        @foreach($products as $product)
+                            <option @if($product->default) selected="selected" @endif
+                            value="{{ $product->id }}">{{ ucfirst($product->name) }} </option>
                         @endforeach
                     </select>
                 </div>
             </div>
 
-            <div class="col-md-2">
-                <label for="license_func_type_id" class="control-label">Type</label>
-                <select id="license_func_type_id" name="license_func_type_id" class="form-control">
-                    @foreach($licenseFuncTypes as $type)
-                        <option value="{{ $type->id }}" @if($type->default) selected="selected" @endif>{{ ucfirst($type->name) }} </option>
-                    @endforeach
-                </select>
-            </div>
+            {{--<div class="col-md-2">--}}
+                {{--<div class="form-group">--}}
+                    {{--<label for="password" class="control-label">Expiration</label>--}}
+                    {{--<select name="license_type_id" class="form-control" >--}}
+                        {{--@foreach($licenseTypes as $type)--}}
+                            {{--<option @if($type->default) selected="selected" @endif--}}
+                            {{--value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>--}}
+                        {{--@endforeach--}}
+                    {{--</select>--}}
+                {{--</div>--}}
+            {{--</div>--}}
+
+            {{--<div class="col-md-2">--}}
+                {{--<label for="license_func_type_id" class="control-label">Type</label>--}}
+                {{--<select id="license_func_type_id" name="license_func_type_id" class="form-control">--}}
+                    {{--@foreach($licenseFuncTypes as $type)--}}
+                        {{--<option value="{{ $type->id }}" @if($type->default) selected="selected" @endif>{{ ucfirst($type->name) }} </option>--}}
+                    {{--@endforeach--}}
+                {{--</select>--}}
+            {{--</div>--}}
 
             <div class="col-md-2">
                 <div class="form-group">

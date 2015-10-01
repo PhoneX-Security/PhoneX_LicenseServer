@@ -27,7 +27,7 @@ class ClientCertAuth{
 			return $next($request);
 		}
 
-		// common name of certificate be user's sip (e.g. test318@phone-x.net)
+		// common name of certificate is user's sip (e.g. test318@phone-x.net)
 		// it will be checked against opensips subscriber table
 		$clientCertVerify = Request::server('SSL_CLIENT_VERIFY', 'NONE');
 		$clientCommonName = Request::server('SSL_CLIENT_S_DN_CN');

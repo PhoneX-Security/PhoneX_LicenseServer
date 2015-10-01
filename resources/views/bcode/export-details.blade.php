@@ -52,29 +52,35 @@
                         <div class="row">
                             <div class="col-md-2 ">
                                 <dl>
-                                    <dt>Type</dt>
-                                    <dd>
-                                        @if($export->licenseFuncType)
-                                            {{$export->licenseFuncType->uc_name}}
-                                        @else
-                                            {{ $firstCode->licenseFuncType->uc_name }}
-                                        @endif
-                                    </dd>
+                                    <dt>Product</dt>
+                                    <dd>{{$export->product->uc_name}}</dd>
                                 </dl>
                             </div>
-                            <div class="col-md-2 ">
-                                <dl>
-                                    <dt>Expiration</dt>
-                                    <dd>
-                                        @if($export->LicenseType)
-                                            {{$export->LicenseType->uc_name}}
-                                        @else
-                                            {{ $firstCode->licenseType->uc_name_with_days }}
-                                        @endif
+                            {{--<div class="col-md-2 ">--}}
+                                {{--<dl>--}}
+                                    {{--<dt>Type</dt>--}}
+                                    {{--<dd>--}}
+                                        {{--@if($export->licenseFuncType)--}}
+                                            {{--{{$export->licenseFuncType->uc_name}}--}}
+                                        {{--@else--}}
+                                            {{--{{ $firstCode->licenseFuncType->uc_name }}--}}
+                                        {{--@endif--}}
+                                    {{--</dd>--}}
+                                {{--</dl>--}}
+                            {{--</div>--}}
+                            {{--<div class="col-md-2 ">--}}
+                                {{--<dl>--}}
+                                    {{--<dt>Expiration</dt>--}}
+                                    {{--<dd>--}}
+                                        {{--@if($export->LicenseType)--}}
+                                            {{--{{$export->LicenseType->uc_name}}--}}
+                                        {{--@else--}}
+                                            {{--{{ $firstCode->licenseType->uc_name_with_days }}--}}
+                                        {{--@endif--}}
 
-                                    </dd>
-                                </dl>
-                            </div>
+                                    {{--</dd>--}}
+                                {{--</dl>--}}
+                            {{--</div>--}}
                             <div class="col-md-2 ">
                                 <dl>
                                     <dt>Group</dt>

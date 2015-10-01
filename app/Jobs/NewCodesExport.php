@@ -7,6 +7,7 @@ use Phonex\Group;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\Model\CodeExportType;
+use Phonex\Model\Product;
 use Phonex\User;
 
 /**
@@ -16,8 +17,7 @@ use Phonex\User;
 abstract class NewCodesExport extends Command implements SelfHandling {
     const TYPE = CodeExportType::SINGLE;// default type single, rewrite it if required
 
-    private $licenseType;
-    private $licenseFuncType;
+    private $product;
     private $group;
     private $prefix;
     private $expiresAt;
@@ -26,12 +26,11 @@ abstract class NewCodesExport extends Command implements SelfHandling {
     private $count;
     private $comment;
 
-    public function __construct($pairsCount, LicenseType $licenseType, LicenseFuncType $licenseFuncType, $licenseLimitPerCode, callable $callback = null)
+    public function __construct($pairsCount, Product $product, $licenseLimitPerCode, callable $callback = null)
     {
         $this->count = $pairsCount;
         $this->licenseLimitPerCode = $licenseLimitPerCode;
-        $this->licenseType = $licenseType;
-        $this->licenseFuncType = $licenseFuncType;
+        $this->product = $product;
         $this->callback = $callback;
     }
 
@@ -62,8 +61,7 @@ abstract class NewCodesExport extends Command implements SelfHandling {
         $export = new BusinessCodesExport();
         $export->creator_id = \Auth::user()->id;
 
-        $export->license_type_id = $this->licenseType->id;
-        $export->license_func_type_id = $this->licenseFuncType->id;
+        $export->product_id = $this->product->id;
         $export->license_limit_per_code = $this->licenseLimitPerCode;
         $export->type = static::TYPE; // late static binding
 

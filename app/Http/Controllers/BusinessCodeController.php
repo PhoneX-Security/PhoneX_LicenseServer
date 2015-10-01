@@ -13,6 +13,7 @@ use Phonex\Jobs\NewSingleCodesExport;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 use Phonex\Model\CodeExportType;
+use Phonex\Model\Product;
 use Phonex\User;
 
 class BusinessCodeController extends Controller {
@@ -63,7 +64,11 @@ class BusinessCodeController extends Controller {
         // Match pairs
         foreach($export->codes as $code){
             $firstCode = $code->code;
-            $secondCode = $code->clMappings->first()->code;
+            $secondCodeObj = $code->clMappings->first();
+            if (!$secondCodeObj){
+                continue;
+            }
+            $secondCode = $secondCodeObj->code;
 
             if (in_array($firstCode, $codePairs)){
                 // we found all pairs, breaking
@@ -90,38 +95,21 @@ class BusinessCodeController extends Controller {
     public function getGenerateSingleCodes()
     {
         $groups = Group::all();
-        $licenseTypes = LicenseType::all();
-        foreach ($licenseTypes as $lt){
-            if ($lt->name === LicenseType::EXPIRATION_QUARTER){
-                $lt->default = true;
-            }
-        }
-        $licenseFuncTypes = LicenseFuncType::all();
-        foreach ($licenseFuncTypes as $lft){
-            if ($lft->name === LicenseFuncType::TYPE_TRIAL){
-                $lt->default = true;
-            }
-        }
-        return view('bcode.create_single_codes', compact('groups', 'licenseTypes', 'licenseFuncTypes'));
+//        $licenseTypes = LicenseType::all();
+//        foreach ($licenseTypes as $lt){
+//            if ($lt->name === LicenseType::EXPIRATION_QUARTER){
+//                $lt->default = true;
+//            }
+//        }
+        $products = Product::allForDirectSalePlatform();
+        return view('bcode.create_single_codes', compact('groups', 'products'));
     }
 
     public function getGenerateCodePairs()
     {
         $groups = Group::all();
-        $licenseTypes = LicenseType::all();
-        foreach ($licenseTypes as $lt){
-            if ($lt->name === LicenseType::EXPIRATION_QUARTER){
-                $lt->default = true;
-            }
-        }
-        $licenseFuncTypes = LicenseFuncType::all();
-        foreach ($licenseFuncTypes as $lft){
-            if ($lft->name === LicenseFuncType::TYPE_TRIAL){
-                $lt->default = true;
-            }
-        }
-
-        return view('bcode.create_pair', compact('groups', 'licenseTypes', 'licenseFuncTypes'));
+        $products = Product::allForDirectSalePlatform();
+        return view('bcode.create_pair', compact('groups', 'products'));
     }
     public function postGenerateSingleCodes(GenerateCodePairsRequest $request)
     {
@@ -167,14 +155,14 @@ class BusinessCodeController extends Controller {
     public function postGenerateCodePairs(GenerateCodePairsRequest $request)
     {
         $group = Group::find($request->get('group_id'));
-        $licenseType = LicenseType::find($request->get('license_type_id'));
-        $licenseFuncType = LicenseFuncType::find($request->get('license_func_type_id'));
+
+        $product = Product::find($request->get('product_id'));
 
         $numberOfPairs = $request->get('number');
         $email = $request->get('email');
         $parent = $request->has('parent_username') ? User::findByUsername($request->get('parent_username')) : null;
 
-        $command = new NewCodePairsExport($numberOfPairs, $licenseType, $licenseFuncType, 1);
+        $command = new NewCodePairsExport($numberOfPairs, $product, 1);
         if ($request->has('comment')){
             $command->addComment($request->get('comment'));
         }

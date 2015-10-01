@@ -1,16 +1,14 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Carbon\Carbon;
-use DB;
 use Illuminate\Http\Request;
 use Log;
 use Phonex\BusinessCode;
-use Phonex\Jobs\CreateSubscriberWithLicense;
-use Phonex\Jobs\CreateUser;
 use Phonex\ContactList;
-use Phonex\LicenseFuncType;
-use Phonex\LicenseType;
-use Phonex\Model\SupportNotification;
+use Phonex\Jobs\CreateUser;
+use Phonex\Jobs\CreateUserWithSubscriber;
+use Phonex\Jobs\IssueProductLicense;
+use Phonex\Model\Product;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
 use Phonex\User;
@@ -138,6 +136,7 @@ class AccountController extends Controller {
 
             // TODO add transaction code here
         } catch (\Exception $e){
+            Log::error("postBusinessAccount exception", [$e]);
             return $this->responseError($e->getCode());
         }
         return $this->issueBusinessAccount($request);
@@ -145,28 +144,22 @@ class AccountController extends Controller {
 
     private function issueBusinessAccount(Request $request)
     {
-        $isQaTrial = false; // Turn this cool feature off
-        $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
-
-        $username = (!$isQaTrial) ? $request->get('username') : 'qa_trial' . $trialNumber;
-        Log::info("Creating business account", [$username]);
-        $sipPassword = rand(100000, 999999);
+        $username = $request->get('username');
+        $password = rand(100000, 999999);
         $bcode = BusinessCode::with('export')->where('code', $request->get('bcode'))->first();
-        Log::info("Creating business account", [$username]);
+        Log::info("Creating account", [$username]);
 
         try {
-            $licType = $bcode->getLicenseType();
-            $licFuncType = $bcode->getLicenseFuncType();
+            $product = $bcode->export->product;
 
             // create user
-            $groups = $bcode->getGroup() ? [$bcode->getGroup()->id] : [];
-            $command = new CreateUser($username,
-                $groups,
-                $isQaTrial,
-                $trialNumber);
-            $user = $this->dispatch($command);
+            $groupIds = $bcode->getGroup() ? [$bcode->getGroup()->id] : [];
 
-            $createSubscriberCommand = new CreateSubscriberWithLicense($user, $licType, $licFuncType, $sipPassword);
+            $createUserCommand = new CreateUserWithSubscriber($username, $password);
+            $createUserCommand->addGroups($groupIds);
+            $user = $this->dispatch($createUserCommand);
+
+            $createSubscriberCommand = new IssueProductLicense($user, $product);
             $license = $this->dispatch($createSubscriberCommand);
             // Store to licenses and to user as well
             $license->business_code_id = $bcode->id;
@@ -203,35 +196,31 @@ class AccountController extends Controller {
             }
 
         } catch (\Exception $e){
-            Log::error("issueBusinessAccount, error", [$e]);
+//            dd($e);
+            Log::error("issueBusinessAccount 22, error", [$e]);
             return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
         }
 
 //        Log::warning("query log", [DB::getQueryLog()]);
 
         $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
-        return $this->responseOk($user->username, $user->email, $sipPassword, $expiresAtUnixTime);
+        return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
     }
 
     private function issueTrialAccount(TrialRequest $trialRequest){
         $isQaTrial = $this->isPhonexIp(\Input::getClientIp());
-//        $trialNumber = $this->getMaxTrialNumber($isQaTrial) + 1;
         $username = $trialRequest->username;
 
-//        if ($isQaTrial){
-//            $username = 'qa_trial' . $trialNumber;
-//        }
-
-        $licenseType = LicenseType::find(1); // MAGIC ID - week is #1
-        $licenseFuncType = LicenseFuncType::getTrial();
-        $sipPassword = rand(100000, 999999);
+        // TODO put this constant somewhere else
+        $product = Product::getTrialWeek();
+        $password = rand(100000, 999999);
 
         try {
-            $createUserCommand = new CreateUser($username, [], $isQaTrial);
+            $createUserCommand = new CreateUserWithSubscriber($username, $password);
             $user = $this->dispatch($createUserCommand);
 
-            $createLicCommand = new CreateSubscriberWithLicense($user, $licenseType, $licenseFuncType, $sipPassword);
-            $license = $this->dispatch($createLicCommand);
+            $createLicCommand = new IssueProductLicense($user, $product);
+            $this->dispatch($createLicCommand);
 
             if (!$isQaTrial){
                 ContactList::addSupportToContactListMutually($user);
@@ -246,7 +235,7 @@ class AccountController extends Controller {
         $trialRequest->save();
 
         $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
-        return $this->responseOk($user->username, $user->email, $sipPassword, $expiresAtUnixTime);
+        return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
     }
 
     private function checkCorrectBusinessCode(Request $request){

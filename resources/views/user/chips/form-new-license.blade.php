@@ -17,19 +17,10 @@
         </script>
 
         <div class="col-md-2">
-            <label for="password" class="control-label">Expiration*</label>
-            <select name="license_type_id" class="form-control">
-                @foreach($licenseTypes as $type)
-                    <option value="{{ $type->id }}">{{ ucfirst($type->name) . " (" . $type->days . " days)" }} </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="col-md-2">
-            <label for="password" class="control-label">Type*</label>
-            <select name="license_func_type_id" class="form-control">
-                @foreach($licenseFuncTypes as $type)
-                    <option value="{{ $type->id }}">{{ ucfirst($type->name) }} </option>
+            <label for="password" class="control-label">Product*</label>
+            <select name="product_id" class="form-control">
+                @foreach($products as $product)
+                    <option value="{{ $product->id }}">{{ $product->uc_name }} </option>
                 @endforeach
             </select>
         </div>

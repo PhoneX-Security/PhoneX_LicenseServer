@@ -21,8 +21,7 @@ class GenerateCodePairsRequest extends Request {
 	{
 		return [
             'group_id' => 'required|exists:groups,id',
-            'license_type_id' => 'exists:license_types,id',
-            'license_func_type_id' => 'exists:license_func_types,id',
+            'product_id' => 'exists:products,id',
 			'number' => 'required|integer|between:1,100',
             'email' => 'email',
             'parent_username' => 'exists:users,username',

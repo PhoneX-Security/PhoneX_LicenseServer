@@ -108,7 +108,7 @@ class TrialAccountCreationTest extends TestCase {
 
             $json = $this->callAndCheckResponse(self::URL, [
                 'version' => AccountController::VERSION,
-                'imei' => 'a',
+                'imei' => 'abcdsejhhk000046666',
                 'captcha' =>'captcha',
                 'username' => self::TEST_USERNAME
             ], AccountController::RESP_OK);
@@ -125,6 +125,8 @@ class TrialAccountCreationTest extends TestCase {
             $this->assertEquals($licenseCount + 1, License::all()->count());
             $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
             $this->assertEquals($trialReqCount + 1, TrialRequest::all()->count());
+        } catch (Exception $e){
+          Log::error("error", [$e]);
         } finally {
             $user = User::where('username', $json->username)->first();
             if ($user){
@@ -135,7 +137,7 @@ class TrialAccountCreationTest extends TestCase {
 
     public function testImeiBlockation(){
         try {
-            $imei = "360a2d6bea383d73581d7a1a9";
+            $imei = "360a2d6b3383d73581d7a1a9";
 
             $usernames = [];
 

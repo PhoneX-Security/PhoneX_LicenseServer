@@ -2,7 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-//use Phonex\Utils\SortableTrait;
+use Phonex\Model\Product;
 
 
 /**
@@ -23,23 +23,27 @@ class License extends Model{
 //	protected $sortable = ['username', 'email', 'has_access', 'id'];
 
 	public function user(){
-		return $this->belongsTo('Phonex\User', 'user_id');
+		return $this->belongsTo(User::class, 'user_id');
 	}
 
     public function issuer(){
-        return $this->belongsTo('Phonex\User', 'issuer_id');
+        return $this->belongsTo(User::class, 'issuer_id');
     }
 
 	public function licenseType() {
-		return $this->belongsTo('Phonex\LicenseType', 'license_type_id');
+		return $this->belongsTo(LicenseType::class, 'license_type_id');
 	}
 
     public function licenseFuncType() {
-        return $this->belongsTo('Phonex\LicenseFuncType', 'license_func_type_id');
+        return $this->belongsTo(LicenseFuncType::class, 'license_func_type_id');
     }
 
     public function businessCode() {
-        return $this->belongsTo('Phonex\BusinessCode', 'business_code_id');
+        return $this->belongsTo(BusinessCode::class, 'business_code_id');
+    }
+
+    public function product() {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
     /* Accessors */
