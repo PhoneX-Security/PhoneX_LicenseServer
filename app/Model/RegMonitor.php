@@ -1,15 +1,20 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: miroc
- * Date: 13.10.15
- * Time: 13:38
- */
+<?php namespace Phonex\Model;
+use Illuminate\Database\Eloquent\Model;
 
-namespace app\Model;
-
-
-class RegMonitor
+class RegMonitor extends Model
 {
+    protected $connection = 'mysql_opensips';
+    protected $table = 'phx_reg_mon';
+    protected $casts = [
+        'id' => 'integer',
+        'port'=>'integer',
+        'expires'=>'integer',
+        'cseq'=>'integer',
+        'reg_idx'=>'integer',
+        'num_registractions'=>'integer'
+    ];
 
+    // table doesn't have timestamps
+    public $timestamps = false;
+    protected $dates = ['created_at'];
 }

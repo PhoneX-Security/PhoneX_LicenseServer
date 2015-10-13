@@ -22,6 +22,7 @@
                         <div class="col-sm-6">
                             <a href="{{ route('users.edit', [$user->id]) }}" class="btn btn-primary">Edit</a>
                             <a class="btn btn-default" href="#" data-href="#" data-toggle="modal" data-target="#modal-reset-trial-counter">Reset trial counter</a>
+                            <a href="{{ route('users.push-lic-update', [$user->id]) }}" class="btn btn-default">Push license update</a>
                             <a class="btn btn-danger" href="#" data-href="#" data-toggle="modal" data-target="#modal-force-logout">Logout</a>
                         </div>
 

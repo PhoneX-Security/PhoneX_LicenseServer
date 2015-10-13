@@ -50,11 +50,13 @@ Route::group(['middleware' => ['auth', 'acl']], function() {
     /* Users + details */
 	Route::resource('users', 'UserController');
     Route::post('users/{user}/reset-trial-counter', ['as'=>'users.reset-trial-counter', 'uses'=>'UserController@resetTrialCounter']);
+    Route::get('users/{user}/push-lic-update', ['as'=>'users.push-lic-update', 'uses'=>'UserController@pushLicUpdate']);
     Route::post('users/{user}/force-logout', ['as'=>'users.force-logout', 'uses'=>'UserController@forceLogout']);
     // CL
     Route::get('users/{user}/licenses', ['as' => 'users.licenses', 'uses' => 'UserController@showLicenses']);
     Route::get('users/{user}/cl', ['as' => 'users.cl', 'uses' => 'UserController@showCl']);
     Route::get('users/{user}/stats', ['as' => 'users.stats', 'uses' => 'UserController@showStats']);
+    Route::get('users/{user}/reg-stats', ['as' => 'users.reg-stats', 'uses' => 'UserController@showRegStats']);
     Route::get('users/{user}/error-reports', ['as' => 'users.error-reports', 'uses' => 'UserController@showErrorReports']);
 
     // Contact lists + alternative via get

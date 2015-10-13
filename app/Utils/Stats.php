@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use Phonex\License;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
+use Phonex\Model\RegMonitor;
 use Phonex\Model\UsageLogs;
 use Phonex\User;
 use stdClass;
@@ -111,6 +112,16 @@ class Stats
             $counts[$index] = $counts[$index] +1;
         }
         return $counts;
+    }
+
+    public function regMonitorStats(User $user)
+    {
+        $days = 1;
+        $dateFrom  = Carbon::tomorrow()->subDays($days); // counting from tomorrow - which basically means end of today
+        $logs = RegMonitor::where('sip', $user->username . "@phone-x.net")
+            ->where("created_at", ">=",$dateFrom->toDateTimeString())
+            ->get();
+        return $logs;
     }
 
     public function reportPerPeriod(Carbon $dateFrom = null, Carbon $dateTo = null, $includeQaTrial = true)

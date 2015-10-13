@@ -145,15 +145,6 @@ class UserController extends Controller {
         if ($user == null){
             throw new NotFoundHttpException;
         }
-
-//        foreach($user->licenses as $license){
-//            if (!$license->expires_at || Carbon::now()->gt(Carbon::parse($license->expires_at))) {
-//                $license->active = false;
-//            } else {
-//                $license->active = true;
-//            }
-//        }
-
         return view('user.show-lic', compact('user'));
     }
 
@@ -172,7 +163,8 @@ class UserController extends Controller {
     public function getNewLicense($id)
     {
         $user = $this->getUserOr404($id);
-        $products = Product::allForDirectSalePlatform()->sortBy('onum');
+//        $products = Product::allForDirectSalePlatform()->sortBy('onum');
+        $products = Product::allAvailable()->sortBy('onum');
         return view('user.new-license', compact('user', 'products'));
     }
 
@@ -222,6 +214,38 @@ class UserController extends Controller {
 
         return view('user.show-stats', compact('user', 'labels', 'data', 'days'));
     }
+
+    public function showRegStats($id, Stats $stats)
+    {
+        $user = User::find($id);
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
+
+        $days = 2;
+        $logs = $stats->regMonitorStats($user);
+
+        $dataPort = [];
+        $dataCseq = [];
+        $dataSockState = [];
+        $labels1 = [];
+        foreach ($logs as $log){
+            //dd($log);
+            $dataPort[] = $log->port;
+            $dataCseq[] = $log->cseq;
+            $dataSockState[] = $log->sock_state ? 1 : 0;
+            $labels1[] = $log->created_at->toTimeString();
+        }
+
+        $dataPort = json_encode($dataPort);
+        $dataCseq = json_encode($dataCseq);
+        $dataSockState = json_encode($dataSockState);
+        $labels1 = json_encode($labels1);
+
+        return view('user.show-reg-stats', compact('user', 'days',
+            'labels1', 'dataPort', 'dataCseq', 'dataSockState'));
+    }
+
 
 	public function update($id, UpdateUserRequest $request)
     {
@@ -285,6 +309,23 @@ class UserController extends Controller {
     }
 
     /**
+     * For testing purposes
+     */
+    public function pushLicUpdate($id)
+    {
+        $user = User::find($id);
+        if ($user == null){
+            throw new NotFoundHttpException;
+        }
+
+        Queue::push('licenseUpdated', ['username' => $user->username."@phone-x.net"], 'users');
+
+        return redirect()
+            ->back()
+            ->with("success", 'License push has been sent.');
+    }
+
+    /**
      * Logout user on all devices
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
@@ -296,7 +337,7 @@ class UserController extends Controller {
             throw new NotFoundHttpException;
         }
         // force logout of users on all devices -- aka kill switch
-        Queue::push('logout', ['username'=>$user->email], 'users');
+        Queue::push('logout', ['username' => $user->email], 'users');
         return redirect()
             ->back()
             ->with("success", 'User has been logged out on all devices.');

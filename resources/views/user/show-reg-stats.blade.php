@@ -16,9 +16,9 @@
 
             @include('errors.notifications')
 
-            <div class="alert alert-danger">
-                <strong>Warning!</strong> This is an experimental feature. Data shown below do not correspond to all user's activities, typically only to login and adding new contacts. We need to enhance this in the future.
-            </div>
+            {{--<div class="alert alert-danger">--}}
+                {{--<strong>Warning!</strong> This is an experimental feature. Data shown below do not correspond to all user's activities, typically only to login and adding new contacts. We need to enhance this in the future.--}}
+            {{--</div>--}}
 
             @include('user.chips.top-nav')
 
@@ -34,17 +34,38 @@
                         <script>
                             $(function () {
                                 var data = {
-                                    labels: [{!! implode(',', $labels) !!}],
+                                    {{--labels: [{!! implode(',', $labels) !!}],--}}
+                                    labels: {!! $labels1 !!},
                                     datasets: [
                                         {
-                                            label: "Activity",
+                                            label: "Port",
                                             fillColor: "rgba(60,141,188,0.9)",
-                                            strokeColor: "rgba(60,141,188,0.8)",
+                                            strokeColor: "rgba(200,200,200,0.4)", // iv
                                             pointColor: "#3b8bba",
                                             pointStrokeColor: "rgba(60,141,188,1)",
                                             pointHighlightFill: "#fff",
                                             pointHighlightStroke: "rgba(60,141,188,1)",
-                                            data: [{{implode(',', $data)}}]
+                                            data: {!! $dataPort !!}
+                                        },
+                                        {
+                                            label: "Cseq",
+                                            fillColor: "rgba(60,141,188,0.0)",
+                                            strokeColor: "rgba(200,200,200,0.4)", // iv
+                                            pointColor: "#cc6",
+                                            pointStrokeColor: "rgba(204,204,102,1)",
+                                            pointHighlightFill: "#fff",
+                                            pointHighlightStroke: "rgba(60,141,188,1)",
+                                            data: {!! $dataCseq !!}
+                                        },
+                                        {
+                                            label: "SockState",
+                                            fillColor: "rgba(60,141,188,0.0)",
+                                            strokeColor: "rgba(200,200,200,0.0)", // iv
+                                            pointColor: "#fff",
+                                            pointStrokeColor: "rgba(204,204,102,0)",
+                                            pointHighlightFill: "#0fff",
+                                            pointHighlightStroke: "rgba(60,141,188,0)",
+                                            data: {!! $dataSockState !!}
                                         }
                                     ]
                                 };
@@ -52,6 +73,17 @@
                                 var chart = new Chart(canvas);
 
                                 var options = {
+                                    animation:false,
+                                    animationEasing: "easeOutElastic",
+                                    showTooltips: true,
+
+                                    // String - Template string for single tooltips
+                                    tooltipTemplate: "<%if (label){%><%=label%>: <%}%><%= value %>",
+
+                                    // String - Template string for multiple tooltips
+                                    multiTooltipTemplate: "<%=datasetLabel%>: <%= value %>",
+
+                                    scaleShowLabels: true,
                                     ///Boolean - Whether grid lines are shown across the chart
                                     scaleShowGridLines : true,
 
@@ -74,21 +106,21 @@
                                     pointDot : true,
 
                                     //Number - Radius of each point dot in pixels
-                                    pointDotRadius : 4,
+                                    pointDotRadius : 2,
 
                                     //Number - Pixel width of point dot stroke
                                     pointDotStrokeWidth : 1,
 
                                     //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-                                    pointHitDetectionRadius : 20,
+                                    pointHitDetectionRadius : 5,
 
                                     //Boolean - Whether to show a stroke for datasets
-                                    datasetStroke : true,
+                                    datasetStroke : false,
 
                                     //Number - Pixel width of dataset stroke
                                     datasetStrokeWidth : 2,
                                     //String - A legend template
-                                    legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+                                    {{--legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",--}}
                                     //Boolean - whether to make the chart responsive
                                     responsive: true,
                                     maintainAspectRatio: false
@@ -103,8 +135,8 @@
 
                     <br />
 
-                    <p><b>Axis X</b> - sum of specific events per day (certificate download, login and certificate signing).  <br />
-                    </p><b>Axis Y</b> - time for last {{$days}} days.
+                    <p><b>Axis X</b> - Time  <br />
+                    </p><b>Axis Y</b>  - Ports / Cseq / SockState (1=NotNull, 0=Null)
 
                 </div>
             </div>
