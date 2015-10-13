@@ -39,7 +39,7 @@ class UpdateLicenseRequest extends Request {
 	public function rules()
 	{
 		return [
-			'license_func_type_id' => 'required|exists:license_func_types,id',
+			'product_id' => 'required|exists:products,id',
             // sometimes = only if input is non-empty
 //            'issuer_username' => 'sometimes|exists:users,username'
 		];

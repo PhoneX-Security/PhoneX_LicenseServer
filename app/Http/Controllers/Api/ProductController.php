@@ -8,36 +8,38 @@ use Phonex\Model\Product;
 
 class ProductController extends Controller {
 
+    const VERSION = 1;
+
 	public function __construct(){
 	}
 
-    public function index(Request $request){
-        $platform = $request->has('platform') ? $request->get('platform') : null;
+    public function getAppleProducts(Request $request)
+    {
+        return $this->getProducts($request, "apple");
+    }
 
-//        $query = Product::with('productPrices')->with('appPermissions');
+    public function getGoogleProducts(Request $request)
+    {
+        return $this->getProducts($request, "google");
+    }
+
+    private function getProducts(Request $request, $platform)
+    {
         $query = Product::with(['appPermissions', 'permissionParent', 'permissionParent.appPermissions']);
         if ($platform){
             $query = $query->where(['platform' => $platform]);
         }
 
         $results = $query->get();
-        foreach($results as $result){
+        foreach($results as $product){
             // for some products load permissions from their permission parent
-            if (!$result->appPermission && $result->permissionParent){
-                // rewrite originally loaded relation
-                $result->setRelation('appPermissions', $result->permissionParent->appPermissions);
-            }
+            $product->loadPermissionsFromParentIfMissing();
         }
-        return $results->toJson();
-    }
 
-//    public function show($id)
-//    {
-//        $product = Product::with('productPrices')->find($id);
-//        if ($product == null){
-//            throw new NotFoundHttpException;
-//        }
-//
-//        return $product->toJson();
-//    }
+        $obj = new \stdClass();
+        $obj->version = self::VERSION;
+        $obj->products = $results;
+
+        return json_encode($obj);
+    }
 }

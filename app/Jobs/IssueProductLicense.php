@@ -43,12 +43,8 @@ class IssueProductLicense extends Command implements SelfHandling {
 
         // reset to start of a day
         $this->startsAt = $this->startsAt->startOfDay();
-        $expiresAt = null;
-        // if product has no days value set, it's probably consumable therefore we do not set license expiration
-        if ($this->product->licenseType->days){
-            // take end of a day for the new license
-            $expiresAt =$this->startsAt->addDays($this->product->licenseType->days)->endOfDay();
-        }
+        $expiresAt = $this->product->computeExpirationTime($this->startsAt);
+
         // create license
         $license = new License();
         $license->user_id = $this->user->id;

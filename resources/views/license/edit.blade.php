@@ -35,17 +35,17 @@
                 <dd><a href="{{ \URL::route('users.show', $license->user_id) }}">{{ $license->user->username }}</a></dd>
             </dl>
         </div>
-        <div class="col-md-2 ">
-            <dl>
-                <dt>Expiration</dt>
-                <dd>{{ $license->licenseType->readableType() }}</dd>
-            </dl>
-        </div>
+        {{--<div class="col-md-2 ">--}}
+            {{--<dl>--}}
+                {{--<dt>Expiration</dt>--}}
+                {{--<dd>{{ $license->licenseType->readableType() }}</dd>--}}
+            {{--</dl>--}}
+        {{--</div>--}}
         <div class="col-md-2">
-            <label class="control-label">Type</label>
-            <select name="license_func_type_id" class="form-control">
-                @foreach($licenseFuncTypes as $type)
-                    <option @if($type->selected) selected @endif value="{{ $type->id }}">{{ ucfirst($type->name) }} </option>
+            <label class="control-label">Product</label>
+            <select name="product_id" class="form-control">
+                @foreach($products as $product)
+                    <option @if($product->selected) selected @endif value="{{ $product->id }}">{{ $product->uc_name }} </option>
                 @endforeach
             </select>
         </div>
@@ -57,14 +57,6 @@
         {{--</div>--}}
     </div>
 
-    <div class="row">
-        <div class="col-md-2 ">
-            <dl>
-                <dt>Active</dt>
-                <dd>@if($license->isActive()) Yes @else No @endif</dd>
-            </dl>
-        </div>
-    </div>
 
     <div class="row">
         <div class="col-md-2 ">

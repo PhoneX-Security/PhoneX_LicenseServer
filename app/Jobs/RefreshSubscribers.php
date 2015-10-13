@@ -40,7 +40,16 @@ class RefreshSubscribers extends Command implements SelfHandling {
 //        Log::info('RefreshSubscribers is finished, ' . $counter . " users were updated.");
 	}
 
-    public static function refreshUsagePolicy(User $user, $sendPushNotification = true)
+    public static function refreshSingleUser(User $user, $sendPushNotification = true)
+    {
+        self::refreshUsagePolicy($user);
+        self::refreshExpirationAndLicenseType($user);
+        if($sendPushNotification){
+            Queue::push('licenseUpdated', ['username'=>$user->email], 'users');
+        }
+    }
+
+    private static function refreshUsagePolicy(User $user)
     {
         $subscriptions = [];
         $consumables = [];
@@ -57,20 +66,29 @@ class RefreshSubscribers extends Command implements SelfHandling {
             }
 
             $product = $license->product;
+            // required step to load permissions from parent
+            $product->loadPermissionsFromParentIfMissing();
 
             foreach ($product->appPermissions as $permission){
                 $obj = new \stdClass();
 
                 try {
+                    $obj->license_id = intval($license->id);
+                    $obj->permission_id = intval($permission->id);
+
                     $obj->permission = $permission->permission;
-                    $obj->count = $permission->pivot->count;
+                    $obj->value = intval($permission->pivot->value);
                     $obj->starts_at = $license->starts_at->timestamp;
-                    $obj->license_id = $license->id;
-                    $obj->permission_id = $permission->id;
 //
                     if ($product->isConsumable()){
                         $consumables[] = $obj;
+                        // todo skip "consumed" consumables
                     } else {
+                        if ($license->expires_at->isPast()){
+//                             do not show expired licenses in policies
+                            continue;
+                        }
+
                         $obj->expires_at = $license->expires_at->timestamp;
                         $subscriptions[] = $obj;
                     }
@@ -86,20 +104,24 @@ class RefreshSubscribers extends Command implements SelfHandling {
 
         $subscriber->usage_policy_current = json_encode($currentUsagePolicy);
         $subscriber->save();
-        return $subscriber->usage_policy_current;
     }
 
-    public static function refreshSingleUser(User $user, $sendPushNotification = true)
+
+    /**
+     * @deprecated kept for legacy reasons - older device not supporting permission policies
+     * @param User $user
+     */
+    private static function refreshExpirationAndLicenseType(User $user)
     {
         /*
-                We want to update Subscriber table (in opensips database) together with auxiliary fields in users table with issued_on, expires_on and license type things.
-                As user may have multiple licenses, we want to find out the recent one, that should be used.
-                Strategy:
-                1. Find active license with latest expiration
-                2. If no such license is present, search future licenses and find one with earliest start
-                3. If none of previous points were able to find licenses, find the past license that expired most recently
-                4. With the license find, update above mentioned information for subscriber and send push notification (but only if data has changed, to avoid spamming users)
-                 */
+                       We want to update Subscriber table (in opensips database) together with auxiliary fields in users table with issued_on, expires_on and license type things.
+                       As user may have multiple licenses, we want to find out the recent one, that should be used.
+                       Strategy:
+                       1. Find active license with latest expiration
+                       2. If no such license is present, search future licenses and find one with earliest start
+                       3. If none of previous points were able to find licenses, find the past license that expired most recently
+                       4. With the license find, update above mentioned information for subscriber and send push notification (but only if data has changed, to avoid spamming users)
+                        */
 
         $license = self::getActiveLicenseWithLatestExpiration($user);
         if ($license == null){
@@ -131,27 +153,26 @@ class RefreshSubscribers extends Command implements SelfHandling {
                 $subscriber->license_type = $license->licenseFuncType->name;
                 $subscriber->save();
 //
-//                        // also update user's auxiliary column
+//              // also update user's auxiliary column
                 $user->active_license_id = $license->id;
                 $user->save();
 
                 Log::info('RefreshSubscribers updating user: ' . $user->username);
-
-                // TODO enable this when we have confidence this function works well
-                if($sendPushNotification){
-                    Queue::push('licenseUpdated', ['username'=>$user->email], 'users');
-                }
             }
         }
     }
 
-    public static function getActiveLicenseWithLatestExpiration(User $user)
+    private static function getActiveLicenseWithLatestExpiration(User $user)
     {
         if ($user->licenses->isEmpty()){
             return null;
         }
         $now = Carbon::now();
         $activeLicenses = $user->licenses->filter(function ($lic) use ($now) {
+            // do not consider consumables
+            if ($lic->product && $lic->product->isConsumable()){
+                return false;
+            }
             // returns true or false
             return ($lic->starts_at->lte($now) && $lic->expires_at->gte($now));
         });
@@ -167,13 +188,17 @@ class RefreshSubscribers extends Command implements SelfHandling {
         return $activeLic;
     }
 
-    public static function getFutureLicenseWithEarliestStart(User $user)
+    private static function getFutureLicenseWithEarliestStart(User $user)
     {
         if ($user->licenses->isEmpty()){
             return null;
         }
         $now = Carbon::now();
         $futureLicenses = $user->licenses->filter(function ($lic) use ($now) {
+            // do not consider consumables
+            if ($lic->product->isConsumable()){
+                return false;
+            }
             // returns true of false
             return $lic->starts_at->gt($now);
         });
@@ -187,13 +212,17 @@ class RefreshSubscribers extends Command implements SelfHandling {
         return $lic;
     }
 
-    public static function getPastLicenseWithLatestExpiration(User $user)
+    private static function getPastLicenseWithLatestExpiration(User $user)
     {
         if ($user->licenses->isEmpty()){
             return null;
         }
         $now = Carbon::now();
         $pastLicenses = $user->licenses->filter(function ($lic) use ($now) {
+            // do not consider consumables
+            if ($lic->product->isConsumable()){
+                return false;
+            }
             // returns true of false
             return $lic->expires_at->lt($now);
         });

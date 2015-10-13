@@ -139,7 +139,7 @@ class Subscriber extends Model{
         $this->subscribersInContactList()->detach($subscriber->id);
     }
 
-    public static function newSubscriber($username, $password, $startsAt = null, $expiresAt = null, $licenseType = "custom", $domain = 'phone-x.net'){
+    public static function newSubscriber($username, $password, $startsAt = null, $expiresAt = null, $licenseType = "none", $domain = 'phone-x.net'){
         return self::createSubscriber($username, $password, $startsAt, $expiresAt, $licenseType, $domain);
     }
 

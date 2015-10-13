@@ -1,5 +1,6 @@
 <?php namespace Phonex\Model;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
@@ -7,10 +8,11 @@ use Phonex\LicenseType;
 class Product extends Model{
 	protected $table = 'products';
     protected $visible = ['name', 'description', 'id', 'productPrices', 'platform', 'priority', 'appPermissions'];
+    protected $casts = ['id'=>'integer', 'priority' => 'integer'];
 
     public function appPermissions()
     {
-        return $this->belongsToMany(AppPermission::class, 'product_app_permission', 'product_id', 'app_permission_id')->withPivot(['count']);
+        return $this->belongsToMany(AppPermission::class, 'product_app_permission', 'product_id', 'app_permission_id')->withPivot(['value']);
     }
 
     public function productPrices()
@@ -44,8 +46,31 @@ class Product extends Model{
     }
 
     /* Helpers */
+    /**
+     * todo refactor this and also database design (separate table instead of parent product)
+     */
+    public function loadPermissionsFromParentIfMissing()
+    {
+        if (!$this->appPermission && $this->permissionParent){
+            // rewrite originally loaded relation
+            $this->setRelation('appPermissions', $this->permissionParent->appPermissions);
+        }
+    }
+
     public function isConsumable(){
         return $this->licenseType && $this->licenseType->name == LicenseType::EXPIRATION_CONSUMABLE;
+    }
+
+    public function computeExpirationTime(Carbon $startsAt){
+        // compute new expiration
+        $expiresAt = null;
+        // if product has no days value set, it's probably consumable therefore we do not set license expiration
+        if ($this->licenseType->days){
+            // take end of a day for the new license
+            $expiresAt = $startsAt->copy();
+            $expiresAt =$expiresAt->addDays($this->licenseType->days)->endOfDay();
+        }
+        return $expiresAt;
     }
 
     // these basic licenses are used in test, should be always present in DB
@@ -79,6 +104,12 @@ class Product extends Model{
     public static function allForGooglePlatform()
     {
         return Product::where(['platform' => 'google', 'available'=>1])->get();
+    }
+
+
+    public static function allAvailable()
+    {
+        return Product::where(['available'=>1])->get();
     }
 
 

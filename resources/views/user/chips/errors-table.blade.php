@@ -11,6 +11,7 @@ Parameters: $reports, $with_username
             @endif
             <th>App info</th>
             <th>User message</th>
+            <th>Filename</th>
         </tr>
         @foreach($reports as $report)
             <tr>
@@ -21,6 +22,7 @@ Parameters: $reports, $with_username
                 @endif
                 <td>{{$report->appVersion}}</td>
                 <td>{{$report->userMessage}}</td>
+                <td>{{$report->filename}}</td>
             </tr>
         @endforeach
     </table>

@@ -7,6 +7,7 @@ use Phonex\Http\Requests\UpdateLicenseRequest;
 use Phonex\Jobs\RefreshSubscribers;
 use Phonex\License;
 use Phonex\LicenseFuncType;
+use Phonex\Model\Product;
 use Phonex\User;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
@@ -114,14 +115,15 @@ class LicenseController extends Controller {
 //            throw new NotFoundHttpException;
         }
 
-		$licenseFuncTypes = LicenseFuncType::all();
-		foreach($licenseFuncTypes as $ft){
-			if($license->licenseFuncType->id === $ft->id){
-				$ft->selected = true;
+		$products = Product::allForDirectSalePlatform();
+//		$licenseFuncTypes = LicenseFuncType::all();
+		foreach($products as $product){
+			if($license->product->id === $product->id){
+				$product->selected = true;
 			}
 		}
 
-        return view('license.edit', compact('license', 'licenseFuncTypes'));
+        return view('license.edit', compact('license', 'products'));
 	}
 
     /**
@@ -145,9 +147,20 @@ class LicenseController extends Controller {
             $license->issuer_id = null;
         }
 
-		$license->license_func_type_id = $request->get('license_func_type_id');
+		$product = Product::find($request->get('product_id'));
+
+		$license->license_func_type_id = $product->licenseFuncType->id;
+		$license->license_type_id = $product->licenseType->id;
+		$license->product_id = $product->id;
+
+		// computes new expiration time
+		$expiresAt = $product->computeExpirationTime($license->starts_at);
+		$license->expires_at = $expiresAt;
+
         $license->comment = InputPost::get('comment');
         $license->save();
+
+		RefreshSubscribers::refreshSingleUser($license->user);
 
         return \Redirect::route('licenses.edit', [$id])
             ->with('success', 'License has been updated. Propagation to users may take up to 24 hours.');

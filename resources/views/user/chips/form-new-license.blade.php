@@ -20,7 +20,7 @@
             <label for="password" class="control-label">Product*</label>
             <select name="product_id" class="form-control">
                 @foreach($products as $product)
-                    <option value="{{ $product->id }}">{{ $product->uc_name }} </option>
+                    <option value="{{ $product->id }}">{{ $product->uc_name . " (" . $product->platform . ")" }} </option>
                 @endforeach
             </select>
         </div>
