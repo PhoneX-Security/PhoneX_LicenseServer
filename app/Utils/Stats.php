@@ -114,12 +114,11 @@ class Stats
         return $counts;
     }
 
-    public function regMonitorStats(User $user)
+    public function regMonitorStats(User $user, Carbon $dateFrom, Carbon $dateTo)
     {
-        $days = 1;
-        $dateFrom  = Carbon::tomorrow()->subDays($days); // counting from tomorrow - which basically means end of today
         $logs = RegMonitor::where('sip', $user->username . "@phone-x.net")
             ->where("created_at", ">=",$dateFrom->toDateTimeString())
+            ->where("created_at", "<=",$dateTo->toDateTimeString())
             ->get();
         return $logs;
     }

@@ -21,6 +21,7 @@ use Phonex\Role;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
 use Phonex\User;
+use Phonex\Utils\DateRangeValidator;
 use Phonex\Utils\InputGet;
 use Phonex\Utils\InputPost;
 use Phonex\Utils\Stats;
@@ -215,35 +216,51 @@ class UserController extends Controller {
         return view('user.show-stats', compact('user', 'labels', 'data', 'days'));
     }
 
-    public function showRegStats($id, Stats $stats)
+    public function showRegStats($id, Request $request, Stats $stats)
     {
         $user = User::find($id);
         if ($user == null){
             throw new NotFoundHttpException;
         }
 
-        $days = 2;
-        $logs = $stats->regMonitorStats($user);
+        //'MM/DD hh:mm'
+        $format = 'm/d H:i';
+        $separator = '~';
+
+        // subtract to be day ago - end of sunday
+        $dateTo = Carbon::now()->addMinute();
+        $dateFrom = Carbon::now()->subHours(1);
+        if ($request->has('daterange')){
+            list($dateFrom, $dateTo) = DateRangeValidator::retrieveDates($request->get('daterange'), $format, $separator);
+//            $dateTo = $dateTo->endOfDay();
+//            $dateFrom = $dateFrom->startOfDay();
+        }
+//        dd($dateTo);
+        $daterange = $dateFrom->format($format) . " " . $separator . " " . $dateTo->format($format);
+        $logs = $stats->regMonitorStats($user, $dateFrom, $dateTo);
 
         $dataPort = [];
         $dataCseq = [];
         $dataSockState = [];
+        $dataNumRegs = [];
         $labels1 = [];
         foreach ($logs as $log){
             //dd($log);
             $dataPort[] = $log->port;
             $dataCseq[] = $log->cseq;
             $dataSockState[] = $log->sock_state ? 1 : 0;
+            $dataNumRegs[] = $log->num_registrations;
             $labels1[] = $log->created_at->toTimeString();
         }
 
         $dataPort = json_encode($dataPort);
         $dataCseq = json_encode($dataCseq);
         $dataSockState = json_encode($dataSockState);
+        $dataNumRegs = json_encode($dataNumRegs);
         $labels1 = json_encode($labels1);
 
-        return view('user.show-reg-stats', compact('user', 'days',
-            'labels1', 'dataPort', 'dataCseq', 'dataSockState'));
+        return view('user.show-reg-stats', compact('user', 'daterange',
+            'labels1', 'dataPort', 'dataCseq', 'dataSockState', 'dataNumRegs'));
     }
 
 

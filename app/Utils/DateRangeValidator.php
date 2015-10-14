@@ -37,13 +37,14 @@ class DateRangeValidator
      * Parse Carbon dates from dateRange value
      * @param $value
      * @param string $format
+     * @param string $separator
      * @return array [$dateFrom, $dateTo]
      */
-    public static function retrieveDates($value, $format = 'Y-m-d')
+    public static function retrieveDates($value, $format = 'Y-m-d', $separator = ":")
     {
         return array_map(function($item) use ($format){
             return carbonFromInput(trim($item), $format);
-        }, explode(":", $value) );
+        }, explode($separator, $value) );
     }
 
     private function validateDate($date, $format)
