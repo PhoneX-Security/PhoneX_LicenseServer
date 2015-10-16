@@ -43,8 +43,8 @@ Parameters: $user
 <div class="row">
     <div class="col-md-4 ">
         </dl>
-        <dt><abbr title="Account creation is limited by IMEI">Successful trial account request</abbr></dt>
-        <dd>@if($user->successful_trial_request) Yes @else No @endif</dd>
+            <dt>Current user policy</dt>
+            <dd>@if($user->subscriber) {{ $user->subscriber->usage_policy_current }} @else - @endif</dd>
         </dl>
     </div>
 </div>

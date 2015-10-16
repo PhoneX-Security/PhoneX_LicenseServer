@@ -15,7 +15,7 @@
 		"rap2hpoutre/laravel-log-viewer": "0.1.*",
 		"mockery/mockery": "0.9.*",
         "miroc/laravel-adminer": "dev-master",
-		"guzzlehttp/guzzle": "^6.0",
+		"guzzlehttp/guzzle": "^6.1",
         "torann/geoip": "0.2.*@dev",
 		"davejamesmiller/laravel-breadcrumbs": "^3.0",
 		"beatswitch/lock": "^0.1.0",

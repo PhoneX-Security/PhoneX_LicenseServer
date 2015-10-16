@@ -4,6 +4,7 @@ use App;
 use Closure;
 use Log;
 use Phonex\Subscriber;
+use Phonex\Utils\ClientCertData;
 use Request;
 
 /**
@@ -35,16 +36,17 @@ class ClientCertAuth{
 			abort(401);
 		}
 
-		if(!filter_var($clientCommonName, FILTER_VALIDATE_EMAIL)) {
+//		dd($clientCommonName);
+
+		$clientCertData = null;
+		try{
+			$clientCertData = ClientCertData::parseFromRequest($request);
+		} catch (\Exception $e){
 			// non-email format, this should never happen
 			abort(400);
 		}
 
-		$sipParams = explode('@', $clientCommonName);
-		$username = $sipParams[0];
-		$domain = $sipParams[1];
-
-		$subscriberCount = Subscriber::where(['username' => $username, 'domain'=> $domain])->count();
+		$subscriberCount = Subscriber::where(['username' => $clientCertData->username, 'domain'=> $clientCertData->domain])->count();
 		if($subscriberCount < 1){
 			Log::warning("ClientCertAuth; user tried to log in, access was denied, no such subscriber email in DB", [$clientCommonName]);
 			abort(401);

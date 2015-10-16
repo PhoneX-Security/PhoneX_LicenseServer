@@ -41,6 +41,8 @@ Route::get('api/support-notification/{user}/{notification}', 'Api\SupportNotific
 Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], function(){
     Route::get('products/apple', 'Api\ProductController@getAppleProducts');
     Route::get('products/google', 'Api\ProductController@getGoogleProducts');
+
+    Route::post('purchase/appstore/payment-verif', 'Api\PurchaseController@postApplePaymentVerification');
 });
 
 // Authenticated pages using client credentials
