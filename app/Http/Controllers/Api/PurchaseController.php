@@ -19,11 +19,12 @@ class PurchaseController extends Controller {
 
     const VERSION = 1;
 
-    const RESULT_OK = 0; // appstore also returns 0 when successful
-    const RESULT_ERR_JSON_PARSING = 1;
-    const RESULT_ERR_MISSING_FIELDS = 2;
-    const RESULT_ERR_INVALID_USER = 3;
-    const RESULT_ERR_INVALID_PRODUCT = 4;
+        const RESULT_OK = 0; // appstore also returns 0 when successful
+        const RESULT_ERR_JSON_PARSING = 1;
+        const RESULT_ERR_MISSING_FIELDS = 2;
+        const RESULT_ERR_INVALID_USER = 3;
+        const RESULT_ERR_INVALID_PRODUCT = 4;
+        const RESULT_ERR_TEST = 5;
 
 
     /*These codes are coming from apple itunes store*/
@@ -59,36 +60,64 @@ class PurchaseController extends Controller {
         try {
             $clientCertData = ClientCertData::parseFromRequest($request);
         } catch (\Exception $e){
+            Log::error("ClientCertData::parseFromRequest", [$e]);
             $response->responseCode = self::RESULT_ERR_INVALID_USER;
             return json_encode($response);
         }
 
         $user = User::where(['email' => $clientCertData->sip])->first();
         if (!$user){
+            Log::error("cannot load user");
             $response->responseCode = self::RESULT_ERR_INVALID_USER;
             return json_encode($response);
         }
 
         // Parse json
-        $json = json_decode($request->get('request'));
+        $jsonReq = $request->get('request');
+        $json = json_decode($jsonReq);
+
+//        Log::info("payment req", [$json]);
         if ($json === null){
+            Log::error("json_decode failed", [$jsonReq, $json]);
             $response->responseCode = self::RESULT_ERR_JSON_PARSING;
             return json_encode($response);
         }
 
         // Create order
+        $purchaseDate = null;
+        $originalPurchaseDate = null;
+        $subscriptionExpirationDate = null;
+        $cancellationDate = null;
+        // for restored transactions (apple may replay all transactions when e.g. new switching to new device)
+        $transactionRestored = false;
         try {
             $payment = $json->payment;
             $appVersion = isset($payment->appVersion) ? json_encode($payment->appVersion) : null;
+            $purchaseDate = Carbon::createFromTimestampUTC($payment->product->purchaseDate);
+            $originalPurchaseDate = Carbon::createFromTimestampUTC($payment->product->originalPurchaseDate);
+
+            if (isset($payment->product->cancellationDate)){
+                $cancellationDate = Carbon::createFromTimestampUTC($payment->product->cancellationDate);
+            }
+            if (isset($payment->product->subscriptionExpirationDate)){
+                $subscriptionExpirationDate = Carbon::createFromTimestampUTC($payment->product->subscriptionExpirationDate);
+            }
+
+            if (isset($payment->transaction) && isset($payment->transaction->transactionRestored)){
+                $transactionRestored = $payment->transaction->transactionRestored == 1;
+            }
 
             $order = new OrderInapp();
             $order->tsx_id = $payment->product->tsxId;
             $order->original_tsx_id = $payment->product->originalTsxId;
-            $order->purchase_date = Carbon::createFromTimestampUTC($payment->product->originalPurchaseDate);
+            $order->purchase_date = $purchaseDate;
+            $order->original_purchase_date = $originalPurchaseDate;
+            $order->subscription_expiration_date = $subscriptionExpirationDate;
+            $order->cancellation_date = $cancellationDate;
             $order->state = OrderInappState::PURCHASE_CREATED;
             $order->platform = $payment->p;
             $order->product_name = $payment->product->productId;
-            $order->receipt = $payment->receipt;
+//            $order->receipt = $payment->receipt;
             if (isset($payment->guuid)){
                 $order->guuid = $payment->guuid;
             }
@@ -107,18 +136,30 @@ class PurchaseController extends Controller {
 //        $validator->setReceiptData($order->receipt);
 //        $validator->validate();
 
-        $order->update(['state' => OrderInappState::PURCHASE_VERIFIED]);
-
-        Log::info("In app purchase made", [$order->id]);
-
-        $product = Product::where(["name" => $order->product_name, 'platform' => ProductPlatformTypes::APPLE])->wherefirst();
-        if (!$product){
-            $response->responseCode = self::RESULT_ERR_INVALID_PRODUCT;
+        if ($transactionRestored){
+            // in case of restoration, do not issue new license
+            $order->update(['state' => OrderInappState::PURCHASE_RESTORED]);
+            $response->responseCode = self::RESULT_OK;
             return json_encode($response);
         }
 
+        $order->update(['state' => OrderInappState::PURCHASE_VERIFIED]);
+        Log::info("In app purchase made", [$order->id]);
+
+        $product = Product::where(["name" => $order->product_name,
+            'platform' => ProductPlatformTypes::APPLE])->first();
+        if (!$product){
+            $response->responseCode = self::RESULT_ERR_INVALID_PRODUCT;
+            return json_encode($response);
+        }//
+
         // Issue license - product on specific user for given time period, update policies in subscribers table
         $c = new IssueProductLicense($user, $product);
+        $c->startingAt($purchaseDate);
+        if ($subscriptionExpirationDate){
+            $c->setExpiration($subscriptionExpirationDate);
+        }
+
         $lic = Bus::dispatch($c);
         $order->update(['license_id' => $lic->id]);
 

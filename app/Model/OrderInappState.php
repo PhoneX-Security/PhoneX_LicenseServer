@@ -10,4 +10,5 @@ class OrderInappState extends BasicEnum
 {
 	const PURCHASE_CREATED = 11;
 	const PURCHASE_VERIFIED = 12;
+	const PURCHASE_RESTORED = 13;
 }

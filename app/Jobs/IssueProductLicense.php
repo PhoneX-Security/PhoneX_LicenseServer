@@ -11,6 +11,7 @@ class IssueProductLicense extends Command implements SelfHandling {
     private $product;
     private $comment;
     private $startsAt;
+    private $expiresAt;
 
     public function __construct(User $user, Product $product)
     {
@@ -21,6 +22,12 @@ class IssueProductLicense extends Command implements SelfHandling {
     public function startingAt(Carbon $startsAt)
     {
         $this->startsAt = $startsAt->copy();
+        return $this;
+    }
+
+    public function setExpiration(Carbon $expiresAt)
+    {
+        $this->expiresAt = $expiresAt;
         return $this;
     }
 
@@ -41,16 +48,17 @@ class IssueProductLicense extends Command implements SelfHandling {
             $this->startsAt = Carbon::now();
         }
 
-        // reset to start of a day
-        $this->startsAt = $this->startsAt->startOfDay();
-        $expiresAt = $this->product->computeExpirationTime($this->startsAt);
+        if (!$this->expiresAt){
+            // if not specified, compute expiration ourselves
+            $this->expiresAt = $this->product->computeExpirationTime($this->startsAt);
+        }
 
         // create license
         $license = new License();
         $license->user_id = $this->user->id;
         $license->product_id = $this->product->id;
         $license->starts_at = $this->startsAt;
-        $license->expires_at = $expiresAt;
+        $license->expires_at = $this->expiresAt;
         if ($this->comment){
             $license->comment = $this->comment;
         }
