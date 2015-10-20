@@ -35,9 +35,23 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	protected $hidden = ['password', 'remember_token'];
 
     /* Relations */
-	public function licenses(){
+	public function licenses()
+    {
 		return $this->hasMany('Phonex\License', 'user_id');
 	}
+
+    public function activeLicenseProducts()
+    {
+        return $this->hasMany('Phonex\License', 'user_id')
+            ->whereNotNull('product_id')
+            ->where('starts_at', '<=', Carbon::now())
+            ->where(function ($query){
+                $query
+                    ->whereNull('expires_at')
+                    ->orWhere('expires_at', '>=', Carbon::now());
+
+            });
+    }
 
     /**
      * Auxiliary column 'active_license_id' is computed periodically (see RefreshSubscriber) and points to current active license

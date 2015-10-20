@@ -42,6 +42,7 @@ Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], functi
     Route::get('products/apple', 'Api\ProductController@getAppleProducts');
     Route::get('products/google', 'Api\ProductController@getGoogleProducts');
 
+    Route::get('products/purchased', 'Api\ProductController@getPurchasedProducts');
     Route::post('purchase/appstore/payment-verif', 'Api\PurchaseController@postApplePaymentVerification');
 });
 

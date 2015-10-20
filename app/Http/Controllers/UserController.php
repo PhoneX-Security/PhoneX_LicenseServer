@@ -165,7 +165,7 @@ class UserController extends Controller {
     {
         $user = $this->getUserOr404($id);
 //        $products = Product::allForDirectSalePlatform()->sortBy('onum');
-        $products = Product::allAvailable()->sortBy('onum');
+        $products = Product::allAvailable()->sortBy('name');
         return view('user.new-license', compact('user', 'products'));
     }
 

@@ -4,6 +4,7 @@ use App;
 use Closure;
 use Log;
 use Phonex\Subscriber;
+use Phonex\User;
 use Phonex\Utils\ClientCertData;
 use Request;
 
@@ -46,12 +47,14 @@ class ClientCertAuth{
 			abort(400);
 		}
 
-		$subscriberCount = Subscriber::where(['username' => $clientCertData->username, 'domain'=> $clientCertData->domain])->count();
-		if($subscriberCount < 1){
+		$user = User::where(['email' => $clientCertData->sip])->first();
+//		$subscriberCount = Subscriber::where(['username' => $clientCertData->username, 'domain'=> $clientCertData->domain])->count();
+//		if($subscriberCount < 1){
+		if (!$user){
 			Log::warning("ClientCertAuth; user tried to log in, access was denied, no such subscriber email in DB", [$clientCommonName]);
 			abort(401);
 		}
-
+		$request->attributes->add([MiddlewareAttributes::CLIENT_CERT_AUTH_USER => $user]);
 		return $next($request);
 	}
 }
