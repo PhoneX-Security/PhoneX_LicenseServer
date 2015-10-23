@@ -26,6 +26,9 @@ class ClientCertAuth{
 		// check if local environment
 		// if so, skip client cert authentication
 		if (App::isLocal() || App::environment() === 'testing'){
+			$user = User::findByUsername('test318');
+			$request->attributes->add([MiddlewareAttributes::CLIENT_CERT_AUTH_USER => $user]);
+
 			return $next($request);
 		}
 

@@ -7,8 +7,11 @@ use Phonex\LicenseType;
 
 class Product extends Model{
 	protected $table = 'products';
-    protected $visible = ['name', 'description', 'id', 'productPrices', 'platform', 'priority', 'appPermissions'];
+    protected $visible = ['name', 'description', 'id', 'productPrices', 'platform', 'priority', 'appPermissions', 'type'];
     protected $casts = ['id'=>'integer', 'priority' => 'integer'];
+    //Once you have created the accessor, just add the value to the appends property on the model:
+    protected $appends = ['type']; // append type accessor to json result
+
 
     public function appPermissions()
     {
@@ -44,6 +47,22 @@ class Product extends Model{
     {
         return ucfirst($this->name);
     }
+    public function getTypeAttribute()
+    {
+        // type depends on license_type (legacy field)
+        $licType = $this->licenseType;
+        if (!$licType){
+            return null;
+        }
+
+        if($licType == LicenseType::EXPIRATION_CONSUMABLE){
+            return 'consumable';
+        } else {
+            // all other are subscriptions
+            return 'subscription';
+        }
+    }
+
 
     /* Helpers */
     /**
@@ -73,21 +92,30 @@ class Product extends Model{
         return $expiresAt;
     }
 
-    // these basic licenses are used in test, should be always present in DB
-    public static function getTrialWeek(){
-        return self::findByName("trial_week");
-    }
-    public static function getTrialMonth(){
-        return self::findByName("trial_month");
-    }
-    public static function getTrialYear(){
-        return self::findByName("trial_year");
-    }
-    public static function getFullMonth(){
-        return self::findByName("full_month");
+    // default product, never issued byt its permissions
+    public static function getDefault()
+    {
+        return self::findByName("default");
     }
 
-    public static function findByName($name){
+    public static function getTrialWeek()
+    {
+        return self::findByName("trial_week");
+    }
+    public static function getTrialMonth()
+    {
+        return self::findByName("trial_month");
+    }
+    public static function getTrialYear()
+    {
+        return self::findByName("trial_year");
+    }
+    public static function getFullMonth()
+    {
+        return self::findByName("full_month");
+    }
+    public static function findByName($name)
+    {
         return Product::where('name', $name)->first();
     }
 

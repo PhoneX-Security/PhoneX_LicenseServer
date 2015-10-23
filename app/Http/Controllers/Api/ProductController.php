@@ -46,6 +46,60 @@ class ProductController extends Controller {
         return json_encode($obj);
     }
 
+    public function getAvailableProducts(Request $request)
+    {
+        $user = $request->attributes->get(MiddlewareAttributes::CLIENT_CERT_AUTH_USER);
+        if (!$user){
+            abort(401);
+        }
+
+        $obj = new \stdClass();
+        $obj->version = self::VERSION;
+        $obj->products = [];
+
+        $licenses = $user->activeLicenseProducts;
+
+        $subscriptionLicenses = $licenses->filter(function($lic){
+            return !$lic->product->isConsumable();
+        });
+
+        $subBasic = Product::findByName("inapp.subs.basic.month");
+        $subPremium = Product::findByName("inapp.subs.premium.month");
+
+        $consCall30 = Product::findByName("inapp.cons.call30");
+        $consCall60 = Product::findByName("inapp.cons.call60");
+
+        $consFiles25 = Product::findByName("inapp.cons.files25");
+        $consFiles50 = Product::findByName("inapp.cons.files50");
+
+        // if no there are no active licenses, offer these two
+        if ($subscriptionLicenses->count() == 0){
+            $obj->products[] = $subBasic;
+            $obj->products[] = $subPremium;
+            return json_encode($obj);
+        }
+
+        $containsOnlyBasic = true;
+        foreach ($subscriptionLicenses as $lic){
+            if ($lic->product->name != $subBasic->name){
+                $containsOnlyBasic = false;
+            }
+        }
+
+        // only basic subscription - in this case, offer consumables
+        if ($containsOnlyBasic){
+            $obj->products[] = $consCall30;
+            $obj->products[] = $consCall60;
+            $obj->products[] = $consFiles25;
+            $obj->products[] = $consFiles50;
+            return json_encode($obj);
+        } else {
+
+            // all other cases (legacy cases), only offer premium
+            $obj->products[] = $subPremium;
+            return json_encode($obj);
+        }
+    }
 
     public function getPurchasedProducts(Request $request)
     {

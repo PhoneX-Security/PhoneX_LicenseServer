@@ -5,6 +5,7 @@ use Illuminate\Contracts\Bus\SelfHandling;
 use League\Flysystem\Exception;
 use Log;
 use Phonex\License;
+use Phonex\Model\Product;
 use Phonex\User;
 use Queue;
 
@@ -59,6 +60,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
         }
         $subscriber = $user->subscriber;
 
+
         foreach ($user->licenses as $license){
             if (!$license->product){
                 // skipping license not having product_id - legacy licenses
@@ -97,6 +99,30 @@ class RefreshSubscribers extends Command implements SelfHandling {
                 }
             }
         }
+
+        // Default product permissions assigned as subscription
+        $product = Product::getDefault();
+        // required step to load permissions from parent
+        $product->loadPermissionsFromParentIfMissing();
+        foreach ($product->appPermissions as $permission){
+            $obj = new \stdClass();
+
+            try {
+                $obj->license_id = 0; // no license,
+                $obj->permission_id = intval($permission->id);
+
+                $obj->permission = $permission->permission;
+                $obj->value = intval($permission->pivot->value);
+                $obj->starts_at = 0;//$license->starts_at->timestamp;
+                // no expiration is set for default product
+//                $obj->expires_at = /
+
+                $subscriptions[] = $obj;
+            } catch (Exception $e){
+                Log::error("Cannot store permission object because of the error.", [$permission, $e]);
+            }
+        }
+
 
         $currentUsagePolicy = new \stdClass();
         $currentUsagePolicy->subscriptions = $subscriptions;

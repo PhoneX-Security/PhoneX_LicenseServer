@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Log;
 use Phonex\BusinessCode;
 use Phonex\ContactList;
@@ -213,14 +214,21 @@ class AccountController extends Controller {
 
         // TODO put this constant somewhere else
         $product = Product::getTrialWeek();
+        // TODO for testing purposes - new version does not issue product automatically
+        if(Str::startsWith($username, 'qatrial')){
+            $product = null;
+        }
+
         $password = rand(100000, 999999);
 
         try {
             $createUserCommand = new CreateUserWithSubscriber($username, $password);
             $user = $this->dispatch($createUserCommand);
 
-            $createLicCommand = new IssueProductLicense($user, $product);
-            $this->dispatch($createLicCommand);
+            if ($product){
+                $createLicCommand = new IssueProductLicense($user, $product);
+                $this->dispatch($createLicCommand);
+            }
 
             if (!$isQaTrial){
                 ContactList::addSupportToContactListMutually($user);
@@ -235,7 +243,11 @@ class AccountController extends Controller {
         $trialRequest->save();
 
         $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
-        return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
+        if ($expiresAtUnixTime){
+            return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
+        } else {
+            return $this->responseOk($user->username, $user->email, $password);
+        }
     }
 
     private function checkCorrectBusinessCode(Request $request){
@@ -370,17 +382,30 @@ class AccountController extends Controller {
             ->max('trialNumber');
     }
 
-    private function responseOk($username, $sip, $password, $expirationTimestamp){
-        return response()->json(
-            [
-                'version' => self::VERSION,
-                'responseCode' => self::RESP_OK,
-                'username' => $username,
-                'sip' => $sip,
-                'password' => $password,
-                'expirationTimestamp' => $expirationTimestamp
-            ]
-        );
+    private function responseOk($username, $sip, $password, $expirationTimestamp = null){
+        if (!$expirationTimestamp){
+            // new model do not provide expiration time when creating account
+            return response()->json(
+                [
+                    'version' => self::VERSION,
+                    'responseCode' => self::RESP_OK,
+                    'username' => $username,
+                    'sip' => $sip,
+                    'password' => $password,
+                ]
+            );
+        } else {
+            return response()->json(
+                [
+                    'version' => self::VERSION,
+                    'responseCode' => self::RESP_OK,
+                    'username' => $username,
+                    'sip' => $sip,
+                    'password' => $password,
+                    'expirationTimestamp' => $expirationTimestamp
+                ]
+            );
+        }
     }
 
     private function getPhonexIp(){

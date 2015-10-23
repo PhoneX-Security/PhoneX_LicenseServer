@@ -18,7 +18,7 @@ class CodeAccountCreationTest extends TestCase {
     use DatabaseTransactions;
 
     const URL = '/account/business-account';
-    const TEST_USERNAME = "ckajsmetke_sk1";
+    const TEST_USERNAME = "ckajsme_sk1";
     const TEST_USERNAME2 = "ckozmker_sk";
     const TEST_USERNAME3 = "cfansmeker_sk";
     const TEST_USERNAME_NON_EXISTING = "kajsmeker11";
@@ -127,7 +127,8 @@ class CodeAccountCreationTest extends TestCase {
 
             // remember counts
             $userCount = User::all()->count();
-            $licenseCount = License::all()->count();
+            // new: license is not issued automatically
+//            $licenseCount = License::all()->count();
             $subscriberCount = Subscriber::all()->count();
 
             // now use first code to get a license
@@ -142,7 +143,7 @@ class CodeAccountCreationTest extends TestCase {
 
             // assert all records created
             $this->assertEquals($userCount + 1, User::all()->count());
-            $this->assertEquals($licenseCount + 1, License::all()->count());
+//            $this->assertEquals($licenseCount + 1, License::all()->count());
             $this->assertEquals($subscriberCount + 1, Subscriber::all()->count());
 
             // check we cannot create another license on the same business code
@@ -176,7 +177,7 @@ class CodeAccountCreationTest extends TestCase {
 
 //        // assert all records created
             $this->assertEquals($userCount + 2, User::all()->count());
-            $this->assertEquals($licenseCount + 2, License::all()->count());
+//            $this->assertEquals($licenseCount + 2, License::all()->count());
             $this->assertEquals($subscriberCount + 2, Subscriber::all()->count());
 
         } finally {

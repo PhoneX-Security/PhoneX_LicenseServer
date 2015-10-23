@@ -10,8 +10,8 @@ use Phonex\User;
 
 class ContactListUpdateTest extends TestCase {
     use DatabaseTransactions;
-    const TEST_USER1 = "smajda42";
-    const TEST_USER2 = "smajdova_mamka31";
+    const TEST_USER1 = "smassjda42";
+    const TEST_USER2 = "smajsdadova_mamka31";
 
     public function setUp()
     {

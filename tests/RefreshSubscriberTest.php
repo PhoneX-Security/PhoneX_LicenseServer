@@ -10,7 +10,7 @@ use Phonex\User;
 
 class RefreshSubscriberTest extends TestCase {
     use DatabaseTransactions;
-    const TEST_NAME_1 = "jano24xc";
+    const TEST_NAME_1 = "jano24xxxc";
 
     public function setUp()
     {
@@ -27,9 +27,13 @@ class RefreshSubscriberTest extends TestCase {
             $command = new CreateUserWithSubscriber(self::TEST_NAME_1, "fasirka_heslo");
             $user1 = Bus::dispatch($command);
 
+            // test that by default "default" product permissions are issued
+
+
             // get subscription and consumable products
             $trialSubscriptionProduct = Product::getTrialWeek();
             $fullSubscriptionProduct = Product::getFullMonth();
+            $defaultSubscriptionProduct = Product::getDefault();
             // todo change hardcoded product id (inapp_consumable_calls30)
             $consumableProduct = Product::find(7);
 
@@ -76,11 +80,13 @@ class RefreshSubscriberTest extends TestCase {
             $subscriptionsPermissionsCount += $trialSubscriptionProduct->appPermissions->count();
             // future lic permissions
             $subscriptionsPermissionsCount += $fullSubscriptionProduct->appPermissions->count();
+            // default lic permission
+            $subscriptionsPermissionsCount += $defaultSubscriptionProduct->appPermissions->count();
 
             // we have two consumables
             $consumablePermissionsCount += 2 * $consumableProduct->appPermissions->count();
 
-            $this->assertEquals($subscriptionsPermissionsCount, count($usagePolicyCurrent->subscriptions));
+            $this->assertEquals($subscriptionsPermissionsCount, count($usagePolicyCurrent->subscriptions ));
             $this->assertEquals($consumablePermissionsCount, count($usagePolicyCurrent->consumables));
         } finally {
             $this->deleteSubscribers([self::TEST_NAME_1]);
