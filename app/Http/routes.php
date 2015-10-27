@@ -37,6 +37,8 @@ Route::get('api/support-notifications/batch', 'Api\SupportNotificationsControlle
 Route::post('api/support-notifications/batch', 'Api\SupportNotificationsController@postBatch');
 Route::get('api/support-notification/{user}/{notification}', 'Api\SupportNotificationsController@getNotificationForUser');
 
+Route::get('api/version-check', 'Api\VersionCheckController@versionCheck');
+
 // Authenticated API using client certs
 Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], function(){
     Route::get('products/apple', 'Api\ProductController@getAppleProducts');
@@ -44,7 +46,7 @@ Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], functi
 
     Route::get('products/available', 'Api\ProductController@getAvailableProducts');
     Route::get('products/purchased', 'Api\ProductController@getPurchasedProducts');
-    Route::post('purchase/appstore/payment-verif', 'Api\PurchaseController@postApplePaymentVerification');
+    Route::any('purchase/appstore/payment-verif', 'Api\PurchaseController@postApplePaymentVerification');
 });
 
 // Authenticated pages using client credentials
