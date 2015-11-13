@@ -16,45 +16,25 @@ class QaController extends Controller {
 	public function QaController(){
 	}
 
+    public function getInfo()
+    {
+        $user = User::findByUsername("cburner2015");
+        RefreshSubscribers::refreshSingleUser($user);
+    }
+
+    private function rec($a){
+        return $this->rec($a+1);
+    }
 
     public function getTest()
     {
-        $user1 = User::findByUsername("jano22xc");
-
-        // get subscription and consumable products
-        $trialSubscriptionProduct = Product::getTrialWeek();
-//        // todo change hardcoded product id (inapp_consumable_calls30)
-        $consumableProduct = Product::find(7);
-//
-//        // issue licenses to products
-//        $licCommand1 = new IssueProductLicense($user1, $trialSubscriptionProduct);
-//        $licCurrent = Bus::dispatch($licCommand1);
-////
-//        $licCommand2 = new IssueProductLicense($user1, $trialSubscriptionProduct);
-//        $licCommand2->startingAt(Carbon::now()->subYears(2));
-//        $licPast = Bus::dispatch($licCommand2);
-//
-//        $licCommand3 = new IssueProductLicense($user1, $trialSubscriptionProduct);
-//        $licCommand3->startingAt(Carbon::now()->addMonths(6));
-//        $licFuture = Bus::dispatch($licCommand3);
-//
-//        $licCommand4 = new IssueProductLicense($user1, $consumableProduct);
-//        $consumableCurrent = Bus::dispatch($licCommand4);
-//
-//        $licCommand5 = new IssueProductLicense($user1, $consumableProduct);
-//        $licCommand5->startingAt(Carbon::now()->addMonths(6));
-//        $consumableFuture = Bus::dispatch($licCommand5);
-//
-//        // refresh subscribers
+        $user1 = User::findByUsername("test-internal3");
+//     // refresh subscribers
         RefreshSubscribers::refreshSingleUser($user1);
-
-        // reload user
-//        $user1 = User::findByUsername($user1->username);
 
         // check subscriber policies and expiration is correct
         $subscriber = $user1->subscriber;
         $usagePolicyCurrent = json_decode($subscriber->usage_policy_current);
-        dd($usagePolicyCurrent);
 
         dd([$usagePolicyCurrent, $subscriber->issued_on, $subscriber->expires_on, $subscriber->license_type]);
     }

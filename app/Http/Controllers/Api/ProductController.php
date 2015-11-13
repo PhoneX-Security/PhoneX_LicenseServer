@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Phonex\Http\Controllers\Controller;
 use Phonex\Http\Middleware\MiddlewareAttributes;
 use Phonex\Http\Requests;
+use Phonex\License;
 use Phonex\Model\Product;
 use Phonex\User;
 use Phonex\Utils\ClientCertData;
@@ -53,6 +54,13 @@ class ProductController extends Controller {
             abort(401);
         }
 
+        // Set locale according to GET parameter to retrieve localized product names
+        $locales = explode(',', $request->get('locales', 'en'));
+        $locale = $locales[0];
+        app()->setLocale($locale);
+
+//        $user = User::findByUsername('test-internal3');
+
         $obj = new \stdClass();
         $obj->version = self::VERSION;
         $obj->products = [];
@@ -63,14 +71,20 @@ class ProductController extends Controller {
             return !$lic->product->isConsumable();
         });
 
-        $subBasic = Product::findByName("inapp.subs.basic.month");
-        $subPremium = Product::findByName("inapp.subs.premium.month");
+        $subBasic = Product::findByNameWithPerms("inapp.subs.basic.month");
+        $subBasic->loadPermissionsFromParentIfMissing();
+        $subPremium = Product::findByNameWithPerms("inapp.subs.premium.e20");
+        $subPremium->loadPermissionsFromParentIfMissing();
 
-        $consCall30 = Product::findByName("inapp.cons.call30");
-        $consCall60 = Product::findByName("inapp.cons.call60");
+        $consCall30 = Product::findByNameWithPerms("inapp.cons.call30");
+        $consCall30->loadPermissionsFromParentIfMissing();
+        $consCall60 = Product::findByNameWithPerms("inapp.cons.call60");
+        $consCall60->loadPermissionsFromParentIfMissing();
 
-        $consFiles25 = Product::findByName("inapp.cons.files25");
-        $consFiles50 = Product::findByName("inapp.cons.files50");
+        $consFiles25 = Product::findByNameWithPerms("inapp.cons.files25");
+        $consFiles25->loadPermissionsFromParentIfMissing();
+        $consFiles50 = Product::findByNameWithPerms("inapp.cons.files50");
+        $consFiles50->loadPermissionsFromParentIfMissing();
 
         // if no there are no active licenses, offer these two
         if ($subscriptionLicenses->count() == 0){
@@ -86,19 +100,51 @@ class ProductController extends Controller {
             }
         }
 
-        // only basic subscription - in this case, offer consumables
+        // only basic subscription - in this case, offer consumables + premium
         if ($containsOnlyBasic){
+//            $obj->products[] = $subBasic;
+            $obj->products[] = $subPremium;
             $obj->products[] = $consCall30;
             $obj->products[] = $consCall60;
             $obj->products[] = $consFiles25;
             $obj->products[] = $consFiles50;
             return json_encode($obj);
         } else {
-
-            // all other cases (legacy cases), only offer premium
+            // all other cases (legacy etc), only offer premium
             $obj->products[] = $subPremium;
             return json_encode($obj);
         }
+    }
+
+    /**
+     * List arbitrary user's products by providing license ids
+     * @param Request $request
+     * @return string
+     */
+    public function getLicensesProducts(Request $request)
+    {
+        $user = $request->attributes->get(MiddlewareAttributes::CLIENT_CERT_AUTH_USER);
+        if (!$user){
+            abort(401);
+        }
+
+        // Set locale according to GET parameter to retrieve localized product names
+        $locales = explode(',', $request->get('locales', 'en'));
+        $locale = $locales[0];
+        app()->setLocale($locale);
+
+        $license_products = [];
+        $licenseIds = explode(',', $request->get('ids', ''));
+        if ($licenseIds){
+            foreach($licenseIds as $licenseId){
+                // consider licenses that belong to that particular user
+                $license = License::where(['id' => $licenseId, 'user_id' => $user->id])->first();
+                if ($license && $license->product){
+                    $license_products[$licenseId] = $license->product;
+                }
+            }
+        }
+        return json_encode($license_products);
     }
 
     public function getPurchasedProducts(Request $request)
@@ -117,7 +163,7 @@ class ProductController extends Controller {
 
             $obj->license_id = $lic->id;
             $obj->product_name = $lic->product->name;
-            $obj->product_type = $lic->product->license_type_id ? $lic->product->licenseType->name : null;
+            $obj->type = $lic->product->type;
 
             if ($lic->starts_at) {$obj->starts_at = $lic->starts_at->timestamp;}
             if ($lic->expires_at) {$obj->expires_at = $lic->expires_at->timestamp;}

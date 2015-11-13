@@ -52,6 +52,18 @@ if (!function_exists('date_simple')){
     }
 }
 
+
+if (!function_exists('valueOrNull')){
+    function valueOrNull(array $arr, $key)
+    {
+        if (isset($arr[$key])){
+            return $arr[$key];
+        } else {
+            return null;
+        }
+    }
+}
+
 /**
  * OpenSips specific functions for password generation
  */

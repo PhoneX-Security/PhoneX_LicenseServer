@@ -5,12 +5,13 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Log;
 use Phonex\Http\Controllers\Controller;
+use Phonex\Http\Middleware\MiddlewareAttributes;
 use Phonex\Http\Requests;
 use Phonex\Jobs\IssueProductLicense;
 use Phonex\Model\OrderInapp;
 use Phonex\Model\OrderInappState;
 use Phonex\Model\Product;
-use Phonex\Model\ProductPlatformTypes;
+use Phonex\Purchase\PlayPurchase;
 use Phonex\User;
 use Phonex\Utils\ClientCertData;
 
@@ -19,12 +20,13 @@ class PurchaseController extends Controller {
 
     const VERSION = 1;
 
-        const RESULT_OK = 0; // appstore also returns 0 when successful
-        const RESULT_ERR_JSON_PARSING = 1;
-        const RESULT_ERR_MISSING_FIELDS = 2;
-        const RESULT_ERR_INVALID_USER = 3;
-        const RESULT_ERR_INVALID_PRODUCT = 4;
-        const RESULT_ERR_TEST = 5;
+    const RESULT_OK = 0; // appstore also returns 0 when successful
+    const RESULT_ERR_JSON_PARSING = 1;
+    const RESULT_ERR_MISSING_FIELDS = 2;
+    const RESULT_ERR_INVALID_USER = 3;
+    const RESULT_ERR_INVALID_PRODUCT = 4;
+    const RESULT_ERR_TEST = 5;
+    const RESULT_ERR_INVALID_SIGNATURE = 6;
 
 
     /*These codes are coming from apple itunes store*/
@@ -48,8 +50,63 @@ class PurchaseController extends Controller {
     // This receipt is from the production environment, but it was sent to the test environment for verification. Send it to the production environment instead.
     const RESULT_PRODUCTION_RECEIPT_SENT_TO_SANDBOX = 21008;
 
+
 	public function __construct(){
 	}
+
+    public function postAndroidPaymentVerification(Request $request)
+    {
+        $user = $request->attributes->get(MiddlewareAttributes::CLIENT_CERT_AUTH_USER);
+        if (!$user){
+            return $this->getResponse(self::RESULT_ERR_INVALID_USER);
+        }
+
+        // Parse json
+        $jsonReq = $request->get('request');
+        $playPurchase = PlayPurchase::fromJson($jsonReq);
+
+        if ($playPurchase === null){
+            Log::error("json_decode failed", [$jsonReq]);
+            return $this->getResponse(self::RESULT_ERR_JSON_PARSING);
+        }
+        if (!$playPurchase->verifySignature()){
+            return $this->getResponse(self::RESULT_ERR_INVALID_SIGNATURE);
+        }
+
+        // First save the order
+        $orderPlayInapp = $playPurchase->createDatabaseModel($user);
+        $orderPlayInapp->save();
+
+        Log::info("received google payment verification", [$jsonReq, $playPurchase, $orderPlayInapp]);
+
+        // Find the product
+        // TODO temporary for testing retrieve product name from developer payload, later switch to productId
+        $dp = json_decode($playPurchase->developerPayload);
+        $productName = $dp->sku;
+
+        $product = Product::where(["name" => $productName])->first();
+//        $product = Product::where(["name" => $playPurchase->productId])->first();
+        if (!$product){
+            return $this->getResponse(self::RESULT_ERR_INVALID_PRODUCT);
+        }
+
+        // Issue product
+        $issueProductCommand = new IssueProductLicense($user, $product);
+        $license = Bus::dispatch($issueProductCommand);
+
+        // Update order
+        $orderPlayInapp->update(['license_id' => $license->id]);
+
+        return $this->getResponse(self::RESULT_OK);
+    }
+
+
+    private function getResponse($code)
+    {
+        $response = new \stdClass();
+        $response->responseCode = $code;
+        return json_encode($response);
+    }
 
     public function postApplePaymentVerification(Request $request)
     {
@@ -88,7 +145,7 @@ class PurchaseController extends Controller {
         $originalPurchaseDate = null;
         $subscriptionExpirationDate = null;
         $cancellationDate = null;
-        // for restored transactions (apple may replay all transactions when e.g. new switching to new device)
+        // for restored transactions (apple may replay all transactions when e.g. new switching to a new device)
         $transactionRestored = false;
         try {
             $payment = $json->payment;
@@ -146,8 +203,10 @@ class PurchaseController extends Controller {
         $order->update(['state' => OrderInappState::PURCHASE_VERIFIED]);
         Log::info("In app purchase made", [$order->id]);
 
-        $product = Product::where(["name" => $order->product_name,
-            'platform' => ProductPlatformTypes::APPLE])->first();
+//        $product = Product::where(["name" => $order->product_name,
+//            'platform' => ProductPlatformTypes::APPLE])->first();
+
+        $product = Product::where(["name" => $order->product_name])->first();
         if (!$product){
             $response->responseCode = self::RESULT_ERR_INVALID_PRODUCT;
             return json_encode($response);

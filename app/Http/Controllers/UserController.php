@@ -35,7 +35,7 @@ class UserController extends Controller {
 	{
 	}
 
-	public function index(){
+	public function index(Request $request){
         $limit = InputGet::getInteger('limit', 15);
 
         $query = User::sortable()->with('subscriber', 'groups', 'roles');
@@ -57,6 +57,11 @@ class UserController extends Controller {
         if(InputGet::has('username')){
             $query = $query->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
         }
+
+        if(InputGet::has('comment')){
+            $query = $query->where('comment', 'LIKE', "%" . $request->get('comment') . "%");
+        }
+
 
         $users = $query->paginate($limit);
         // TODO when including groups, total count may not be correct, currently it's all 1, fix it
@@ -92,7 +97,7 @@ class UserController extends Controller {
         $defaultPassword = $request->get('password');
         $username = $request->get('username');
         $userRequest = new CreateUserWithSubscriber($username, $defaultPassword);
-        $userRequest->addAccess();
+//        $userRequest->addAccess();
         if ($roleIds){
             $userRequest->addRoles($roleIds);
         }

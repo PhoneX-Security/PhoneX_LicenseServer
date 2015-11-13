@@ -50,7 +50,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
         }
     }
 
-    private static function refreshUsagePolicy(User $user)
+    public static function refreshUsagePolicy(User $user)
     {
         $subscriptions = [];
         $consumables = [];
@@ -60,6 +60,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
         }
         $subscriber = $user->subscriber;
 
+//        dd($user->licenses);
 
         foreach ($user->licenses as $license){
             if (!$license->product){
@@ -127,6 +128,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
         $currentUsagePolicy = new \stdClass();
         $currentUsagePolicy->subscriptions = $subscriptions;
         $currentUsagePolicy->consumables = $consumables;
+        $currentUsagePolicy->timestamp = Carbon::now()->timestamp;
 
         $subscriber->usage_policy_current = json_encode($currentUsagePolicy);
         $subscriber->save();

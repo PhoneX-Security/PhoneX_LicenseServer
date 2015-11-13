@@ -46,7 +46,9 @@ Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], functi
 
     Route::get('products/available', 'Api\ProductController@getAvailableProducts');
     Route::get('products/purchased', 'Api\ProductController@getPurchasedProducts');
+    Route::get('products/list-from-licenses', 'Api\ProductController@getLicensesProducts'); // List arbitrary user's products by providing license ids
     Route::any('purchase/appstore/payment-verif', 'Api\PurchaseController@postApplePaymentVerification');
+    Route::any('purchase/play/payment-verif', 'Api\PurchaseController@postAndroidPaymentVerification');
 });
 
 // Authenticated pages using client credentials

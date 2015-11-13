@@ -1,18 +1,25 @@
 <?php namespace Phonex\Model;
 
 use Carbon\Carbon;
+use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Phonex\LicenseFuncType;
 use Phonex\LicenseType;
 
 class Product extends Model{
+    use Translatable {
+        toArray as translatableToArray;
+    }
+
 	protected $table = 'products';
     protected $visible = ['name', 'description', 'id', 'productPrices', 'platform', 'priority', 'appPermissions', 'type'];
     protected $casts = ['id'=>'integer', 'priority' => 'integer'];
-    //Once you have created the accessor, just add the value to the appends property on the model:
+    // Once you have created the accessor, just add the value to the appends property on the model:
     protected $appends = ['type']; // append type accessor to json result
+    // Translatable trait attributes
+    public $translatedAttributes = ['display_name', 'description'];
 
-
+    /* Relations */
     public function appPermissions()
     {
         return $this->belongsToMany(AppPermission::class, 'product_app_permission', 'product_id', 'app_permission_id')->withPivot(['value']);
@@ -32,6 +39,24 @@ class Product extends Model{
     {
         return $this->belongsTo(LicenseFuncType::class, 'license_func_type_id');
     }
+
+    /**
+     * Copied from Translatable trait, added period, period_type
+     * @return array
+     */
+    public function toArray()
+    {
+        // call function from Translatable
+        $attributes = $this->translatableToArray();
+
+        // added
+        if (isset($attributes['type']) && $attributes['type'] == 'subscription'){
+            $attributes['period']=1;
+            $attributes['period_type']='month';
+        }
+        return $attributes;
+    }
+
 
     /**
      * Products can inherit permissions from their variant parents
@@ -55,7 +80,7 @@ class Product extends Model{
             return null;
         }
 
-        if($licType == LicenseType::EXPIRATION_CONSUMABLE){
+        if($licType->name == LicenseType::EXPIRATION_CONSUMABLE){
             return 'consumable';
         } else {
             // all other are subscriptions
@@ -114,6 +139,11 @@ class Product extends Model{
     {
         return self::findByName("full_month");
     }
+    public static function findByNameWithPerms($name)
+    {
+        return Product::with(['appPermissions', 'permissionParent', 'permissionParent.appPermissions'])
+            ->where('name', $name)->first();
+    }
     public static function findByName($name)
     {
         return Product::where('name', $name)->first();
@@ -133,15 +163,8 @@ class Product extends Model{
     {
         return Product::where(['platform' => 'google', 'available'=>1])->get();
     }
-
-
     public static function allAvailable()
     {
         return Product::where(['available'=>1])->get();
     }
-
-
-
-
-
 }

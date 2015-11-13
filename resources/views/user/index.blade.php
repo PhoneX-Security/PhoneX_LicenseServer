@@ -40,6 +40,16 @@
                             </div>
                         </form>
 
+                        <form class="form-inline inline-block" action="{{ route('users.index') }}" method="get">
+
+                            <div class="input-group">
+                                <input type="text" name="comment" value="{{Request::get('comment')}}" class="form-control input-sm pull-right" style="width: 150px;" placeholder="Search by comment">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
+                                </div>
+                            </div>
+                        </form>
+
                         <form class="form-inline inline-block"  action="{{ \URL::route('users.index') }}" method="get">
                             <div class="form-group">
                                 <label for="group_input">Group</label>

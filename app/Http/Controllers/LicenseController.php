@@ -60,7 +60,8 @@ class LicenseController extends Controller {
 		}
 
         if(InputGet::has('username')){
-            $query = $query->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
+            $query = $query
+				->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
         }
 
 		$licenses = $query->paginate(15);

@@ -10,7 +10,7 @@ return [
     | Contains an array with the applications available locales.
     |
     */
-    'locales' => ['en', 'es'],
+    'locales' => ['en', 'cs', 'sk'],
 
     /*
     |--------------------------------------------------------------------------
@@ -22,7 +22,7 @@ return [
     | instance, this value will be overridden by the property
     | $useTranslationFallback when defined
     */
-    'use_fallback' => false,
+    'use_fallback' => true,
 
     /*
     |--------------------------------------------------------------------------
