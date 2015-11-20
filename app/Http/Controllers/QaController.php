@@ -7,6 +7,7 @@ use Phonex\Http\Requests;
 use Phonex\Jobs\CreateUserWithSubscriber;
 use Phonex\Jobs\IssueProductLicense;
 use Phonex\Jobs\RefreshSubscribers;
+use Phonex\Model\OrderPlayInapp;
 use Phonex\Model\Product;
 use Phonex\Subscriber;
 use Phonex\User;
@@ -18,8 +19,9 @@ class QaController extends Controller {
 
     public function getInfo()
     {
-        $user = User::findByUsername("cburner2015");
-        RefreshSubscribers::refreshSingleUser($user);
+        dd(OrderPlayInapp::orderIdExists('transactionId.android.test.purchased2', User::findByUsername('test318')));
+//        $user = User::findByUsername("cburner2015");
+//        RefreshSubscribers::refreshSingleUser($user);
     }
 
     private function rec($a){

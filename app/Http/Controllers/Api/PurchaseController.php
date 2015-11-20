@@ -10,6 +10,7 @@ use Phonex\Http\Requests;
 use Phonex\Jobs\IssueProductLicense;
 use Phonex\Model\OrderInapp;
 use Phonex\Model\OrderInappState;
+use Phonex\Model\OrderPlayInapp;
 use Phonex\Model\Product;
 use Phonex\Purchase\PlayPurchase;
 use Phonex\User;
@@ -27,9 +28,10 @@ class PurchaseController extends Controller {
     const RESULT_ERR_INVALID_PRODUCT = 4;
     const RESULT_ERR_TEST = 5;
     const RESULT_ERR_INVALID_SIGNATURE = 6;
+    const RESULT_ERR_EXISTING_ORDER_ID = 7;
+    const RESULT_MULTIPLE_PURCHASES = 8; // when saving multiple purchases
 
-
-    /*These codes are coming from apple itunes store*/
+    /* These codes are coming from apple itunes store */
     // The App Store could not read the JSON object you provided.
     const RESULT_APPSTORE_CANNOT_READ = 21000;
     // The data in the receipt-data property was malformed or missing.
@@ -54,6 +56,11 @@ class PurchaseController extends Controller {
 	public function __construct(){
 	}
 
+    /**
+     * Main processing method for Google Play store transactions
+     * @param Request $request
+     * @return string
+     */
     public function postAndroidPaymentVerification(Request $request)
     {
         $user = $request->attributes->get(MiddlewareAttributes::CLIENT_CERT_AUTH_USER);
@@ -63,31 +70,79 @@ class PurchaseController extends Controller {
 
         // Parse json
         $jsonReq = $request->get('request');
-        $playPurchase = PlayPurchase::fromJson($jsonReq);
+        $jsonObject = json_decode($jsonReq, true);
+        $playPurchase = PlayPurchase::fromJsonObject($jsonObject);
 
-        if ($playPurchase === null){
-            Log::error("json_decode failed", [$jsonReq]);
+        // Process Ticket
+        $returnCode = $this->processPlayPurchase($playPurchase, $user);
+        if ($returnCode == self::RESULT_OK){
+            Log::info("received google payment verification", [$returnCode, $jsonReq]);
+        } else {
+            Log::error("received google payment verification", [$returnCode, $jsonReq]);
+        }
+
+        return $this->getResponse($returnCode);
+    }
+
+    /**
+     * Processes array of payments
+     * @param Request $request
+     * @return string
+     */
+    public function postAndroidPaymentsVerification(Request $request)
+    {
+        $user = $request->attributes->get(MiddlewareAttributes::CLIENT_CERT_AUTH_USER);
+        if (!$user){
+            return $this->getResponse(self::RESULT_ERR_INVALID_USER);
+        }
+
+
+        $jsonReq = $request->get('request');
+        $jsonObjects = json_decode($jsonReq, true);
+        if ($jsonObjects == null || !is_array($jsonObjects)){
             return $this->getResponse(self::RESULT_ERR_JSON_PARSING);
         }
+
+        $responseArray = [];
+        // Process purchases one by one
+        foreach($jsonObjects as $jsonObject){
+            $playPurchase = PlayPurchase::fromJsonObject($jsonObject);
+            $errCode = $this->processPlayPurchase($playPurchase, $user);
+            $responseArray[] = $errCode;
+        }
+        Log::info("received google payment verifications", [$responseArray, $jsonReq]);
+        return $this->getResponseForMultiplePurchases($responseArray);
+    }
+
+
+    private function processPlayPurchase(PlayPurchase $playPurchase, User $user)
+    {
+        if ($playPurchase === null){
+            return self::RESULT_ERR_JSON_PARSING;
+        }
         if (!$playPurchase->verifySignature()){
-            return $this->getResponse(self::RESULT_ERR_INVALID_SIGNATURE);
+            return self::RESULT_ERR_INVALID_SIGNATURE;
+        }
+        // order id should be unique, otherwise the transaction is replayed
+        if (OrderPlayInapp::orderIdExists($playPurchase->orderId, $user)){
+            return self::RESULT_ERR_EXISTING_ORDER_ID;
         }
 
         // First save the order
         $orderPlayInapp = $playPurchase->createDatabaseModel($user);
         $orderPlayInapp->save();
 
-        Log::info("received google payment verification", [$jsonReq, $playPurchase, $orderPlayInapp]);
+        Log::info("received google payment verification");
 
         // Find the product
         // TODO temporary for testing retrieve product name from developer payload, later switch to productId
         $dp = json_decode($playPurchase->developerPayload);
         $productName = $dp->sku;
-
         $product = Product::where(["name" => $productName])->first();
+
 //        $product = Product::where(["name" => $playPurchase->productId])->first();
         if (!$product){
-            return $this->getResponse(self::RESULT_ERR_INVALID_PRODUCT);
+            return self::RESULT_ERR_INVALID_PRODUCT;
         }
 
         // Issue product
@@ -97,7 +152,7 @@ class PurchaseController extends Controller {
         // Update order
         $orderPlayInapp->update(['license_id' => $license->id]);
 
-        return $this->getResponse(self::RESULT_OK);
+        return self::RESULT_OK;
     }
 
 
@@ -108,6 +163,23 @@ class PurchaseController extends Controller {
         return json_encode($response);
     }
 
+    private function getResponseForMultiplePurchases(array $allResponseCodes)
+    {
+        $response = new \stdClass();
+        $response->responseCode = self::RESULT_MULTIPLE_PURCHASES;
+        $response->purchasesResponseCodes = $allResponseCodes;
+        return json_encode($response);
+    }
+
+    /***************************************/
+    /*************  APPLE  *****************/
+    /***************************************/
+
+    /**
+     * Main processing method of Apple AppStore transactions
+     * @param Request $request
+     * @return string
+     */
     public function postApplePaymentVerification(Request $request)
     {
         $response = new \stdClass();

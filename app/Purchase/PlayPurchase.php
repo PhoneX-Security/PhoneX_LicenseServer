@@ -30,10 +30,16 @@ class PlayPurchase
     public $appVersion;
     public $itemType;
 
-    public static function fromJson($json)
+
+    /**
+     * Takes jsonObject input (after json_decode($json, true) has been passed)
+     * @param $jsonObject
+     * @return null|PlayPurchase
+     */
+    public static function fromJsonObject(array $jsonObject)
     {
-        $jsonObject = json_decode($json, true);
-        if ($jsonObject ===null){
+//        $jsonObject = json_decode($json, true);
+        if ($jsonObject === null){
             return null;
         }
         $purchaseJson = $jsonObject['INAPP_PURCHASE_DATA'];
