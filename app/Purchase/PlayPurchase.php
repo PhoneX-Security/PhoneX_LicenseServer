@@ -54,6 +54,13 @@ class PlayPurchase
         $result = new PlayPurchase();
 
         $result->orderId = valueOrNull($detailsObj, 'orderId');
+
+        if (!$result->orderId){
+            // in case of test purchases, Google does not provide
+            // therefore create a random one
+            $result->orderId = 'testorder.' . getRandomString(50, 'abcdefghjkmnpqrstuvwxyz1234567890');
+        }
+
         $result->productId = valueOrNull($detailsObj, 'productId');
         // purchase time is received in milliseconds from epoch
         $result->purchaseTime = valueOrNull($detailsObj, 'purchaseTime');
@@ -103,7 +110,8 @@ class PlayPurchase
         if ($this->purchaseTime == null){
             return null;
         }
-        return Carbon::createFromTimestampUTC($this->purchaseTime / 1000);
+        $seconds = $this->purchaseTime / 1000;
+        return Carbon::createFromTimestampUTC((int) $seconds);
     }
 
 

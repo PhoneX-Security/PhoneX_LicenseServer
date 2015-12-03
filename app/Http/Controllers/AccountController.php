@@ -9,6 +9,7 @@ use Phonex\ContactList;
 use Phonex\Jobs\CreateUser;
 use Phonex\Jobs\CreateUserWithSubscriber;
 use Phonex\Jobs\IssueProductLicense;
+use Phonex\Jobs\RefreshSubscribers;
 use Phonex\Model\Product;
 use Phonex\Subscriber;
 use Phonex\TrialRequest;
@@ -212,12 +213,12 @@ class AccountController extends Controller {
         $isQaTrial = $this->isPhonexIp(\Input::getClientIp());
         $username = $trialRequest->username;
 
-        // TODO put this constant somewhere else
-        $product = Product::getTrialWeek();
-        // TODO for testing purposes - new version does not issue product automatically
-        if(Str::startsWith($username, 'qatrial')){
+
+//        $product = Product::getTrialWeek();
+//        if(Str::startsWith($username, 'qatrial')){
+        // Do not issue any product (starting from In-app Purchases release, November 2015)
             $product = null;
-        }
+//        }
 
         $password = rand(100000, 999999);
 
@@ -233,6 +234,9 @@ class AccountController extends Controller {
             if (!$isQaTrial){
                 ContactList::addSupportToContactListMutually($user);
             }
+
+            RefreshSubscribers::refreshSingleUser($user, false);
+
         } catch (\Exception $e){
             Log::error("issueTrial; cannot create trial account", [$e]);
             return $this->responseError(self::RESP_ERR_UNKNOWN_ERROR);
@@ -243,11 +247,17 @@ class AccountController extends Controller {
         $trialRequest->save();
 
         $expiresAtUnixTime = strtotime($user->subscriber->expires_on);
-        if ($expiresAtUnixTime){
-            return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
-        } else {
-            return $this->responseOk($user->username, $user->email, $password);
+        if (!$expiresAtUnixTime){
+            // when no expiration is set (newer licenses do not provide trial period) set fake "expiration" week ahead
+            // new GUI should not display any expiration date
+            $expiresAtUnixTime = Carbon::now()->addWeek()->timestamp;
         }
+        return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
+
+//        if ($expiresAtUnixTime){
+//        } else {
+//            return $this->responseOk($user->username, $user->email, $password);
+//        }
     }
 
     private function checkCorrectBusinessCode(Request $request){

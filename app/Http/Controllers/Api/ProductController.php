@@ -1,10 +1,12 @@
 <?php namespace Phonex\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Phonex\Http\Controllers\Controller;
 use Phonex\Http\Middleware\MiddlewareAttributes;
 use Phonex\Http\Requests;
 use Phonex\License;
+use Phonex\Model\ApiRequest;
 use Phonex\Model\Product;
 use Phonex\User;
 use Phonex\Utils\ClientCertData;
@@ -16,6 +18,14 @@ class ProductController extends Controller {
 
 	public function __construct(){
 	}
+
+    public function getTest(Request $request)
+    {
+        $user = $request->attributes->get(MiddlewareAttributes::CLIENT_CERT_AUTH_USER);
+        if (!$user){
+            abort(401);
+        }
+    }
 
     public function getAppleProducts(Request $request)
     {
@@ -54,6 +64,10 @@ class ProductController extends Controller {
             abort(401);
         }
 
+        // Differentiate products according to platform
+        $platform = $request->get('platform', 'apple');
+        $isApple = $platform === 'apple';
+
         // Set locale according to GET parameter to retrieve localized product names
         $locales = explode(',', $request->get('locales', 'en'));
         $locale = $locales[0];
@@ -73,7 +87,15 @@ class ProductController extends Controller {
 
         $subBasic = Product::findByNameWithPerms("inapp.subs.basic.month");
         $subBasic->loadPermissionsFromParentIfMissing();
-        $subPremium = Product::findByNameWithPerms("inapp.subs.premium.e20");
+        $subPremium = null;
+        if ($isApple){
+            $subPremium = Product::findByNameWithPerms("inapp.subs.premium.e20");
+        } else {
+            // New product had to be released for Google, price cannot be changed
+            $subPremium = Product::findByNameWithPerms("inapp.subs.premium.e10");
+        }
+
+//
         $subPremium->loadPermissionsFromParentIfMissing();
 
         $consCall30 = Product::findByNameWithPerms("inapp.cons.call30");
@@ -81,10 +103,10 @@ class ProductController extends Controller {
         $consCall60 = Product::findByNameWithPerms("inapp.cons.call60");
         $consCall60->loadPermissionsFromParentIfMissing();
 
-        $consFiles25 = Product::findByNameWithPerms("inapp.cons.files25");
-        $consFiles25->loadPermissionsFromParentIfMissing();
-        $consFiles50 = Product::findByNameWithPerms("inapp.cons.files50");
-        $consFiles50->loadPermissionsFromParentIfMissing();
+//        $consFiles25 = Product::findByNameWithPerms("inapp.cons.files25");
+//        $consFiles25->loadPermissionsFromParentIfMissing();
+//        $consFiles50 = Product::findByNameWithPerms("inapp.cons.files50");
+//        $consFiles50->loadPermissionsFromParentIfMissing();
 
         // if no there are no active licenses, offer these two
         if ($subscriptionLicenses->count() == 0){
@@ -106,12 +128,12 @@ class ProductController extends Controller {
             $obj->products[] = $subPremium;
             $obj->products[] = $consCall30;
             $obj->products[] = $consCall60;
-            $obj->products[] = $consFiles25;
-            $obj->products[] = $consFiles50;
+//            $obj->products[] = $consFiles25;
+//            $obj->products[] = $consFiles50;
             return json_encode($obj);
         } else {
             // all other cases (legacy etc), only offer premium
-            $obj->products[] = $subPremium;
+//            $obj->products[] = $subPremium;
             return json_encode($obj);
         }
     }

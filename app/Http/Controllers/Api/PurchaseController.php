@@ -3,11 +3,14 @@
 use Bus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Log;
+use Mail;
 use Phonex\Http\Controllers\Controller;
 use Phonex\Http\Middleware\MiddlewareAttributes;
 use Phonex\Http\Requests;
 use Phonex\Jobs\IssueProductLicense;
+use Phonex\Model\ApiRequest;
 use Phonex\Model\OrderInapp;
 use Phonex\Model\OrderInappState;
 use Phonex\Model\OrderPlayInapp;
@@ -63,15 +66,23 @@ class PurchaseController extends Controller {
      */
     public function postAndroidPaymentVerification(Request $request)
     {
+        $jsonReq = $request->get('request');
+        Log::info("postAndroidPaymentVerification", [$request, $jsonReq]);
+
+
         $user = $request->attributes->get(MiddlewareAttributes::CLIENT_CERT_AUTH_USER);
         if (!$user){
             return $this->getResponse(self::RESULT_ERR_INVALID_USER);
         }
 
         // Parse json
-        $jsonReq = $request->get('request');
+//        $jsonReq = $request->get('request');
         $jsonObject = json_decode($jsonReq, true);
         $playPurchase = PlayPurchase::fromJsonObject($jsonObject);
+
+        if (!Str::startsWith($playPurchase->orderId, 'testorder')){
+            $this->notifyUsByEmail($playPurchase->productId, 'Android');
+        }
 
         // Process Ticket
         $returnCode = $this->processPlayPurchase($playPurchase, $user);
@@ -95,7 +106,6 @@ class PurchaseController extends Controller {
         if (!$user){
             return $this->getResponse(self::RESULT_ERR_INVALID_USER);
         }
-
 
         $jsonReq = $request->get('request');
         $jsonObjects = json_decode($jsonReq, true);
@@ -169,6 +179,17 @@ class PurchaseController extends Controller {
         $response->responseCode = self::RESULT_MULTIPLE_PURCHASES;
         $response->purchasesResponseCodes = $allResponseCodes;
         return json_encode($response);
+    }
+
+    private function notifyUsByEmail($productId, $platform)
+    {
+        Log::info("New order has been purchased, notifying by email.");
+        Mail::send('emails.order_has_landed', compact('productId', 'platform'),
+            function($message)
+            {
+                $message->from('order@phone-x.net', 'PhoneX');
+                $message->to(["vedeni@phone-x.net"])->subject("Nova objednavka v aplikacii");
+            });
     }
 
     /***************************************/
@@ -290,6 +311,8 @@ class PurchaseController extends Controller {
         if ($subscriptionExpirationDate){
             $c->setExpiration($subscriptionExpirationDate);
         }
+
+        $this->notifyUsByEmail($order->product_name, 'ios');
 
         $lic = Bus::dispatch($c);
         $order->update(['license_id' => $lic->id]);

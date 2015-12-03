@@ -3,6 +3,7 @@
 use App;
 use Closure;
 use Log;
+use Phonex\Model\ApiRequest;
 use Phonex\Subscriber;
 use Phonex\User;
 use Phonex\Utils\ClientCertData;
@@ -57,6 +58,7 @@ class ClientCertAuth{
 			Log::warning("ClientCertAuth; user tried to log in, access was denied, no such subscriber email in DB", [$clientCommonName]);
 			abort(401);
 		}
+		ApiRequest::saveReq($request, $user->username);
 		$request->attributes->add([MiddlewareAttributes::CLIENT_CERT_AUTH_USER => $user]);
 		return $next($request);
 	}
