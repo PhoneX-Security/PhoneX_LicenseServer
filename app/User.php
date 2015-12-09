@@ -53,6 +53,15 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
             });
     }
 
+    public function pastLicenseProducts()
+    {
+        return $this->hasMany('Phonex\License', 'user_id')
+            ->whereNotNull('product_id')
+            ->where(function ($query){
+                $query->where('expires_at', '<=', Carbon::now());
+            });
+    }
+
     /**
      * Auxiliary column 'active_license_id' is computed periodically (see RefreshSubscriber) and points to current active license
      * @return \Illuminate\Database\Eloquent\Relations\HasOne

@@ -108,10 +108,25 @@ class ProductController extends Controller {
 //        $consFiles50 = Product::findByNameWithPerms("inapp.cons.files50");
 //        $consFiles50->loadPermissionsFromParentIfMissing();
 
-        // if no there are no active licenses, offer these two
+        // if no there are no active licenses
         if ($subscriptionLicenses->count() == 0){
+            // offer basic
             $obj->products[] = $subBasic;
-            $obj->products[] = $subPremium;
+
+            // if user had basic previously, offer premium as well
+            $pastLicenses = $user->pastLicenseProducts;
+            $hadBasic = false;
+            foreach ($pastLicenses as $lic){
+                if ($lic->product->name == $subBasic->name){
+                    $hadBasic = true;
+                    break;
+                }
+            }
+
+            if ($hadBasic){
+                $obj->products[] = $subPremium;
+            }
+
             return json_encode($obj);
         }
 
