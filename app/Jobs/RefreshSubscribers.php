@@ -59,11 +59,9 @@ class RefreshSubscribers extends Command implements SelfHandling {
             throw new Exception("Given user has no subscriber");
         }
         $subscriber = $user->subscriber;
-
-//        dd($user->licenses);
-
         foreach ($user->licenses as $license){
             if (!$license->product){
+                Log::warning("Skipping license because it does not have product_id assigned - legacy issues", [$license]);
                 // skipping license not having product_id - legacy licenses
                 continue;
             }
@@ -124,16 +122,57 @@ class RefreshSubscribers extends Command implements SelfHandling {
             }
         }
 
-
         $currentUsagePolicy = new \stdClass();
         $currentUsagePolicy->subscriptions = $subscriptions;
         $currentUsagePolicy->consumables = $consumables;
         $currentUsagePolicy->timestamp = Carbon::now()->timestamp;
 
+        $oldPolicy = json_decode($subscriber->usage_policy_current);
+        if ($oldPolicy != null){
+            $policyChanged = self::checkIfPolicyHasChanged($oldPolicy, $currentUsagePolicy);
+            if (!$policyChanged){
+                Log::info("Refresh subscriber - policy for user has not been changed, not updating", [$user->username]);
+                return;
+            }
+        } else {
+            Log::warning("Refresh subscriber - old policy was null");
+        }
+
+        Log::info("Refresh subscriber - policy for user has changed, updating", [$user->username]);
         $subscriber->usage_policy_current = json_encode($currentUsagePolicy);
         $subscriber->save();
     }
 
+    /**
+     * @param $oldPolicy - json object
+     * @param $newPolicy - json object
+     * @return bool
+     */
+    private static function checkIfPolicyHasChanged($oldPolicy, $newPolicy)
+    {
+//        echo("new subs count: " . count($newPolicy->subscriptions) . ", old subs count: " . count($oldPolicy->subscriptions) . "\n");
+//        var_dump($newPolicy->subscriptions, $oldPolicy->subscriptions);
+        $compareFunc = function($sub1, $sub2){
+            if ($sub1 == $sub2){
+                // everything is equal
+                return 0;
+            } else {
+                // not equal
+                return 1;
+            }
+        };
+
+        // array_udiff does only one way difference, test both sides for subscriptions and consumables
+        $subDiff1 = array_udiff($oldPolicy->subscriptions, $newPolicy->subscriptions, $compareFunc);
+        $subDiff2 = array_udiff($newPolicy->subscriptions, $oldPolicy->subscriptions, $compareFunc);
+        $consDiff1 = array_udiff($oldPolicy->consumables, $newPolicy->consumables, $compareFunc);
+        $consDiff2 = array_udiff($newPolicy->consumables, $oldPolicy->consumables, $compareFunc);
+
+        return !empty($subDiff1) ||
+            !empty($subDiff2) ||
+            !empty($consDiff1) ||
+            !empty($consDiff2);
+    }
 
     /**
      * @deprecated kept for legacy reasons - older device not supporting permission policies

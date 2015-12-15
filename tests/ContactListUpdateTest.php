@@ -10,8 +10,8 @@ use Phonex\User;
 
 class ContactListUpdateTest extends TestCase {
     use DatabaseTransactions;
-    const TEST_USER1 = "smassjda42";
-    const TEST_USER2 = "smajsdadova_mamka31";
+    const TEST_USER1 = "cl_update_user_a1";
+    const TEST_USER2 = "cl_update_user_b1";
 
     public function setUp()
     {
@@ -21,17 +21,6 @@ class ContactListUpdateTest extends TestCase {
     }
 
     public function testContactListUpdate(){
-
-//        $oldUser = User::where('username', self::TEST_USER1)->first();
-//        if ($oldUser != null){
-//            $oldUser->deleteWithLicenses();
-//        }
-//        $oldUser2 = User::where('username', self::TEST_USER2)->first();
-//        if ($oldUser2 != null){
-//            $oldUser2->deleteWithLicenses();
-//        }
-
-
         try {
             $product = Product::getFullMonth();
 
@@ -60,12 +49,12 @@ class ContactListUpdateTest extends TestCase {
             $u2->addToContactList($u1);
         } finally {
             $user = User::where('username', self::TEST_USER1)->first();
-            if ($user){
+            if ($user && $user->subscriber){
                 $user->subscriber->deleteWithContactListRecords();
             }
-            $user = User::where('username', self::TEST_USER2)->first();
-            if ($user){
-                $user->subscriber->deleteWithContactListRecords();
+            $user2 = User::where('username', self::TEST_USER2)->first();
+            if ($user2 && $user2->subscriber){
+                $user2->subscriber->deleteWithContactListRecords();
             }
         }
     }

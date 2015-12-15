@@ -30,7 +30,7 @@ class QaController extends Controller {
 
     public function getTest()
     {
-        $user1 = User::findByUsername("test-internal3");
+        $user1 = User::findByUsername("test318");
 //     // refresh subscribers
         RefreshSubscribers::refreshSingleUser($user1);
 

@@ -74,8 +74,9 @@ class IssueProductLicense extends Command implements SelfHandling {
         $license->save();
 
         // refresh usage_policy_current and usage_policy_expired in subscribers table
-        RefreshSubscribers::refreshSingleUser($this->user, true);
-
+        // reload user because he has new license issued;
+        $reloadedUser = User::findByUsername($this->user->username);
+        RefreshSubscribers::refreshSingleUser($reloadedUser, true);
         return $license;
 	}
 }

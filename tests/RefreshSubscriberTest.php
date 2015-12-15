@@ -10,7 +10,8 @@ use Phonex\User;
 
 class RefreshSubscriberTest extends TestCase {
     use DatabaseTransactions;
-    const TEST_NAME_1 = "jano24xxxc";
+    const TEST_NAME_1 = "refresh_subscriber_user1";
+    const TEST_NAME_2 = "refresh_subscriber_user_b13";
 
     public function setUp()
     {
@@ -21,14 +22,12 @@ class RefreshSubscriberTest extends TestCase {
 
     public function testRefreshPermissions()
     {
-
         try {
             // create user1
             $command = new CreateUserWithSubscriber(self::TEST_NAME_1, "fasirka_heslo");
             $user1 = Bus::dispatch($command);
 
             // test that by default "default" product permissions are issued
-
 
             // get subscription and consumable products
             $trialSubscriptionProduct = Product::getTrialWeek();
@@ -66,7 +65,6 @@ class RefreshSubscriberTest extends TestCase {
             $this->assertTrue($subscriber->expires_on->eq($licCurrent->expires_at));
             $this->assertEquals($licCurrent->product->licenseFuncType->name, $subscriber->license_type);
 
-
             $usagePolicyCurrent = json_decode($subscriber->usage_policy_current);
 
             $trialSubscriptionProduct->loadPermissionsFromParentIfMissing();
@@ -88,8 +86,52 @@ class RefreshSubscriberTest extends TestCase {
 
             $this->assertEquals($subscriptionsPermissionsCount, count($usagePolicyCurrent->subscriptions ));
             $this->assertEquals($consumablePermissionsCount, count($usagePolicyCurrent->consumables));
+
         } finally {
             $this->deleteSubscribers([self::TEST_NAME_1]);
+        }
+    }
+
+    public function testPolicyTimestampRefresh(){
+        try {
+            $command = new CreateUserWithSubscriber(self::TEST_NAME_2, "fasirka_heslo");
+            $user1 = Bus::dispatch($command);
+            $this->assertNull($user1->subscriber->usage_policy_current);
+
+            // Get subscription of product with limited permissions
+            $trialSubscription = Product::findByName('inapp.subs.basic.month');
+            $this->assertNotNull($trialSubscription);
+            $licCommand1 = new IssueProductLicense($user1, $trialSubscription);
+            Bus::dispatch($licCommand1);
+
+            // Reload user
+            $userA = User::findByUsername($user1->username);
+            $timestamp1 = json_decode($userA->subscriber->usage_policy_current)->timestamp;
+
+            // Timestamp is based on seconds
+            // Wait a few seconds before refreshing
+            sleep(2);
+            RefreshSubscribers::refreshSingleUser($userA);
+
+            $userB = User::findByUsername($user1->username);
+            $timestamp2 = json_decode($userB->subscriber->usage_policy_current)->timestamp;
+
+            $this->assertEquals($timestamp1, $timestamp2, "Timestamp should not have been updated, but the value was changed.");
+
+            // Issue new product (full license) and check the timestamp value again - now it should be updated
+            $fullSubscriptionProduct = Product::getFullMonth();
+            $licCommand2 = new IssueProductLicense($userB, $fullSubscriptionProduct);
+            Bus::dispatch($licCommand2);
+
+            sleep(2);
+            RefreshSubscribers::refreshSingleUser($user1);
+
+            // Reload user
+            $userC = User::findByUsername($user1->username);
+            $timestamp3 = json_decode($userC->subscriber->usage_policy_current)->timestamp;
+            $this->assertGreaterThan($timestamp1, $timestamp3, "Timestamp is not greater than the old one");
+        } finally {
+            $this->deleteSubscribers([self::TEST_NAME_2]);
         }
     }
 }
