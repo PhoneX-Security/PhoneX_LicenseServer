@@ -210,15 +210,10 @@ class AccountController extends Controller {
     }
 
     private function issueTrialAccount(TrialRequest $trialRequest){
-        $isQaTrial = $this->isPhonexIp(\Input::getClientIp());
         $username = $trialRequest->username;
 
-
-//        $product = Product::getTrialWeek();
-//        if(Str::startsWith($username, 'qatrial')){
         // Do not issue any product (starting from In-app Purchases release, November 2015)
-            $product = null;
-//        }
+        $product = null;
 
         $password = rand(100000, 999999);
 
@@ -230,11 +225,7 @@ class AccountController extends Controller {
                 $createLicCommand = new IssueProductLicense($user, $product);
                 $this->dispatch($createLicCommand);
             }
-
-            if (!$isQaTrial){
-                ContactList::addSupportToContactListMutually($user);
-            }
-
+            ContactList::addSupportToContactListMutually($user);
             RefreshSubscribers::refreshSingleUser($user, false);
 
         } catch (\Exception $e){
@@ -253,11 +244,6 @@ class AccountController extends Controller {
             $expiresAtUnixTime = Carbon::now()->addWeek()->timestamp;
         }
         return $this->responseOk($user->username, $user->email, $password, $expiresAtUnixTime);
-
-//        if ($expiresAtUnixTime){
-//        } else {
-//            return $this->responseOk($user->username, $user->email, $password);
-//        }
     }
 
     private function checkCorrectBusinessCode(Request $request){
@@ -326,11 +312,6 @@ class AccountController extends Controller {
             return;
         }
 
-//        $this->isPhonexIp();
-
-//        if ($this->isPhonexIp() && $captcha === self::QA_CAPTCHA){
-//            return;
-//        }
         $captcha = $request->get('captcha');
         if ($this->securimage->check($captcha) == false) {
 //            Log::error("Bad captcha entered [received=" . $captcha . " ]");
@@ -389,12 +370,6 @@ class AccountController extends Controller {
 //        return true;
     }
 
-
-    private function getMaxTrialNumber($isQaTrial = false){
-        return User::where('qa_trial', ($isQaTrial ? "1" : "0"))
-            ->max('trialNumber');
-    }
-
     private function responseOk($username, $sip, $password, $expirationTimestamp = null){
         if (!$expirationTimestamp){
             // new model do not provide expiration time when creating account
@@ -427,12 +402,5 @@ class AccountController extends Controller {
         }
 
         return $this->phonexIP;
-    }
-
-    private function isPhonexIp(){
-        // turn this off, we do not want JIC have qa_trial accounts
-        return false;
-//        $remote = \Input::getClientIp();
-//        return $remote == $this->getPhonexIp() || $remote == '127.0.0.1';
     }
 }
