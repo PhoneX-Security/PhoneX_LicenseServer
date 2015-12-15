@@ -37,7 +37,7 @@ Route::get('api/support-notifications/batch', 'Api\SupportNotificationsControlle
 Route::post('api/support-notifications/batch', 'Api\SupportNotificationsController@postBatch');
 Route::get('api/support-notification/{user}/{notification}', 'Api\SupportNotificationsController@getNotificationForUser');
 
-Route::get('api/version-check', 'Api\VersionCheckController@versionCheck');
+Route::any('api/version-check', 'Api\VersionCheckController@versionCheck');
 
 // Authenticated API using client certs
 Route::group(['prefix'=>'api/auth/', 'middleware'=>['auth.client_cert']], function(){
