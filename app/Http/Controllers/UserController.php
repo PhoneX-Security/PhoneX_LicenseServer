@@ -15,6 +15,7 @@ use Phonex\Http\Requests\NewLicenseRequest;
 use Phonex\Http\Requests\UpdateUserRequest;
 use Phonex\Jobs\CreateUserWithSubscriber;
 use Phonex\Jobs\IssueProductLicense;
+use Phonex\Jobs\RefreshSubscribers;
 use Phonex\Model\ErrorReport;
 use Phonex\Model\Product;
 use Phonex\Role;
@@ -340,6 +341,7 @@ class UserController extends Controller {
             throw new NotFoundHttpException;
         }
 
+        RefreshSubscribers::refreshSingleUser($user, false);
         Queue::push('licenseUpdated', ['username' => $user->username."@phone-x.net"], 'users');
 
         return redirect()

@@ -38,7 +38,7 @@ class QaController extends Controller {
         $subscriber = $user1->subscriber;
         $usagePolicyCurrent = json_decode($subscriber->usage_policy_current);
 
-        dd([$usagePolicyCurrent, $subscriber->issued_on, $subscriber->expires_on, $subscriber->license_type]);
+        dd([$usagePolicyCurrent, $usagePolicyCurrent->timestamp, $subscriber->issued_on, $subscriber->expires_on, $subscriber->license_type]);
     }
 
     public function getCheckLic(){

@@ -109,8 +109,8 @@ class RefreshSubscriberTest extends TestCase {
             $timestamp1 = json_decode($userA->subscriber->usage_policy_current)->timestamp;
 
             // Timestamp is based on seconds
-            // Wait a few seconds before refreshing
-            sleep(2);
+            // Wait a second before refreshing manually
+            sleep(1);
             RefreshSubscribers::refreshSingleUser($userA);
 
             $userB = User::findByUsername($user1->username);
@@ -118,13 +118,13 @@ class RefreshSubscriberTest extends TestCase {
 
             $this->assertEquals($timestamp1, $timestamp2, "Timestamp should not have been updated, but the value was changed.");
 
+            // Wait a second again before issuing a new product
+            sleep(1);
+
             // Issue new product (full license) and check the timestamp value again - now it should be updated
             $fullSubscriptionProduct = Product::getFullMonth();
             $licCommand2 = new IssueProductLicense($userB, $fullSubscriptionProduct);
             Bus::dispatch($licCommand2);
-
-            sleep(2);
-            RefreshSubscribers::refreshSingleUser($user1);
 
             // Reload user
             $userC = User::findByUsername($user1->username);

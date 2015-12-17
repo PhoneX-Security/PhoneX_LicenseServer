@@ -150,24 +150,23 @@ class RefreshSubscribers extends Command implements SelfHandling {
      */
     private static function checkIfPolicyHasChanged($oldPolicy, $newPolicy)
     {
-//        echo("new subs count: " . count($newPolicy->subscriptions) . ", old subs count: " . count($oldPolicy->subscriptions) . "\n");
-//        var_dump($newPolicy->subscriptions, $oldPolicy->subscriptions);
         $compareFunc = function($sub1, $sub2){
             if ($sub1 == $sub2){
                 // everything is equal
                 return 0;
             } else {
-                // not equal
+                // something is not equal, return value other than 0
                 return 1;
             }
         };
 
-        // array_udiff does only one way difference, test both sides for subscriptions and consumables
+        // array_udiff does one way difference only, test both sides for subscriptions and consumables
         $subDiff1 = array_udiff($oldPolicy->subscriptions, $newPolicy->subscriptions, $compareFunc);
         $subDiff2 = array_udiff($newPolicy->subscriptions, $oldPolicy->subscriptions, $compareFunc);
         $consDiff1 = array_udiff($oldPolicy->consumables, $newPolicy->consumables, $compareFunc);
         $consDiff2 = array_udiff($newPolicy->consumables, $oldPolicy->consumables, $compareFunc);
 
+        // if at least one difference is not null, something has changed
         return !empty($subDiff1) ||
             !empty($subDiff2) ||
             !empty($consDiff1) ||
