@@ -13,48 +13,40 @@
             <div class="box-header">
 
                 <h3 class="box-title">Licenses</h3>
-                {{--<div class="box-tools">--}}
-
-
-                    {{--TODO: Rework--}}
-                    {{--<form method="get" class="form-inline">--}}
-                        {{--@if(\Request::has('o')) <input type="hidden" name="o" value="{{ InputGet::get('o') }}" /> @endif--}}
-                        {{--@if(\Request::has('s')) <input type="hidden" name="s" value="{{ InputGet::get('s') }}" /> @endif--}}
-                        {{--<div class="form-group">--}}
-                            {{--<label class="col-md-1 control-label text-le">Filters:</label>--}}
-                        {{--</div>--}}
-                        {{--<div class="form-group">--}}
-                            {{--<label class="checkbox-inline" for="checkboxes-0">--}}
-                                {{--{!! Form::checkbox('active_only', '1', \Request::has('active_only'), ['id'=>'checkboxes-0']); !!}--}}
-                                {{--Active only--}}
-                            {{--</label>--}}
-
-                            {{--<label class="checkbox-inline" for="checkboxes-1">--}}
-                                {{--{!! Form::checkbox('trial_only', '1', \Request::has('trial_only'), ['id'=>'checkboxes-1']); !!}--}}
-                                {{--Trial only--}}
-                            {{--</label>--}}
-
-                        {{--</div>--}}
-                        {{--<button type="submit" class="btn btn-default">Submit</button>--}}
-                    {{--</form>--}}
-                {{--</div>--}}
             </div>
 
-
-
-
             <div class="box-body">
-
                 <div class="row form-inline" style="margin-bottom: 5px">
                     <div class="col-sm-6">
-                        <form class="form-horizontal" action="{{ route('licenses.index') }}" method="get">
+                        <form class="form-inline inline-block" action="{{ route('licenses.index') }}" method="get">
                             <div class="input-group">
-                                <input type="search" class="form-control input-sm" name="username" value="{{ Input::get('username') }}" placeholder="Search">
+                                <input type="search" class="form-control input-sm" name="username" value="{{ Input::get('username') }}" placeholder="Search by username">
                             <span class="input-group-btn">
                                 <button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
                             </span>
                             </div>
                         </form>
+
+                        <form class="form-inline inline-block" style="margin-left: 5px; margin-right: 5px" method="get">
+
+                            @if(\Request::has('o')) <input type="hidden" name="o" value="{{ InputGet::get('o') }}" /> @endif
+                            @if(\Request::has('s')) <input type="hidden" name="s" value="{{ InputGet::get('s') }}" /> @endif
+
+                            <div class="form-group" style="margin-left: 5px; margin-right: 5px">
+                                <label for="input-limit">Limit:</label>
+                                <input type="number" style="width: 70px" class="form-control" id="input-limit" name="limit" value="{{ request('limit', 20)}}">
+                            </div>
+
+                            <div class="form-group" style="margin-left: 5px; margin-right: 5px">
+                                <label class="checkbox-inline" for="checkboxes-0">
+                                    {!! Form::checkbox('active_only', '1', \Request::has('active_only'), ['id'=>'checkboxes-0']); !!}
+                                    Active only
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-default">Submit</button>
+                        </form>
+
                     </div>
                     <div class="col-sm-6 text-right">
                     </div>
@@ -69,8 +61,8 @@
                             <th>{!! link_to_sort('license_func_type', 'Type') !!}</th>
                             <th>License code (code/group)</th>
                             <th>Active</th>
-                            <th>{!! link_to_sort('starts_at', 'Start date') !!}</th>
-                            <th>{!! link_to_sort('expires_at', 'Expiration date') !!}</th>
+                            <th>{!! link_to_sort('starts_at', 'Starts at') !!}</th>
+                            <th>{!! link_to_sort('expires_at', 'Expires at') !!}</th>
                             <th width="22%">Comment</th>
                             <th>Options</th>
                         </tr>
@@ -89,8 +81,8 @@
                                 @else - @endif
                             </td>
                             <td>@if($lic->active) Yes @else No @endif</td>
-                            <td>{{ $lic->formatted_starts_at}}</td>
-                            <td>{{ $lic->formatted_expires_at }}</td>
+                            <td>{{ $lic->starts_at}}</td>
+                            <td>{{ $lic->expires_at }}</td>
                             <td>{{ $lic->comment }}</td>
 
                             <td>

@@ -1,6 +1,7 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Log;
 use Phonex\Http\Requests;
 use Phonex\Http\Requests\UpdateLicenseRequest;
@@ -23,7 +24,7 @@ class LicenseController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index(){
+	public function index(Request $request){
 		if (\Request::has('filters')){
 //			dd($_GET);
 //			dd(\Request::get('filters'));
@@ -46,17 +47,13 @@ class LicenseController extends Controller {
                 'license_types.name as license_type',
                 'license_func_types.name as license_func_type',
                 'licenses.*',
-				\DB::raw('IF(expires_at IS NULL OR expires_at >= NOW(), 1, 0) as active')
+				\DB::raw('IF(expires_at >= NOW() and starts_at <= NOW(), 1, 0) as active')
             ]); // Warning: MySQL specific syntax
 
         $query = $query->where('users.qa_trial', false);
 
 		if (InputGet::has('active_only')){
-			$query = $query->whereRaw('( expires_at IS NULL OR expires_at >= NOW() )');
-
-		}
-		if (InputGet::has('trial_only')){
-			$query = $query->where('is_trial', 1);
+			$query = $query->whereRaw('( starts_at <= NOW() AND expires_at >= NOW() )');
 		}
 
         if(InputGet::has('username')){
@@ -64,16 +61,9 @@ class LicenseController extends Controller {
 				->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
         }
 
-		$licenses = $query->paginate(15);
 
-		foreach ($licenses as $v){
-			if ($v->starts_at){
-				$v->formatted_starts_at = Carbon::parse($v->starts_at)->format('Y-m-d');
-			}
-			if ($v->expires_at) {
-				$v->formatted_expires_at = Carbon::parse($v->expires_at)->format('Y-m-d');
-			}
-		}
+
+		$licenses = $query->paginate($request->get('limit', 20));
 		return view('license.index', ['licenses' => $licenses]);
 	}
 
