@@ -4,6 +4,7 @@ use Illuminate\Database\Eloquent\Model;
 use Phonex\Exceptions\InvalidStateException;
 use Phonex\Exceptions\SubscriberAlreadyInCLException;
 use GeoIP;
+use Phonex\Utils\SortableTrait;
 
 /**
  * @property  username
@@ -13,9 +14,13 @@ use GeoIP;
  * @property  license_type
  */
 class Subscriber extends Model{
+    use SortableTrait;
+
     /* Definition */
     protected $connection = 'mysql_opensips';
     protected $table = 'subscriber';
+    // attribute required by SortableTrait
+    protected $sortable = ['date_last_activity', 'issued_on', 'expires_on'];
 
     // legacy - Subscriber table doesn't have timestamps
     public $timestamps = false;

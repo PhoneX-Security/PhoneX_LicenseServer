@@ -27,17 +27,17 @@
                             </div>
                         </form>
 
-                        <form class="form-inline inline-block" style="margin-left: 5px; margin-right: 5px" method="get">
+                        <form class="form-inline inline-block side-margin-small" method="get">
 
                             @if(\Request::has('o')) <input type="hidden" name="o" value="{{ InputGet::get('o') }}" /> @endif
                             @if(\Request::has('s')) <input type="hidden" name="s" value="{{ InputGet::get('s') }}" /> @endif
 
-                            <div class="form-group" style="margin-left: 5px; margin-right: 5px">
+                            <div class="form-group side-margin-small">
                                 <label for="input-limit">Limit:</label>
                                 <input type="number" style="width: 70px" class="form-control" id="input-limit" name="limit" value="{{ request('limit', 20)}}">
                             </div>
 
-                            <div class="form-group" style="margin-left: 5px; margin-right: 5px">
+                            <div class="form-group side-margin-small">
                                 <label class="checkbox-inline" for="checkboxes-0">
                                     {!! Form::checkbox('active_only', '1', \Request::has('active_only'), ['id'=>'checkboxes-0']); !!}
                                     Active only

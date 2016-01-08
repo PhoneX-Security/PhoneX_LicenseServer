@@ -18,3 +18,8 @@ th a {
     text-decoration: none;
     color: #72afd2;
 }
+
+.side-margin-small {
+    margin-left: 5px;
+    margin-right: 5px;
+}

@@ -40,6 +40,12 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 		return $this->hasMany('Phonex\License', 'user_id');
 	}
 
+    public function licenseProducts()
+    {
+        return $this->hasMany('Phonex\License', 'user_id')
+            ->whereNotNull('product_id');
+    }
+
     public function activeLicenseProducts()
     {
         return $this->hasMany('Phonex\License', 'user_id')

@@ -78,7 +78,7 @@ Parameters: $user
     <div class="col-md-4 ">
         </dl>
         <dt>Phone</dt>
-        <dd>{{ $user->subscriber->app_version_obj->platformDesc() }}</dd>
+        <dd>{{ $user->subscriber->app_version_obj->platformDesc() . " " . $user->subscriber->app_version_obj->device() }}</dd>
         </dl>
     </div>
     <div class="col-md-4 ">

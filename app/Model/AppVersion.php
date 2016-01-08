@@ -17,6 +17,7 @@ class AppVersion {
     public $versionCode;
     public $versionName;
     public $appName;
+    public $device;
     public $locales = [];
 
 
@@ -30,6 +31,7 @@ class AppVersion {
         $this->versionCode = isset($obj->rc) ? $obj->rc : null; //release code aka version code (android naming)
         $this->versionName = isset($obj->ac) ? $obj->ac : null; // e.g. 1.0.4
         $this->appName = isset($obj->info) ? $obj->info : null;
+        $this->device = isset($obj->dev) ? $obj->dev : null;
         if (isset($obj->locales) && is_array($obj->locales)){ // preferred locales
             $this->locales = $obj->locales;
         }
@@ -40,12 +42,18 @@ class AppVersion {
         $desc = ucfirst($this->platform);
         switch ($this->platform){
             case "iOS":
-                return $desc . " " . $this->oscd;
+                return "{$desc} {$this->oscd}";
                 break;
             default: // android and such
-                return $desc . " " . $this->platformId;
+//                return $desc . " " . $this->platformId;
+                return "{$desc} {$this->platformId}";
                 break;
         }
+    }
+
+    public function device()
+    {
+        return ($this->device ? " ({$this->device})": "unknown");
     }
 
     public function versionDesc()

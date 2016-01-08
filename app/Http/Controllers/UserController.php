@@ -37,43 +37,56 @@ class UserController extends Controller {
 	}
 
 	public function index(Request $request){
-        $limit = InputGet::getInteger('limit', 15);
 
-        $query = User::sortable()->with('subscriber', 'groups', 'roles');
-        $filteredGroups = [];
-        // Filter groups
-        if (\Request::has('user_group')){
-            $filteredGroups = \Request::get('user_group');
-            $query = User::select('users.*')
-                ->join('user_group', 'users.id', '=', 'user_group.user_id')
-                ->groupBy('users.id')
-                ->whereIn('group_id', $filteredGroups)
-                ->sortable()
-                ->with('subscriber', 'groups');
+        $fromSubscriber = false;
+        // HACK: if filtering according to date_last_activity (which is subscribers table), we need to load data from subscribers first
+        // subscribers and users tables cannot join - they reside in different databases
+        $needToLoadFromSubscribers = ['date_last_activity', 'issued_on', 'expires_on'];
+        if (
+            ($request->has('s') && in_array($request->get('s'), $needToLoadFromSubscribers))
+            || $request->has('last_activity_from')
+        ){
+            $query = Subscriber::sortable()
+                ->with('user','user.subscriber', 'user.groups', 'user.roles', 'user.licenseProducts');
+            if (!empty($request->get('last_activity_from'))){
+                $lastActivityFrom = carbonFromInput($request->get('last_activity_from'));
+                $query = $query->where('date_last_activity', '>=', $lastActivityFrom);
+            }
+
+            $fromSubscriber = true;
+        } else {
+            $query = User::sortable()
+                ->with('subscriber', 'groups', 'roles', 'licenseProducts');
         }
+        if($request->has('username')){
+            $query = $query->where('username', 'LIKE', "%" . $request->get('username') . "%");
+        }
+//        $filteredGroups = [];
+//        // Filter groups
+//        if (\Request::has('user_group')){
+//            $filteredGroups = \Request::get('user_group');
+//            $query = User::select('users.*')
+//                ->join('user_group', 'users.id', '=', 'user_group.user_id')
+//                ->groupBy('users.id')
+//                ->whereIn('group_id', $filteredGroups)
+//                ->sortable()
+//                ->with('subscriber', 'groups');
+//        }
 
         // avoid qa users
-        $query = $query->where('qa_trial', false);
+//        $query = $query->where('qa_trial', false);
 
-        if(InputGet::has('username')){
-            $query = $query->where('username', 'LIKE', "%" . InputGet::getAlphaNum('username') . "%");
-        }
+        $users = $query->paginate($request->get('limit', 20));
+//        dd($users[0]);
 
-        if(InputGet::has('comment')){
-            $query = $query->where('comment', 'LIKE', "%" . $request->get('comment') . "%");
-        }
-
-
-        $users = $query->paginate($limit);
         // TODO when including groups, total count may not be correct, currently it's all 1, fix it
 
-
         $groups = Group::all();
-        foreach($groups as $group){
-            $group->selected = in_array($group->id, $filteredGroups);
-        }
-
-		return view('user.index', compact('users', 'groups'));
+//        foreach($groups as $group){
+//            $group->selected = in_array($group->id, $filteredGroups);
+//        }
+//
+		return view('user.index', compact('users', 'groups', 'fromSubscriber'));
 	}
 
 	public function create()

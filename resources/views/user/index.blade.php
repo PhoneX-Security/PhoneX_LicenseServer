@@ -19,17 +19,6 @@
                 <div class="row form-inline" style="margin-bottom: 5px">
                     <div class="col-sm-6">
 
-                        {{--<form class="form-horizontal" action="{{ route('users.index') }}" method="get">--}}
-
-                            {{--<div class="input-group">--}}
-                                {{--<input type="search" class="form-control input-sm" name="username"--}}
-                                       {{--value="{{ Input::get('username') }}" placeholder="Search">--}}
-                                {{--<span class="input-group-btn">--}}
-                                    {{--<button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>--}}
-                                {{--</span>--}}
-                            {{--</div>--}}
-                        {{--</form>--}}
-
                         <form class="form-inline inline-block" action="{{ route('users.index') }}" method="get">
 
                             <div class="input-group">
@@ -40,51 +29,46 @@
                             </div>
                         </form>
 
-                        <form class="form-inline inline-block" action="{{ route('users.index') }}" method="get">
+                        {{--<form class="form-inline inline-block" action="{{ route('users.index') }}" method="get">--}}
 
-                            <div class="input-group">
-                                <input type="text" name="comment" value="{{Request::get('comment')}}" class="form-control input-sm pull-right" style="width: 150px;" placeholder="Search by comment">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
-                                </div>
-                            </div>
-                        </form>
-
-                        <form class="form-inline inline-block"  action="{{ \URL::route('users.index') }}" method="get">
-                            <div class="form-group">
-                                <label for="group_input">Group</label>
-                                <select id="group_input" name="user_group[]" class="multiselect-basic"  multiple="multiple">
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}" @if($group->selected) selected="selected" @endif>{{ $group->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-default">Filter</button>
-                        </form>
-
-
-                        {{--<div class="left-cell">--}}
-                        {{--<form class="form-horizontal" style="width: 25%" action="{{ \URL::route('users.index') }}" method="get">--}}
-
-                        {{--<div class="input-group">--}}
-                        {{--<input type="search" class="form-control input-sm" name="username" value="{{ Input::get('username') }}" placeholder="Searchsssss">--}}
-                        {{--<span class="input-group-btn">--}}
-                        {{--<button class="btn  btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>--}}
-                        {{--</span>--}}
-                        {{--</div>--}}
+                            {{--<div class="input-group">--}}
+                                {{--<input type="text" name="comment" value="{{Request::get('comment')}}" class="form-control input-sm pull-right" style="width: 150px;" placeholder="Search by comment">--}}
+                                {{--<div class="input-group-btn">--}}
+                                    {{--<button class="btn btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>--}}
+                                {{--</div>--}}
+                            {{--</div>--}}
                         {{--</form>--}}
-                        {{--</div>--}}
 
-                        {{--<div class="form-group">--}}
-                            {{--<label>Show <select--}}
-                                        {{--name="example1_length" aria-controls="example1"--}}
-                                        {{--class="form-control input-sm">--}}
-                                    {{--<option value="10">10</option>--}}
-                                    {{--<option value="25">25</option>--}}
-                                    {{--<option value="50">50</option>--}}
-                                    {{--<option value="100">100</option>--}}
-                                {{--</select> entries</label>--}}
-                        {{--</div>--}}
+                        <form class="form-inline inline-block "  action="{{ \URL::route('users.index') }}" method="get">
+                            @if(\Request::has('o')) <input type="hidden" name="o" value="{{ request('o') }}" /> @endif
+                            @if(\Request::has('s')) <input type="hidden" name="s" value="{{ request('s') }}" /> @endif
+
+                            <div class="form-group side-margin-small">
+                                <label for="input-limit">Limit:</label>
+                                <input type="number" style="width: 70px" class="form-control" id="input-limit" name="limit" value="{{ request('limit', 20)}}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="last-activity-from" class="inline-block">Last activity (from):</label>
+                            </div>
+
+                            <div class="input-group side-margin-small date">
+                                <input value="{{ request('last_activity_from') }}" id="last-activity-from" type="text" name="last_activity_from" class="form-control" />
+                                <span class="input-group-addon" ><i class="glyphicon glyphicon-th"></i></span>
+                            </div>
+
+
+                            {{--<div class="form-group">--}}
+                                {{--<label for="group_input">Group:</label>--}}
+                                {{--<select id="group_input" name="user_group[]" class="multiselect-basic"  multiple="multiple">--}}
+                                    {{--@foreach($groups as $group)--}}
+                                        {{--<option value="{{ $group->id }}" @if($group->selected) selected="selected" @endif>{{ $group->name }}</option>--}}
+                                    {{--@endforeach--}}
+                                {{--</select>--}}
+                            {{--</div>--}}
+                            <button type="submit" class="btn btn-default side-margin-small">Submit</button>
+                        </form>
+
                     </div>
                     <div class="col-sm-6 text-right">
 
@@ -102,13 +86,15 @@
                             <tr>
                                 <th>{!! link_to_sort('id', 'ID') !!}</th>
                                 <th>{!! link_to_sort('username', 'Username') !!}</th>
-                                <th>{!! link_to_sort('email', 'E-mail') !!}</th>
-                                <th width="15%">Groups</th>
-                                <th>Last activity</th>
-                                <th>Active lic. expiration</th>
+                                {{--<th>{!! link_to_sort('email', 'E-mail') !!}</th>--}}
+                                <th>{!! link_to_sort('date_last_activity','Last activity') !!}</th>
+                                <th>{!! link_to_sort('issued_on', 'Current license from') !!}</th>
+                                <th>{!! link_to_sort('expires_on', 'Current license to') !!}</th>
+                                <th>Purchased licenses</th>
                                 <th>Phone / Version</th>
                                 <th>Location</th>
-                                <th>Roles</th>
+                                <th >Groups</th> {{-- width="15%" --}}
+                                {{--<th>Roles</th>--}}
                                 <th class="text-center">Options</th>
                             </tr>
                             </thead>
@@ -116,22 +102,40 @@
                             <tbody>
                             @foreach($users as $user)
                                 <tr>
+                                    {{--Hackiti-hack--}}
+                                    <?php if($fromSubscriber) {
+                                        if($user->user == null){ ?>
+                                            <td>{{$user->username}}<td>
+                                            <?php
+                                            continue;
+                                        }
+                                        $user = $user->user;
+                                    } ?>
 
                                     <td>{{ $user->id }}</td>
                                     <td>
                                         <a href="{{ \URL::route('users.show', [ $user->id ]) }}">{{ $user->username }}</a>
                                     </td>
-                                    <td>{{ $user->email or '' }}</td>
-                                    <td>
-                                        @foreach($user->groups as $k => $group)
-                                            @if($k > 0), @endif
-                                            {{ $group->name }}
-                                        @endforeach
-                                    </td>
+                                    {{--<td>{{ $user->email or '' }}</td>--}}
 
                                     <td>@if($user->subscriber) {{ $user->subscriber->date_last_activity }} @endif</td>
 {{--                                    <td>@if($user->subscriber) {{ $user->subscriber->expires_on }} @endif</td>--}}
-                                    <td>{{ $user->activeLicense->expires_at or '' }}</td>
+                                    <td>@if($user->subscriber) {{ $user->subscriber->issued_on }} @endif</td>
+                                    <td>@if($user->subscriber) {{ $user->subscriber->expires_on }} @endif</td>
+                                    {{--<td>{{ $user->activeLicense->expires_at or '' }}</td>--}}
+                                    <td>
+                                        @foreach($user->licenseProducts as $k=>$licProd)
+                                            @if($k>0), @endif
+                                            <?php $expired = $licProd->expires_at < \Carbon\Carbon::now(); ?>
+                                            @if($expired)<strike style="color: grey">@endif
+                                            @if($licProd->product->display_name)
+                                                    {{$licProd->product->display_name}}
+                                            @else
+                                                    {{ucfirst($licProd->product->name)}}
+                                            @endif
+                                            @if($expired)</strike>@endif
+                                        @endforeach
+                                    </td>
                                     <td>
                                         @if($user->subscriber && $user->subscriber->app_version)
                                             {{$user->subscriber->app_version_obj->platformDesc() . " / " . $user->subscriber->app_version_obj->versionDesc()}}
@@ -147,8 +151,16 @@
                                     </td>
 
                                     <td>
-                                        {{ $user->roles_list }}
+                                        @foreach($user->groups as $k => $group)
+                                            @if($k > 0), @endif
+                                            {{ $group->name }}
+                                        @endforeach
                                     </td>
+
+                                    {{--ROLES NOT NECCESSARY TO BE SHOWN --}}
+                                    {{--<td>--}}
+                                        {{--{{ $user->roles_list }}--}}
+                                    {{--</td>--}}
 
                                     <td class="text-center">
                                         <div class="btn-group  btn-group-xs">
@@ -168,7 +180,6 @@
             <div class="box-footer clearfix">
                 <div class="pull-left">
                     <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
-                        {{--Showing 1 to 10 of --}}
                         Total {{ $users->total() }} entries</div>
                 </div>
 
@@ -178,6 +189,6 @@
                 </div>
 
             </div>
-        </div><!-- /.box -->
+        </div>
     </section>
 @endsection
