@@ -36,9 +36,6 @@ class RefreshSubscribers extends Command implements SelfHandling {
         });
 
         Log::info('RefreshSubscribers is finished');
-
-        // counter doesn't work - is not updated from closure
-//        Log::info('RefreshSubscribers is finished, ' . $counter . " users were updated.");
 	}
 
     public static function refreshSingleUser(User $user, $sendPushNotification = true)
@@ -179,15 +176,15 @@ class RefreshSubscribers extends Command implements SelfHandling {
      */
     private static function refreshExpirationAndLicenseType(User $user)
     {
-        /*
-                       We want to update Subscriber table (in opensips database) together with auxiliary fields in users table with issued_on, expires_on and license type things.
-                       As user may have multiple licenses, we want to find out the recent one, that should be used.
-                       Strategy:
-                       1. Find active license with latest expiration
-                       2. If no such license is present, search future licenses and find one with earliest start
-                       3. If none of previous points were able to find licenses, find the past license that expired most recently
-                       4. With the license find, update above mentioned information for subscriber and send push notification (but only if data has changed, to avoid spamming users)
-                        */
+       /*
+        * We want to update Subscriber table (in opensips database) together with auxiliary fields in users table with issued_on, expires_on and license type things.
+        * As user may have multiple licenses, we want to find out the recent one, that should be used.
+        * Strategy:
+        * 1. Find active license with latest expiration
+        * 2. If no such license is present, search future licenses and find one with earliest start
+        * 3. If none of previous points were able to find licenses, find the past license that expired most recently
+        * 4. With the license find, update above mentioned information for subscriber and send push notification (but only if data has changed, to avoid spamming users)
+        */
 
         $license = self::getActiveLicenseWithLatestExpiration($user);
         if ($license == null){
@@ -218,7 +215,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
                 $subscriber->expires_on = $license->expires_at;
                 $subscriber->license_type = $license->licenseFuncType->name;
                 $subscriber->save();
-//
+
 //              // also update user's auxiliary column
                 $user->active_license_id = $license->id;
                 $user->save();
