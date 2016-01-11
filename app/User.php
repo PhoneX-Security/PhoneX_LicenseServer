@@ -31,7 +31,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     protected $table = 'users';
 
 	protected $fillable = ['username', 'email', 'password', 'has_access'];
-	protected $sortable = ['username', 'email', 'has_access', 'id'];
+	protected $sortable = ['username', 'email', 'has_access', 'id',
+        'date_last_activity', 'expires_on', 'issued_on']; // when doing join with subscriber_view, we may use these sortable columns
 	protected $hidden = ['password', 'remember_token'];
 
     /* Relations */

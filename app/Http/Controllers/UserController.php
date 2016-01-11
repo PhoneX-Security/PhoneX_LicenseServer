@@ -1,6 +1,9 @@
 <?php namespace Phonex\Http\Controllers;
 
 use Carbon\Carbon;
+use DB;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -37,31 +40,132 @@ class UserController extends Controller {
 	}
 
 	public function index(Request $request){
+        $filteredProducts = [];
+        if($request->has('products')){
+            $filteredProducts = $request->get('products');
+        }
 
-        $fromSubscriber = false;
-        // HACK: if filtering according to date_last_activity (which is subscribers table), we need to load data from subscribers first
-        // subscribers and users tables cannot join - they reside in different databases
-        $needToLoadFromSubscribers = ['date_last_activity', 'issued_on', 'expires_on'];
-        if (
-            ($request->has('s') && in_array($request->get('s'), $needToLoadFromSubscribers))
-            || $request->has('last_activity_from')
-        ){
-            $query = Subscriber::sortable()
-                ->with('user','user.subscriber', 'user.groups', 'user.roles', 'user.licenseProducts');
-            if (!empty($request->get('last_activity_from'))){
-                $lastActivityFrom = carbonFromInput($request->get('last_activity_from'));
-                $query = $query->where('date_last_activity', '>=', $lastActivityFrom);
+        $query = User::select(['users.*'])
+            ->join('subscriber_view', 'subscriber_view.username' ,'=' ,'users.username')
+            ->leftJoin('licenses','licenses.user_id','=','users.id')
+            ->leftJoin('products','products.id','=','licenses.product_id')
+            ->groupBy('users.id')
+            ->sortable()
+            ->with('subscriber', 'groups', 'roles', 'licenseProducts');
+        // avoid qa users
+        $query = $query->where('qa_trial', false);
+
+        // Lots of conditions
+        if (!empty($request->get('last_activity_from'))){
+            $lastActivityFrom = carbonFromInput($request->get('last_activity_from'));
+            $query = $query->where('date_last_activity', '>=', $lastActivityFrom);
+        }
+        if ($request->has('username')){
+            $query = $query->where('users.username', 'LIKE', "%" . $request->get('username') . "%");
+        }
+
+        if (!empty($filteredProducts)){
+            $query = $query
+                ->whereIn('products.id', $filteredProducts)
+                ->whereNotNull('licenses.id');
+        } else if ($request->get('with_licenses') == 1){
+            $query = $query->whereNotNull('licenses.id');
+        }
+
+        /* Render FOAF Force layout graph using D3 */
+        if($request->get('foaf') == '1'){
+            $users = $query->get();
+            return $this->getFoaf($users);
+        }
+
+        $products = Product::all();
+        foreach($products as $product){
+            $product->selected = in_array($product->id, $filteredProducts);
+            $product->xname = $product->display_name ? $product->display_name : $product->name;
+        }
+        $products = $products->sortBy('xname');
+
+        // this doesn't work because of complicated query
+        $users = $query->paginate($request->get('limit', 20));
+		return view('user.index', compact('users', 'products'));
+    }
+
+
+    private function getFoaf(Collection $users, $omitSupport = true)
+    {
+        $nodes = [];
+        $links = [];
+        $supportUser = "phonex-support";
+
+        // First iteration - add all selected users (group 1)
+        foreach($users as $user){
+            $subscriber = $user->subscriber;
+            if (!$subscriber){
+                continue;
             }
+            if ($omitSupport && $subscriber->username == $supportUser){
+                continue;
+            }
+            $nodes[$subscriber->id] = $this->newFoafNode($subscriber->username, $subscriber->id, 1);
 
-            $fromSubscriber = true;
-        } else {
-            $query = User::sortable()
-                ->with('subscriber', 'groups', 'roles', 'licenseProducts');
+            // Add neighbor users (group 2)
+            foreach($subscriber->subscribersInContactList as $friendSubscriber){
+                if ($omitSupport && $friendSubscriber->username == $supportUser){
+                    continue;
+                }
+                if (!isset($nodes[$friendSubscriber->id])){
+                    $nodes[$friendSubscriber->id] = $this->newFoafNode($friendSubscriber->username, $friendSubscriber->id, 2);
+                }
+                $links[] = $this->newFoafLink($subscriber->id, $friendSubscriber->id);
+            }
         }
-        if($request->has('username')){
-            $query = $query->where('username', 'LIKE', "%" . $request->get('username') . "%");
+
+        // Remove links that lead to users not present in nodes
+//        foreach ($nodes as $node){
+//            $links[] = $this->newFoafLink($subscriber->id, $friendSubscriber->id);
+//        }
+
+        // find out mapping between ids and array index (nodes and links are referenced by array index, not user id in D3)
+        $ids = array_keys($nodes);
+        $idToIndex = [];
+        $d3Nodes = [];
+        $d3Links = [];
+        foreach ($nodes as $id => $node){
+            $index = array_search($id, $ids);
+            $idToIndex[$id] = $index;
+            $d3Nodes[$index] = $node;
         }
-//        $filteredGroups = [];
+        foreach ($links as $link){
+            $d3Links[] = $this->newFoafLink($idToIndex[$link->source], $idToIndex[$link->target]);
+        }
+
+        $o = new \stdClass();
+        $o->nodes = $d3Nodes;
+        $o->links = $d3Links;
+//        return json_encode($o);
+        return view('user.foaf_xml', ["graphData" => json_encode($o)]);
+    }
+
+    private function newFoafLink($source, $target)
+    {
+        $e = new \stdClass();
+        $e->source = $source;
+        $e->target = $target;
+        return $e;
+    }
+
+    private function newFoafNode($username, $userId, $group)
+    {//
+        return ['username' => $username, 'user_id' =>$userId, 'group' => $group];
+    }
+
+    //        $groups = Group::all();
+//        foreach($groups as $group){
+//            $group->selected = in_array($group->id, $filteredGroups);
+//        }
+//
+// TODO when including groups, total count may not be correct, currently it's all 1, fix it
+    //        $filteredGroups = [];
 //        // Filter groups
 //        if (\Request::has('user_group')){
 //            $filteredGroups = \Request::get('user_group');
@@ -73,21 +177,21 @@ class UserController extends Controller {
 //                ->with('subscriber', 'groups');
 //        }
 
-        // avoid qa users
-//        $query = $query->where('qa_trial', false);
 
-        $users = $query->paginate($request->get('limit', 20));
-//        dd($users[0]);
+    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
+    {
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        // TODO when including groups, total count may not be correct, currently it's all 1, fix it
+        $total = $this->getCountForPagination($columns);
 
-        $groups = Group::all();
-//        foreach($groups as $group){
-//            $group->selected = in_array($group->id, $filteredGroups);
-//        }
-//
-		return view('user.index', compact('users', 'groups', 'fromSubscriber'));
-	}
+        $results = $this->forPage($page, $perPage)->get($columns);
+
+        return new LengthAwarePaginator($results, $total, $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
+    }
+
 
 	public function create()
 	{

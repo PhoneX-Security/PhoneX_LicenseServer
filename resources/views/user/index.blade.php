@@ -17,7 +17,7 @@
             <div class="box-body">
 
                 <div class="row form-inline" style="margin-bottom: 5px">
-                    <div class="col-sm-6">
+                    <div class="col-sm-9">
 
                         <form class="form-inline inline-block" action="{{ route('users.index') }}" method="get">
 
@@ -57,6 +57,28 @@
                                 <span class="input-group-addon" ><i class="glyphicon glyphicon-th"></i></span>
                             </div>
 
+                            <div class="form-group side-margin-small">
+                                <label class="checkbox-inline" for="checkboxes-0">
+                                    {!! Form::checkbox('with_licenses', '1', \Request::has('with_licenses'), ['id'=>'checkboxes-0']) !!}
+                                    With licenses only
+                                </label>
+                            </div>
+
+                            {{--<div class="form-group side-margin-small">--}}
+                                {{--<label class="checkbox-inline" for="checkboxes-1">--}}
+                                    {{--{!! Form::checkbox('with_', '1', \Request::has('paying_only'), ['id'=>'checkboxes-1']) !!}--}}
+                                    {{--With purchased (Full/Premium/Basic) only--}}
+                                {{--</label>--}}
+                            {{--</div>--}}
+
+                            <div class="form-group">
+                                <label for="product_input">License:</label>
+                                <select id="product_input" name="products[]" class="multiselect-basic"  multiple="multiple">
+                                    @foreach($products as $product)
+                                        <option value="{{ $product->id }}" @if($product->selected) selected="selected" @endif>{{ $product->xname }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
                             {{--<div class="form-group">--}}
                                 {{--<label for="group_input">Group:</label>--}}
@@ -70,7 +92,7 @@
                         </form>
 
                     </div>
-                    <div class="col-sm-6 text-right">
+                    <div class="col-sm-3 text-right">
 
                         <a class="btn btn-sm btn-primary view-btn-create" href="/users/create">
                             <i class="fa fa-plus-circle"></i> New User
@@ -102,15 +124,6 @@
                             <tbody>
                             @foreach($users as $user)
                                 <tr>
-                                    {{--Hackiti-hack--}}
-                                    <?php if($fromSubscriber) {
-                                        if($user->user == null){ ?>
-                                            <td>{{$user->username}}<td>
-                                            <?php
-                                            continue;
-                                        }
-                                        $user = $user->user;
-                                    } ?>
 
                                     <td>{{ $user->id }}</td>
                                     <td>
