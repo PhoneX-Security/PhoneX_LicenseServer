@@ -78,7 +78,7 @@ class UserController extends Controller {
         /* Render FOAF Force layout graph using D3 */
         if($request->get('foaf') == '1'){
             $users = $query->get();
-            return $this->getFoaf($users);
+            return $this->getFoaf($users, true, $request->has('with-contacts-only'));
         }
 
         $products = Product::with('translations')->get();
@@ -94,7 +94,7 @@ class UserController extends Controller {
     }
 
 
-    private function getFoaf(Collection $users, $omitSupport = true)
+    private function getFoaf(Collection $users, $omitSupport = true, $onlyWithContacts = false)
     {
         $nodes = [];
         $links = [];
@@ -110,6 +110,16 @@ class UserController extends Controller {
                 continue;
             }
 
+            if ($onlyWithContacts){
+                // contacts count excluding support
+                $contactsCount = count($subscriber->subscribersInContactList
+                        ->filter(function($item) {
+                            return $item->username != "phonex-support";
+                        }));
+                if ($contactsCount <= 0){
+                    continue;
+                }
+            }
 
             $nodes[$subscriber->id] = $this->newFoafNode($subscriber->username, $subscriber->id, 'main', $user);
 
@@ -166,17 +176,25 @@ class UserController extends Controller {
         foreach ($user->licenseProducts as $licProd){
             $start = $licProd->starts_at ? $licProd->starts_at->format('d.m.Y') : "";
             $end = $licProd->expires_at ? $licProd->expires_at->format('d.m.Y') : "";
-            $lics[] = [
+            $x = [
                 'product'=>$licProd->product->display_name_or_name,
                 'starts_at' => $start,
                 'expires_at' => $end
             ];
+            if ($licProd->comment){
+                $x['comment'] = $licProd->comment;
+            }
+            $lics[] = $x;
         }
 
         $arr = [
             'username' => $user->username,
             'licenses' => $lics
         ];
+        if($user->comment){
+            $arr['comment'] = $user->comment;
+        }
+
         return json_encode($arr, JSON_PRETTY_PRINT);
     }
 
@@ -198,7 +216,7 @@ class UserController extends Controller {
                     $nodeColor = "Orange";
                     break;
                 case FoafProductType::TRIAL_WEEK_AND_LESS:
-                    $nodeColor = "LightSkyBlue";
+                    $nodeColor = "Yellow";
                     break;
                 case FoafProductType::INFINITE:
                     $nodeColor = "DarkSalmon";
