@@ -40,7 +40,6 @@
 <div id="tooltip"><pre></pre></div>
 
 <script src="https://d3js.org/d3.v3.min.js"></script>
-<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 <script>
     var graph = {!! $graphData !!};
 
@@ -73,7 +72,8 @@
             .charge(-600)
             .size([w, h]);
 
-    var tooltip = $('#tooltip').find('pre');
+//    var tooltip = $('#tooltip').find('pre');
+    var tooltipEl =  document.querySelector('#tooltip pre');
 
     var default_node_color = "#ccc";
     //var default_node_color = "rgb(3,190,100)";
@@ -188,19 +188,16 @@
 
     node.on("mouseover", function (d) {
         set_highlight(d);
-
-//        tooltip.innerHtml = d.username;
     })
         .on("mousedown", function (d) {
             d3.event.stopPropagation();
             focus_node = d;
             set_focus(d);
             if (highlight_node === null) set_highlight(d);
-            tooltip.html(d.extra);
+            tooltipEl.innerHTML = d.extra;
 
         }).on("mouseout", function (d) {
             exit_highlight();
-//            tooltip.innerHtml = "";
         });
 
     d3.select(window).on("mouseup",
@@ -216,7 +213,7 @@
                 }
 
                 if (highlight_node === null) exit_highlight();
-                tooltip.html("");
+                tooltipEl.innerHTML = "";
             });
 
     function exit_highlight() {
