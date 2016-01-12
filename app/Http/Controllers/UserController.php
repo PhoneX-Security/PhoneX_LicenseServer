@@ -109,9 +109,9 @@ class UserController extends Controller {
             if ($omitSupport && $subscriber->username == $supportUser){
                 continue;
             }
-            // Color node by latest license
-            $latestLicense = RefreshSubscribers::getActiveLicenseWithLatestExpiration($user);
-            $nodes[$subscriber->id] = $this->newFoafNode($subscriber->username, $subscriber->id, 'main', $latestLicense);
+
+
+            $nodes[$subscriber->id] = $this->newFoafNode($subscriber->username, $subscriber->id, 'main', $user);
 
             // Add neighbor users (group 2)
             foreach($subscriber->subscribersInContactList as $friendSubscriber){
@@ -160,14 +160,38 @@ class UserController extends Controller {
         return $e;
     }
 
-    private function newFoafNode($username, $userId, $group, $license = null)
+    private function extractJsonExtraData(User $user)
+    {
+        $lics = [];
+        foreach ($user->licenseProducts as $licProd){
+            $start = $licProd->starts_at ? $licProd->starts_at->format('d.m.Y') : "";
+            $end = $licProd->expires_at ? $licProd->expires_at->format('d.m.Y') : "";
+            $lics[] = [
+                'product'=>$licProd->product->display_name_or_name,
+                'starts_at' => $start,
+                'expires_at' => $end
+            ];
+        }
+
+        $arr = [
+            'username' => $user->username,
+            'licenses' => $lics
+        ];
+        return json_encode($arr, JSON_PRETTY_PRINT);
+    }
+
+    private function newFoafNode($username, $userId, $group, $user = null)
     {
         $score = 1;
         $size = 1;
         $nodeColor = null;
+        $extra = [];
+
         if ($group == 'main'){
 //            $score = 0.9;
+            $extra = $this->extractJsonExtraData($user);
 
+            $license = RefreshSubscribers::getActiveLicenseWithLatestExpiration($user);
             $foafProductType = FoafProductType::getTypeByLicenseProduct($license);
             switch($foafProductType){
                 case FoafProductType::TRIAL_UP_TO_YEAR:
@@ -202,11 +226,11 @@ class UserController extends Controller {
             'group' => $group,
             'type'=>'circle',
             'score'=>$score,
-            'size'=>$size];
+            'size'=>$size,
+            'extra'=>$extra];
         if ($nodeColor){
             $toRet['node_color'] = $nodeColor;
         }
-
         return $toRet;
     }
 
@@ -228,22 +252,6 @@ class UserController extends Controller {
 //                ->sortable()
 //                ->with('subscriber', 'groups');
 //        }
-
-
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
-    {
-        $page = $page ?: Paginator::resolveCurrentPage($pageName);
-
-        $total = $this->getCountForPagination($columns);
-
-        $results = $this->forPage($page, $perPage)->get($columns);
-
-        return new LengthAwarePaginator($results, $total, $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
-            'pageName' => $pageName,
-        ]);
-    }
-
 
 	public function create()
 	{

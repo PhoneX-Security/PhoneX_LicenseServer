@@ -87,6 +87,15 @@ class Product extends Model{
             return 'subscription';
         }
     }
+    // display_name_or_name
+    public function getDisplayNameOrNameAttribute()
+    {
+        if ($this->display_name){
+            return $this->display_name;
+        } else {
+            return $this->name;
+        }
+    }
 
 
     /* Helpers */
