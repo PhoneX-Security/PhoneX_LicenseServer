@@ -38,11 +38,11 @@
 
     var size = d3.scale.pow().exponent(1)
             .domain([1,100])
-            .range([8,24]);
+            .range([2,24]);
 
     var force = d3.layout.force()
-            .linkDistance(60)
-            .charge(-300)
+            .linkDistance(70)
+            .charge(-600)
             .size([w,h]);
 
     var default_node_color = "#ccc";
@@ -120,15 +120,15 @@
         }
 
         var circle = node.append("path")
-
-
                 .attr("d", d3.svg.symbol()
                         .size(function(d) { return Math.PI*Math.pow(size(d.size)||nominal_base_node_size,2); })
                         .type(function(d) { return d.type; }))
 
                 .style(tocolor, function(d) {
-                    if (isNumber(d.score) && d.score>=0) return color(d.score);
-                    else return default_node_color; })
+                    return d.node_color;
+                })
+//                    if (isNumber(d.score) && d.score>=0) return color(d.score);
+//                    else return default_node_color; })
             //.attr("r", function(d) { return size(d.size)||nominal_base_node_size; })
                 .style("stroke-width", nominal_stroke)
                 .style(towhite, "white");

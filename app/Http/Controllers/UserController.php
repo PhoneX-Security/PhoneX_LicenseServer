@@ -20,6 +20,7 @@ use Phonex\Jobs\CreateUserWithSubscriber;
 use Phonex\Jobs\IssueProductLicense;
 use Phonex\Jobs\RefreshSubscribers;
 use Phonex\Model\ErrorReport;
+use Phonex\Model\FoafProductType;
 use Phonex\Model\Product;
 use Phonex\Role;
 use Phonex\Subscriber;
@@ -45,13 +46,15 @@ class UserController extends Controller {
             $filteredProducts = $request->get('products');
         }
 
+        // Tuned-up query to load things quickly and enable sorting and filtering
         $query = User::select(['users.*'])
             ->join('subscriber_view', 'subscriber_view.username' ,'=' ,'users.username')
             ->leftJoin('licenses','licenses.user_id','=','users.id')
             ->leftJoin('products','products.id','=','licenses.product_id')
             ->groupBy('users.id')
             ->sortable()
-            ->with('subscriber', 'groups', 'roles', 'licenseProducts');
+            ->with('subscriber', 'groups', 'roles',
+                'licenseProducts', 'licenseProducts.product', 'licenseProducts.product.translations');
         // avoid qa users
         $query = $query->where('qa_trial', false);
 
@@ -78,7 +81,7 @@ class UserController extends Controller {
             return $this->getFoaf($users);
         }
 
-        $products = Product::all();
+        $products = Product::with('translations')->get();
         foreach($products as $product){
             $product->selected = in_array($product->id, $filteredProducts);
             $product->xname = $product->display_name ? $product->display_name : $product->name;
@@ -106,7 +109,9 @@ class UserController extends Controller {
             if ($omitSupport && $subscriber->username == $supportUser){
                 continue;
             }
-            $nodes[$subscriber->id] = $this->newFoafNode($subscriber->username, $subscriber->id, 1);
+            // Color node by latest license
+            $latestLicense = RefreshSubscribers::getActiveLicenseWithLatestExpiration($user);
+            $nodes[$subscriber->id] = $this->newFoafNode($subscriber->username, $subscriber->id, 'main', $latestLicense);
 
             // Add neighbor users (group 2)
             foreach($subscriber->subscribersInContactList as $friendSubscriber){
@@ -114,7 +119,7 @@ class UserController extends Controller {
                     continue;
                 }
                 if (!isset($nodes[$friendSubscriber->id])){
-                    $nodes[$friendSubscriber->id] = $this->newFoafNode($friendSubscriber->username, $friendSubscriber->id, 2);
+                    $nodes[$friendSubscriber->id] = $this->newFoafNode($friendSubscriber->username, $friendSubscriber->id, 'slave');
                 }
                 $links[] = $this->newFoafLink($subscriber->id, $friendSubscriber->id);
             }
@@ -155,17 +160,56 @@ class UserController extends Controller {
         return $e;
     }
 
-    private function newFoafNode($username, $userId, $group)
-    {//
-        return [
+    private function newFoafNode($username, $userId, $group, $license = null)
+    {
+        $score = 1;
+        $size = 1;
+        $nodeColor = null;
+        if ($group == 'main'){
+//            $score = 0.9;
+
+            $foafProductType = FoafProductType::getTypeByLicenseProduct($license);
+            switch($foafProductType){
+                case FoafProductType::TRIAL_UP_TO_YEAR:
+                    $nodeColor = "Orange";
+                    break;
+                case FoafProductType::TRIAL_WEEK_AND_LESS:
+                    $nodeColor = "LightSkyBlue";
+                    break;
+                case FoafProductType::INFINITE:
+                    $nodeColor = "DarkSalmon";
+                    break;
+                case FoafProductType::FULL_B2B:
+                    $nodeColor = "Red";
+                    break;
+                case FoafProductType::INAPP_B2C:
+                    $nodeColor = "Blue";
+                    break;
+                case FoafProductType::NO_PRODUCT_AND_TESTS:
+                default:
+                    $nodeColor = "LightGray";
+                    break;
+            }
+            $size = 20;
+        } else if ($group == 'slave'){
+//            $score = 0;
+            $nodeColor = "LightGray";
+            $size = 4;
+        }
+        $toRet = [
             'username' => $username,
             'user_id' =>$userId,
             'group' => $group,
             'type'=>'circle',
-            'id' => 'X',
-            'score'=>0.5,
-            'size'=>10];
+            'score'=>$score,
+            'size'=>$size];
+        if ($nodeColor){
+            $toRet['node_color'] = $nodeColor;
+        }
+
+        return $toRet;
     }
+
 
     //        $groups = Group::all();
 //        foreach($groups as $group){

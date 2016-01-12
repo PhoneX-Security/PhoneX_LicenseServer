@@ -225,7 +225,7 @@ class RefreshSubscribers extends Command implements SelfHandling {
         }
     }
 
-    private static function getActiveLicenseWithLatestExpiration(User $user)
+    public static function getActiveLicenseWithLatestExpiration(User $user)
     {
         if ($user->licenses->isEmpty()){
             return null;
