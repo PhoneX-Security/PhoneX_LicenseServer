@@ -114,17 +114,6 @@
     node.append("circle")
             .attr("r", 8)
             .style("fill", function(d) { return color(d.group); });
-//            .on("dblclick", dblclick)
-//            .call(drag);
-
-
-//    var node = svg.selectAll(".node")
-//            .data(graphData.nodes)
-//            .enter().append("g")
-//            .attr("class", "node")
-//            .call(force.drag);
-//
-
 
     force.on("tick", function() {
         link.attr("x1", function(d) { return d.source.x; })
@@ -135,49 +124,5 @@
         node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
     });
 
-
-//    var drag = force.drag()
-//            .on("dragstart", dragstart);
-//
-
-//
-//    var link = svg.selectAll(".link");
-//
-//
-//    // Start graph renderings
-//    link = link.data(graphData.links)
-//            .enter().append("line")
-//            .attr("class", "link");
-//
-//    node = node.append("text")
-////            .attr("dx", 12)
-////            .attr("dy", ".35em")
-//            .text("X");
-//
-//    var node = svg.selectAll(".node")
-//            .data(graphData.nodes)
-//            .enter().append("circle")
-//            .attr("class", "node")
-//            .attr("r", 5)
-//            .on("dblclick", dblclick)
-//            .call(drag);
-
-
 </script>
 </body>
-
-{{--<graph directed="1">--}}
-    {{--<!-- nodes -->--}}
-    {{--@foreach($nodes as $id => $node)--}}
-    {{--<node id="{{$id}}">--}}
-    {{--@foreach($node->attributes as $name => $value)--}}
-    {{--<att name="{{$name}}" value="{{$value}}"/>--}}
-    {{--@endforeach--}}
-    {{--</node>--}}
-    {{--@endforeach--}}
-
-    {{--<!-- edges -->--}}
-    {{--@foreach($edges as $edge)--}}
-    {{--<edge source="{{$edge->source}}" target="{{$edge->target}}"></edge>--}}
-    {{--@endforeach--}}
-{{--</graph>--}}

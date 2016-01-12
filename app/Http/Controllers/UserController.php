@@ -143,7 +143,8 @@ class UserController extends Controller {
         $o->nodes = $d3Nodes;
         $o->links = $d3Links;
 //        return json_encode($o);
-        return view('user.foaf_xml', ["graphData" => json_encode($o)]);
+//        return view('user.foaf_xml', ["graphData" => json_encode($o)]);
+        return view('user.foaf_xml2', ["graphData" => json_encode($o)]);
     }
 
     private function newFoafLink($source, $target)
@@ -156,7 +157,14 @@ class UserController extends Controller {
 
     private function newFoafNode($username, $userId, $group)
     {//
-        return ['username' => $username, 'user_id' =>$userId, 'group' => $group];
+        return [
+            'username' => $username,
+            'user_id' =>$userId,
+            'group' => $group,
+            'type'=>'circle',
+            'id' => 'X',
+            'score'=>0.5,
+            'size'=>10];
     }
 
     //        $groups = Group::all();
