@@ -187,10 +187,13 @@ class UserController extends Controller {
             $lics[] = $x;
         }
 
-        $arr = [
-            'username' => $user->username,
-            'licenses' => $lics
-        ];
+        $arr = ['username' => $user->username];
+        if ($user->subscriber){
+            $arr['last_activity'] = $user->subscriber->date_last_activity ? $user->subscriber->date_last_activity->format('d.m.Y') : "never";
+            $arr['first_authentication'] = $user->subscriber->date_first_authCheck ? $user->subscriber->date_first_authCheck->format('d.m.Y') : "never";
+        }
+        $arr['licenses'] = $lics;
+
         if($user->comment){
             $arr['comment'] = $user->comment;
         }
@@ -245,7 +248,8 @@ class UserController extends Controller {
             'type'=>'circle',
             'score'=>$score,
             'size'=>$size,
-            'extra'=>$extra];
+            'extra'=>$extra
+        ];
         if ($nodeColor){
             $toRet['node_color'] = $nodeColor;
         }
