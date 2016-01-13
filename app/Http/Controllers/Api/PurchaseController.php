@@ -10,6 +10,7 @@ use Phonex\Http\Controllers\Controller;
 use Phonex\Http\Middleware\MiddlewareAttributes;
 use Phonex\Http\Requests;
 use Phonex\Jobs\IssueProductLicense;
+use Phonex\License;
 use Phonex\Model\ApiRequest;
 use Phonex\Model\OrderInapp;
 use Phonex\Model\OrderInappState;
@@ -117,12 +118,100 @@ class PurchaseController extends Controller {
         // Process purchases one by one
         foreach($jsonObjects as $jsonObject){
             $playPurchase = PlayPurchase::fromJsonObject($jsonObject);
-            $errCode = $this->processPlayPurchase($playPurchase, $user);
+//            if ($user->username == 'test318' || $user->username == 'test-internal'){
+            // 13 January 2016: New way if checking if play purchase is renewal, valid, etc.
+            $errCode = $this->processPlayPurchase2($playPurchase, $user);
+//            } else {
+//                $errCode = $this->processPlayPurchase($playPurchase, $user);
+//            }
+
             $responseArray[] = $errCode;
         }
         Log::info("received google payment verifications", [$responseArray, $jsonReq]);
         return $this->getResponseForMultiplePurchases($responseArray);
     }
+
+
+    /* TEST */
+    private function processPlayPurchase2(PlayPurchase $playPurchase, User $user)
+    {
+        Log::info("processPlayPurchase2");
+        // TODO make this as a transaction
+
+        if ($playPurchase === null){
+            return self::RESULT_ERR_JSON_PARSING;
+        }
+        if (!$playPurchase->verifySignature()){
+            return self::RESULT_ERR_INVALID_SIGNATURE;
+        }
+        $renewalCount = 0;
+        // Order id - if subscription, it can be non-unique - check existing subscriptions with the same
+        // if they are expired. If so, issue new product (valid renewal)
+        // January 2016: replaced by purchased token
+
+        // use Purchase token for checking duplicities
+        if ($playPurchase->itemType == 'subs'){
+            $playOrders = OrderPlayInapp::getByPurchaseTokenHash($playPurchase->purchaseToken);
+            if ($playOrders->count() > 0){
+                $now = Carbon::now();
+                $nonColliding  = true;
+                $maxRenewalCount = 0;
+                foreach ($playOrders as $playOrder){
+                    if ($playOrder->license){
+                        Log::debug("InApp: Checking if subscription ticket collides with lic", [$playOrder->license->id]);
+                        $maxRenewalCount = max(intval($playOrder->renewal_count), $maxRenewalCount);
+                        if ($playOrder->license->expires_at->gt($now) && $playOrder->license->starts_at->lt($now)){
+                            // if colliding expiration, do not replay this ticket - otherwise it means that subscription is renewed
+                            $nonColliding = false;
+                            break;
+                        }
+                    }
+                }
+                if (!$nonColliding){
+                    Log::info("InApp: Subscription ticket is colliding with existing license expiration, not issuing new license");
+                    return self::RESULT_ERR_EXISTING_ORDER_ID;
+                }
+
+                $renewalCount = $maxRenewalCount + 1;
+                Log::info("InApp: No collision found, renewing license", [$renewalCount]);
+            }
+        } else {
+            // Otherwise it has to be unique
+//            if (OrderPlayInapp::orderIdExists($playPurchase->orderId)){
+            if (OrderPlayInapp::purchaseTokenHashExists($playPurchase->purchaseToken)){
+                return self::RESULT_ERR_EXISTING_ORDER_ID;
+            }
+        }
+
+        // First save the order
+        $orderPlayInapp = $playPurchase->createDatabaseModel($user, $renewalCount);
+        $orderPlayInapp->save();
+
+        Log::info("received google payment verification");
+
+        // Find the product
+        // TODO temporary for testing retrieve product name from developer payload, later switch to productId
+        $dp = json_decode($playPurchase->developerPayload);
+        $productName = $dp->sku;
+        $product = Product::where(["name" => $productName])->first();
+
+//        $product = Product::where(["name" => $playPurchase->productId])->first();
+        if (!$product){
+            return self::RESULT_ERR_INVALID_PRODUCT;
+        }
+
+        // Issue product
+        $issueProductCommand = new IssueProductLicense($user, $product);
+        $license = Bus::dispatch($issueProductCommand);
+
+        // Update order
+        $orderPlayInapp->update(['license_id' => $license->id]);
+
+        return self::RESULT_OK;
+    }
+    /* TEST END */
+
+
 
 
     private function processPlayPurchase(PlayPurchase $playPurchase, User $user)
@@ -134,7 +223,7 @@ class PurchaseController extends Controller {
             return self::RESULT_ERR_INVALID_SIGNATURE;
         }
         // order id should be unique, otherwise the transaction is replayed
-        if (OrderPlayInapp::orderIdExists($playPurchase->orderId, $user)){
+        if (OrderPlayInapp::orderIdExists($playPurchase->orderId)){
             return self::RESULT_ERR_EXISTING_ORDER_ID;
         }
 

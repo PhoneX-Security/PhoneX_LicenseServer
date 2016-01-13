@@ -5,6 +5,7 @@ Parameters: $licenses, $show_username, $show_issuer
 @if($licenses && count($licenses) > 0)
     <table class="table table-condensed">
         <tr>
+            <th>ID</th>
             <th>Expiration</th>
             <th>License type</th>
             <th>Product</th>
@@ -28,6 +29,7 @@ Parameters: $licenses, $show_username, $show_issuer
 
     @foreach($licenses as $license)
         <tr>
+            <td>{{ $license->id }}</td>
             <td>{{ ucfirst($license->licenseType->name) }} ({{ $license->licenseType->days }} days)</td>
             <td>{{ ucfirst($license->licenseFuncType->name) }}</td>
             <td>@if($license->product) {{$license->product->uc_name}} @endif</td>

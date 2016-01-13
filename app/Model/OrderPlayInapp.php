@@ -21,4 +21,25 @@ class OrderPlayInapp extends Model{
 			->count() > 0;
 	}
 
+	public static function getByOrderId($playOrderId)
+	{
+		return OrderPlayInapp::where('play_order_id', $playOrderId)->get();
+	}
+
+	public static function getByPurchaseTokenHash($purchaseToken)
+	{
+		$hash = sha1($purchaseToken);
+		return OrderPlayInapp::where('purchase_token_sha1', $hash)->get();
+	}
+
+	public static function purchaseTokenHashExists($purchaseToken)
+	{
+		$hash = sha1($purchaseToken);
+		return OrderPlayInapp::where('purchase_token_sha1', $hash)->count() > 0;
+	}
+
+	public function license()
+	{
+		return $this->hasOne('Phonex\License', 'id', 'license_id');
+	}
 }

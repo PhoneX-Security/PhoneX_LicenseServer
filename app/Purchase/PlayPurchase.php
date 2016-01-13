@@ -84,9 +84,10 @@ class PlayPurchase
     /**
      * Create eloquent model from the object
      * @param User $user
+     * @param int $renewalCount
      * @return OrderPlayInapp
      */
-    public function createDatabaseModel(User $user)
+    public function createDatabaseModel(User $user, $renewalCount = 0)
     {
         $model = new OrderPlayInapp();
         $model->play_order_id = $this->orderId;
@@ -94,11 +95,13 @@ class PlayPurchase
         $model->purchase_time = $this->getCarbonPurchaseTime();
         $model->purchase_state = $this->purchaseState;
         $model->purchase_token = $this->purchaseToken;
+        $model->purchase_token_sha1 = sha1($this->purchaseToken);
         $model->auto_renewing = $this->autoRenewing;
         $model->app_version = $this->appVersion;
         $model->developer_payload = $this->developerPayload;
         $model->item_type = $this->itemType;
         $model->user_id = $user->id;
+        $model->renewal_count = $renewalCount;
         return $model;
     }
 
