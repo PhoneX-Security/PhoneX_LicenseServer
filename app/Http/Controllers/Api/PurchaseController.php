@@ -152,12 +152,13 @@ class PurchaseController extends Controller {
         // use Purchase token for checking duplicities
         if ($playPurchase->itemType == 'subs'){
             $playOrders = OrderPlayInapp::getByPurchaseTokenHash($playPurchase->purchaseToken);
+//            Log::debug("playOrders", [$playOrders]);
             if ($playOrders->count() > 0){
                 $now = Carbon::now();
                 $nonColliding  = true;
                 $maxRenewalCount = 0;
                 foreach ($playOrders as $playOrder){
-                    if ($playOrder->license){
+                    if ($playOrder->license_id && $playOrder->license){
                         Log::debug("InApp: Checking if subscription ticket collides with lic", [$playOrder->license->id]);
                         $maxRenewalCount = max(intval($playOrder->renewal_count), $maxRenewalCount);
                         if ($playOrder->license->expires_at->gt($now) && $playOrder->license->starts_at->lt($now)){
