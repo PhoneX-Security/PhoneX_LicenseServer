@@ -3,6 +3,8 @@
 use Bus;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Log;
+use Phonex\Jobs\CleanSupportContacts;
 use Phonex\Jobs\RefreshSubscribers;
 
 class Kernel extends ConsoleKernel {
@@ -28,6 +30,9 @@ class Kernel extends ConsoleKernel {
             Bus::dispatch(new RefreshSubscribers());
         })->dailyAt('03:30');
 
+		$schedule->call(function(){
+			Bus::dispatch(new CleanSupportContacts());
+		})->dailyAt('03:00');
 	}
 
 }
