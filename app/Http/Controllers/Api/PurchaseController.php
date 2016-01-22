@@ -82,7 +82,7 @@ class PurchaseController extends Controller {
         $playPurchase = PlayPurchase::fromJsonObject($jsonObject);
 
         if (!Str::startsWith($playPurchase->orderId, 'testorder')){
-            $this->notifyUsByEmail($playPurchase->productId, 'Android');
+            $this->notifyUsByEmail($playPurchase->productId, 'Android', $user->username);
         }
 
         // Process Ticket
@@ -118,24 +118,16 @@ class PurchaseController extends Controller {
         // Process purchases one by one
         foreach($jsonObjects as $jsonObject){
             $playPurchase = PlayPurchase::fromJsonObject($jsonObject);
-//            if ($user->username == 'test318' || $user->username == 'test-internal'){
-            // 13 January 2016: New way if checking if play purchase is renewal, valid, etc.
-            $errCode = $this->processPlayPurchase2($playPurchase, $user);
-//            } else {
-//                $errCode = $this->processPlayPurchase($playPurchase, $user);
-//            }
-
+            $errCode = $this->processPlayPurchase($playPurchase, $user);
             $responseArray[] = $errCode;
         }
         Log::info("received google payment verifications", [$responseArray, $jsonReq]);
         return $this->getResponseForMultiplePurchases($responseArray);
     }
 
-
-    /* TEST */
-    private function processPlayPurchase2(PlayPurchase $playPurchase, User $user)
+    private function processPlayPurchase(PlayPurchase $playPurchase, User $user)
     {
-        Log::info("processPlayPurchase2");
+        Log::info("processPlayPurchase");
         // TODO make this as a transaction
 
         if ($playPurchase === null){
@@ -210,51 +202,6 @@ class PurchaseController extends Controller {
 
         return self::RESULT_OK;
     }
-    /* TEST END */
-
-
-
-
-    private function processPlayPurchase(PlayPurchase $playPurchase, User $user)
-    {
-        if ($playPurchase === null){
-            return self::RESULT_ERR_JSON_PARSING;
-        }
-        if (!$playPurchase->verifySignature()){
-            return self::RESULT_ERR_INVALID_SIGNATURE;
-        }
-        // order id should be unique, otherwise the transaction is replayed
-        if (OrderPlayInapp::orderIdExists($playPurchase->orderId)){
-            return self::RESULT_ERR_EXISTING_ORDER_ID;
-        }
-
-        // First save the order
-        $orderPlayInapp = $playPurchase->createDatabaseModel($user);
-        $orderPlayInapp->save();
-
-        Log::info("received google payment verification");
-
-        // Find the product
-        // TODO temporary for testing retrieve product name from developer payload, later switch to productId
-        $dp = json_decode($playPurchase->developerPayload);
-        $productName = $dp->sku;
-        $product = Product::where(["name" => $productName])->first();
-
-//        $product = Product::where(["name" => $playPurchase->productId])->first();
-        if (!$product){
-            return self::RESULT_ERR_INVALID_PRODUCT;
-        }
-
-        // Issue product
-        $issueProductCommand = new IssueProductLicense($user, $product);
-        $license = Bus::dispatch($issueProductCommand);
-
-        // Update order
-        $orderPlayInapp->update(['license_id' => $license->id]);
-
-        return self::RESULT_OK;
-    }
-
 
     private function getResponse($code)
     {
@@ -271,10 +218,10 @@ class PurchaseController extends Controller {
         return json_encode($response);
     }
 
-    private function notifyUsByEmail($productId, $platform)
+    private function notifyUsByEmail($productId, $platform, $username)
     {
         Log::info("New order has been purchased, notifying by email.");
-        Mail::send('emails.order_has_landed', compact('productId', 'platform'),
+        Mail::send('emails.order_has_landed', compact('productId', 'platform', 'username'),
             function($message)
             {
                 $message->from('order@phone-x.net', 'PhoneX');
@@ -304,6 +251,7 @@ class PurchaseController extends Controller {
             $response->responseCode = self::RESULT_ERR_INVALID_USER;
             return json_encode($response);
         }
+        Log::info("Apple payment verification initiated", [$clientCertData]);
 
         $user = User::where(['email' => $clientCertData->sip])->first();
         if (!$user){
@@ -316,7 +264,6 @@ class PurchaseController extends Controller {
         $jsonReq = $request->get('request');
         $json = json_decode($jsonReq);
 
-//        Log::info("payment req", [$json]);
         if ($json === null){
             Log::error("json_decode failed", [$jsonReq, $json]);
             $response->responseCode = self::RESULT_ERR_JSON_PARSING;
@@ -347,8 +294,22 @@ class PurchaseController extends Controller {
                 $transactionRestored = $payment->transaction->transactionRestored == 1;
             }
 
+            // check if this is already in DB with issued license
+            if (OrderInapp::where(
+                    ['original_tsx_id' => $payment->product->originalTsxId,
+                        'tsx_id' => $payment->product->tsxId,
+                        'original_purchase_date' => $originalPurchaseDate,
+                        'purchase_date' => $purchaseDate])
+                    ->whereNotNull('license_id')
+                    ->count() > 0){
+                Log::warning("Apple purchase - order was already stored in database, not issuing a new license.");
+                $response->responseCode = self::RESULT_OK;
+                return json_encode($response);
+            }
+
             $order = new OrderInapp();
             $order->tsx_id = $payment->product->tsxId;
+            $order->created_at = Carbon::now();
             $order->original_tsx_id = $payment->product->originalTsxId;
             $order->purchase_date = $purchaseDate;
             $order->original_purchase_date = $originalPurchaseDate;
@@ -384,7 +345,7 @@ class PurchaseController extends Controller {
         }
 
         $order->update(['state' => OrderInappState::PURCHASE_VERIFIED]);
-        Log::info("In app purchase made", [$order->id]);
+        Log::info("APPLE In app purchase made", [$order->id]);
 
 //        $product = Product::where(["name" => $order->product_name,
 //            'platform' => ProductPlatformTypes::APPLE])->first();
@@ -402,7 +363,7 @@ class PurchaseController extends Controller {
             $c->setExpiration($subscriptionExpirationDate);
         }
 
-        $this->notifyUsByEmail($order->product_name, 'ios');
+        $this->notifyUsByEmail($order->product_name, 'ios', $user->username);
 
         $lic = Bus::dispatch($c);
         $order->update(['license_id' => $lic->id]);

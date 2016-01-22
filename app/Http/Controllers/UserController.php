@@ -47,6 +47,7 @@ class UserController extends Controller {
         }
 
         // Tuned-up query to load things quickly and enable sorting and filtering
+        // TODO do native query to speed up things -- a lot is done in PHP code
         $query = User::select(['users.*'])
             ->join('subscriber_view', 'subscriber_view.username' ,'=' ,'users.username')
             ->leftJoin('licenses','licenses.user_id','=','users.id')
@@ -295,7 +296,7 @@ class UserController extends Controller {
 
 
         $defaultPassword = $request->get('password');
-        $username = $request->get('username');
+        $username = mb_strtolower($request->get('username'));
         $userRequest = new CreateUserWithSubscriber($username, $defaultPassword);
 //        $userRequest->addAccess();
         if ($roleIds){
